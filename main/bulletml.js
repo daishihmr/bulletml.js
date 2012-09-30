@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * namespace.
  */
@@ -15,15 +17,17 @@ var BulletML = {};
 		} else if (xml instanceof Document) {
 			return parse(xml);
 		} else {
-			throw new Error();
+			throw new Exception("cannot build " + xml);
 		}
 	};
 
 	var Bullet = BulletML.Bullet = function() {
-		this.label = null;;
+		this.label = null;
 		this.root = null;
 		this.age = 0;
 		this.speed = 1;
+		this.direction = new Direction();
+		this.speed = new Speed();
 	};
 
 	var Root = BulletML.Root = function() {
@@ -31,14 +35,16 @@ var BulletML = {};
 		this.root = this;
 		this.actions = [];
 		this.bullets = [];
+		this.fires = [];
 	};
-	Root.prototype = new Bullet();
 	Root.prototype.findAction = function(label) {
-		for ( var i = 0, end = this.actions.length; i < end; i++) {
-			if (this.actions[i].label == label) {
-				return this.actions[i];
-			}
-		}
+		return search(this.actions, label);
+	};
+	Root.prototype.findBullet = function(label) {
+		return search(this.bullets, label);
+	};
+	Root.prototype.findFire = function(label) {
+		return search(this.fires, label);
 	};
 
 	var Action = BulletML.Action = function() {
@@ -46,13 +52,82 @@ var BulletML = {};
 		this.root = null;
 	};
 
+	var Command = BulletML.Command = function() {
+	};
+
+	var Fire = BulletML.Fire = function() {
+		this.label = null;
+		this.root = null;
+		this.direction = 0;
+		this.speed = 1;
+		this.bullet = null;
+		this.bulletRef = null;
+	};
+	Fire.prototype = new Command();
+
+	var ChangeDirection = function(direction, term) {
+		this.direction = direction;
+		this.term = term;
+	};
+	ChangeDirection.prototype = new Command();
+
+	var ChangeSpeed = BulletML.ChangeSpeed = function(speed, term) {
+		this.speed = speed;
+		this.term = term;
+	};
+	ChangeSpeed.prototype = new Command();
+
+	var Accel = BulletML.Accel = function(horizontal, vertical, term) {
+		this.horizontal = horizontal;
+		this.vertical = vertical;
+		this.term = term;
+	};
+	Accel.prototype = new Command();
+
+	var Wait = BulletML.Wait = function(value) {
+		this.value = value;
+	};
+	Wait.prototype = new Command();
+
+	var Vanish = BulletML.Vanish = function() {
+	};
+	Vanish.prototype = new Command();
+
+	var Direction = BulletML.Direction = function(value) {
+		this.type = "aim";
+		if (value) {
+			this.value = value;
+		} else {
+			this.value = 0;
+		}
+	};
+
+	var Speed = BulletML.Speed = function(value) {
+		this.type = "absolute";
+		if (value) {
+			this.value = value;
+		} else {
+			this.value = 1;
+		}
+	};
+
+	var Horizontal = BulletML.Horizontal = function(type, value) {
+		this.type = type;
+		this.value = value;
+	};
+
+	var Vertical = BulletML.Vertical = function(type, value) {
+		this.type = type;
+		this.value = value;
+	};
+
 	function parse(dom) {
 		var result = new Root();
 
 		var root = dom.getElementsByTagName("bulletml")[0];
-		if (root.attributes.type) {
-			result.type = root.attributes.type.value;
-		}
+		attr(root, "type", function(type) {
+			result.type = type;
+		});
 
 		// Top Level Actions
 		var actions = root.getElementsByTagName("action");
@@ -66,11 +141,7 @@ var BulletML = {};
 			}
 		}
 		// find topAction
-		result.actions.forEach(function(a) {
-			if (a.label == "top") {
-				result.topAction = a;
-			}
-		});
+		result.topAction = search(result.actions, "top");
 
 		// Top Level Bullets
 		var bullets = root.getElementsByTagName("bullet");
@@ -84,23 +155,127 @@ var BulletML = {};
 			}
 		}
 
+		// Top Level Fires
+		var fires = root.getElementsByTagName("fire");
+		if (fires) {
+			for ( var i = 0, end = fires.length; i < end; i++) {
+				var newFire = parseFire(fires[i]);
+				if (newFire) {
+					newFire.root = result;
+					result.fires.push(newFire);
+				}
+			}
+		}
+
 		return result;
 	}
 
 	function parseAction(dom) {
 		var result = new Action();
-		if (dom.attributes.label) {
-			result.label = dom.attributes.label.value;
-		}
+		attr(dom, "label", function(label) {
+			result.label = label;
+		});
 		return result;
 	}
 
 	function parseBullet(dom) {
 		var result = new Bullet();
-		if (dom.attributes.label) {
-			result.label = dom.attributes.label.value;
+		attr(dom, "label", function(label) {
+			result.label = label;
+		});
+		get(dom, "direction", function(direction) {
+			result.direction = parseDirection(direction);
+		});
+		get(dom, "speed", function(speed) {
+			result.speed = parseSpeed(speed);
+		});
+		return result;
+	}
+
+	function parseFire(dom) {
+		var result = new Fire();
+		attr(dom, "label", function(label) {
+			result.label = label;
+		});
+		get(dom, "direction", function(direction) {
+			result.direction = parseDirection(direction);
+		})
+		get(dom, "speed", function(speed) {
+			reuslt.speed = parseSpeed(speed);
+		})
+		get(dom, "bullet", function(bullet) {
+			result.bullet = parseBullet(bullet);
+		});
+		get(dom, "bulletRef", function(bulletRef) {
+			result.bulletRef = parseBulletRef(bulletRef);
+		});
+
+		if (!result.bullet && !result.bulletRef) {
+			throw new Exception("fire has no bullet or bulletRef.");
+		}
+
+		return result;
+	}
+
+	function parseDirection(dom) {
+		var result = new Direction();
+		attr(dom, "type", function(type) {
+			result.type = type;
+		});
+		if (dom.textContent) {
+			result.value = dom.textContent;
 		}
 		return result;
+	}
+
+	function parseSpeed(dom) {
+		var result = new Speed();
+		attr(dom, "type", function(type) {
+			result.type = type;
+		});
+		if (dom.textContent) {
+			result.value = dom.textContent;
+		}
+		return result;
+	}
+
+	function parseBulletRef(dom) {
+		if (dom.attributes.label) {
+			return dom.attributes.label.value;
+		} else {
+			throw new Exception("bulletRef has no label.");
+		}
+	}
+
+	function search(array, label) {
+		for ( var i = 0, end = array.length; i < end; i++) {
+			if (array[i].label == label) {
+				return array[i];
+			}
+		}
+	}
+
+	function get(element, tagName, callback, ifNotFound) {
+		var elms = element.getElementsByTagName(tagName);
+		if (elms && elms[0]) {
+			if (callback) {
+				callback(elms[0]);
+			}
+			return elms[0];
+		} else if (ifNotFound) {
+			ifNotFound();
+		}
+	}
+	function attr(element, attrName, callback, ifNotFound) {
+		var attr = element.attributes[attrName];
+		if (attr) {
+			if (callback) {
+				callback(attr.value);
+			}
+			return attr;
+		} else if (ifNotFound) {
+			ifNotFound();
+		}
 	}
 
 })();

@@ -1,3 +1,5 @@
+"use strict";
+
 BulletMLTest = TestCase("BulletMLTest");
 
 BulletMLTest.prototype.testBuild = function() {
@@ -52,4 +54,50 @@ BulletMLTest.prototype.testBuildTopLebelBullets = function() {
 	assertEquals(result, result.bullets[0].root);
 	assertEquals(result, result.bullets[1].root);
 	assertEquals(result, result.bullets[2].root);
+};
+
+BulletMLTest.prototype.testBuildTopLebelFires = function() {
+	var result = BulletML
+			.build("<bulletml><fire label='f1'><bulletRef label='b'/></fire>"
+					+ "<fire label='f2'><bulletRef label='b'/></fire>"
+					+ "<fire label='f3'><bulletRef label='b'/></fire></bulletml>");
+	assertEquals("f1", result.fires[0].label);
+	assertEquals("f2", result.fires[1].label);
+	assertEquals("f3", result.fires[2].label);
+	assertEquals(result, result.fires[0].root);
+	assertEquals(result, result.fires[1].root);
+	assertEquals(result, result.fires[2].root);
+	assertEquals("b", result.fires[0].bulletRef);
+	assertEquals("b", result.fires[1].bulletRef);
+	assertEquals("b", result.fires[2].bulletRef);
+};
+
+BulletMLTest.prototype.testParseBullet = function() {
+	var result = BulletML.build("<bulletml><bullet label='b1'></bulletml>");
+	var b1 = result.findBullet("b1");
+	assertNotUndefined(b1);
+	assertEquals("aim", b1.direction.type);
+	assertEquals("0", b1.direction.value);
+	assertEquals("absolute", b1.speed.type);
+	assertEquals("1", b1.speed.value);
+};
+
+BulletMLTest.prototype.testParseDirection = function() {
+	var result = BulletML.build("<bulletml><bullet label='b1'>"
+			+ "<direction type='relative'>180</direction>"
+			+ "</bullet></bulletml>");
+	var b1 = result.findBullet("b1");
+	assertNotUndefined(b1);
+	assertEquals("relative", b1.direction.type);
+	assertEquals("180", b1.direction.value);
+};
+
+BulletMLTest.prototype.testParseSpeed = function() {
+	var result = BulletML.build("<bulletml><bullet label='b1'>"
+			+ "<speed type='sequence'>(2+$1)*0.3</speed>"
+			+ "</bullet></bulletml>");
+	var b1 = result.findBullet("b1");
+	assertNotUndefined(b1);
+	assertEquals("sequence", b1.speed.type);
+	assertEquals("(2+$1)*0.3", b1.speed.value);
 };
