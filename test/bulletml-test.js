@@ -1,6 +1,6 @@
 "use strict";
 
-BulletMLTest = TestCase("BulletMLTest");
+var BulletMLTest = TestCase("BulletMLTest");
 
 BulletMLTest.prototype.testBuild = function() {
 	var result = BulletML.build("<bulletml></bulletml>");
@@ -13,10 +13,14 @@ BulletMLTest.prototype.testTypeDefaultValue = function() {
 };
 
 BulletMLTest.prototype.testBuildXml = function() {
-	var dom = new DOMParser().parseFromString(
-			"<bulletml type='horizontal'></bulletml>", "text/xml");
+	var dom = new DOMParser()
+			.parseFromString(
+					"<?xml version='1.0'?>"
+							+ "<!DOCTYPE bulletml SYSTEM 'http://www.asahi-net.or.jp/~cs8k-cyu/bulletml/bulletml.dtd'>"
+							+ "<bulletml xmlns='http://www.asahi-net.or.jp/~cs8k-cyu/bulletml'>"
+							+ "</bulletml>", "text/xml");
 	var result = BulletML.build(dom);
-	assertEquals("horizontal", result.type);
+	assertEquals("none", result.type);
 };
 
 BulletMLTest.prototype.testBuildTopLevelActions = function() {

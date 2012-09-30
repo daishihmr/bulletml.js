@@ -21,14 +21,29 @@ var BulletML = {};
 		}
 	};
 
+	var Actor = BulletML.Actor = function() {
+		this.age = 0;
+		this.waitTo = -1;
+		this.x = 0;
+		this.y = 0;
+		this.lastFireDirection = 0;
+		this.speed = 0;
+	};
+	Actor.prototype.act = function(command) {
+		if (this.waitTo <= this.age) {
+			this.waitTo = -1;
+			command.execute(this);
+		}
+	};
+
 	var Bullet = BulletML.Bullet = function() {
 		this.label = null;
 		this.root = null;
-		this.age = 0;
 		this.speed = 1;
 		this.direction = new Direction();
 		this.speed = new Speed();
 	};
+	Bullet.prototype = new Actor();
 
 	var Root = BulletML.Root = function() {
 		this.type = "none";
@@ -37,6 +52,7 @@ var BulletML = {};
 		this.bullets = [];
 		this.fires = [];
 	};
+	Root.prototype = new Actor();
 	Root.prototype.findAction = function(label) {
 		return search(this.actions, label);
 	};
@@ -47,33 +63,37 @@ var BulletML = {};
 		return search(this.fires, label);
 	};
 
+	var Command = BulletML.Command = function() {
+	};
+	Command.prototype.execute = function() {
+	};
+
 	var Action = BulletML.Action = function() {
 		this.label = null;
 		this.root = null;
+		this.commands = [];
 	};
-
-	var Command = BulletML.Command = function() {
-	};
+	Action.prototype = new Command();
 
 	var Fire = BulletML.Fire = function() {
 		this.label = null;
 		this.root = null;
-		this.direction = 0;
-		this.speed = 1;
+		this.direction = new Direction();
+		this.speed = new Speed();
 		this.bullet = null;
 		this.bulletRef = null;
 	};
 	Fire.prototype = new Command();
 
-	var ChangeDirection = function(direction, term) {
-		this.direction = direction;
-		this.term = term;
+	var ChangeDirection = function() {
+		this.direction = null;
+		this.term = 0;
 	};
 	ChangeDirection.prototype = new Command();
 
-	var ChangeSpeed = BulletML.ChangeSpeed = function(speed, term) {
-		this.speed = speed;
-		this.term = term;
+	var ChangeSpeed = BulletML.ChangeSpeed = function() {
+		this.speed = null;
+		this.term = 0;
 	};
 	ChangeSpeed.prototype = new Command();
 
