@@ -53,6 +53,7 @@ var BulletML = {};
 		this.actions = [];
 		this.bullets = [];
 		this.fires = [];
+		this.visitor = new Visitor();
 	};
 	Root.prototype.findAction = function(label) {
 		return search(this.actions, label);
@@ -62,6 +63,37 @@ var BulletML = {};
 	};
 	Root.prototype.findFire = function(label) {
 		return search(this.fires, label);
+	};
+	Root.prototype.nextCommands = function() {
+		if (this.visitor.currentCommand == null) {
+			this.visitor.currentCommand = this.topAction;
+		}
+		this.visitor.goNext();
+		return this.visitor.commands;
+	};
+
+	var Visitor = function() {
+		this.currentCommand = null;
+		this.commands = [];
+	};
+	Visitor.prototype.goNext = function() {
+		this.commands = [];
+		this.currentCommand.accept(this);
+	};
+	Visitor.prototype.visit = function(command) {
+		console.debug("visit", command);
+		switch (command.commandName) {
+		case "action":
+			for ( var i = 0, end = command.commands.length; i < end; i++) {
+				command.commands[i].accept(this);
+			}
+			break;
+		case "wait":
+			break;
+		default:
+			this.commands.push(command);
+			break;
+		}
 	};
 
 	/**
@@ -89,8 +121,10 @@ var BulletML = {};
 	 */
 	var Command = BulletML.Command = function() {
 		this.root = null;
+		this.commandName = null;
 	};
-	Command.prototype.execute = function() {
+	Command.prototype.accept = function(visitor) {
+		visitor.visit(this);
 	};
 
 	var Action = BulletML.Action = function() {
@@ -160,6 +194,8 @@ var BulletML = {};
 		}
 	};
 	Wait.prototype = new Command();
+	Wait.prototype.accept = function(visitor) {
+	};
 
 	var Vanish = BulletML.Vanish = function() {
 		this.commandName = "vanish";

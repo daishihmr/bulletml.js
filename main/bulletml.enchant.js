@@ -26,6 +26,31 @@ enchant.bulletml.AttackPattern = enchant.Class.create({
 	initialize : function(bulletml) {
 		this.bulletml = bulletml;
 	},
-	tick : function(sprite, callback) {
+	clone : function() {
+		var c = new enchant.bulletml.AttackPattern(this.bulletml);
+		return c;
+	},
+	tick : function(sprite) {
+		var commands = this.bulletml.nextCommands();
+	}
+});
+
+enchant.bulletml.Sprite = enchant.Class.create(enchant.Sprite, {
+	initialize : function(width, height) {
+		enchant.Sprite.call(this, width, height);
+		this._attackPattern = null;
+		this.addEventListener("enterframe", function() {
+			if (this._attackPattern) {
+				this._attackPattern.tick(this);
+			}
+		});
+	},
+	attackPattern : {
+		get : function() {
+			return this._attackPattern;
+		},
+		set : function(attackPattern) {
+			this._attackPattern = attackPattern.clone();
+		}
 	}
 });
