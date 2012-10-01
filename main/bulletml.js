@@ -6,6 +6,28 @@
 var BulletML = {};
 
 (function() {
+	// for IE
+	if (typeof DOMParser == "undefined") {
+		DOMParser = function() {
+		};
+		DOMParser.prototype.parseFromString = function(string, contentType) {
+			if (typeof ActiveXObject != "undefined") {
+				var domDoc = new ActiveXObject("MSXML.DomDocument");
+				domDoc.loadXML(string);
+				return domDoc;
+			} else if (typeof XMLHttpRequest != "undefined") {
+				var xhr = new XMLHttpRequest();
+				xhr.open("GET", "data:" + (contenttype || "application/xml")
+						+ ";charset=utf-8," + encodingURIComponent(string),
+						false);
+				if (xhr.overrideMimeType) {
+					xhr.overrideMimeType(contentType);
+				}
+				xhr.send(null);
+				return xhr.responseXML;
+			}
+		};
+	}
 
 	/**
 	 * 
@@ -13,8 +35,8 @@ var BulletML = {};
 	BulletML.build = function(xml) {
 		if (typeof (xml) == "string") {
 			var domParser = new DOMParser();
-			return parse(domParser.parseFromString(xml, "text/xml"));
-		} else if (xml instanceof Document) {
+			return parse(domParser.parseFromString(xml, "application/xml"));
+		} else if (xml.getElementsByTagName("bulletml")) {
 			return parse(xml);
 		} else {
 			throw new Exception("cannot build " + xml);
@@ -242,9 +264,9 @@ var BulletML = {};
 		attr(dom, "type", function(type) {
 			result.type = type;
 		});
-		if (dom.textContent) {
-			result.value = dom.textContent;
-		}
+		text(dom, function(val) {
+			result.value = val;
+		});
 		return result;
 	}
 
@@ -253,18 +275,18 @@ var BulletML = {};
 		attr(dom, "type", function(type) {
 			result.type = type;
 		});
-		if (dom.textContent) {
-			result.value = dom.textContent;
-		}
+		text(dom, function(val) {
+			result.value = val;
+		});
 		return result;
 	}
 
 	function parseBulletRef(dom) {
-		if (dom.attributes.label) {
-			return dom.attributes.label.value;
-		} else {
+		var result = attr(dom, "label", function() {
+		}, function() {
 			throw new Exception("bulletRef has no label.");
-		}
+		});
+		return result.value;
 	}
 
 	function search(array, label) {
@@ -287,7 +309,25 @@ var BulletML = {};
 		}
 	}
 	function attr(element, attrName, callback, ifNotFound) {
-		var attr = element.attributes[attrName];
+		// for IE
+		var attrs;
+		if (element.attributes.item(0)) {
+			attrs = {};
+			var i = 0;
+			while (element.attributes.item(i)) {
+				var item = element.attributes.item(i);
+				if (item.value != "" && item.value != "null") {
+					attrs[item.name] = {
+						value : item.value
+					};
+				}
+				i++;
+			}
+		} else {
+			attrs = element.attributes;
+		}
+
+		var attr = attrs[attrName];
 		if (attr) {
 			if (callback) {
 				callback(attr.value);
@@ -295,6 +335,26 @@ var BulletML = {};
 			return attr;
 		} else if (ifNotFound) {
 			ifNotFound();
+		}
+	}
+	function text(element, callback) {
+		var result = element.textContent;
+		if (result !== undefined) {
+			if (callback) {
+				callback(result);
+				return result;
+			}
+		}
+
+		// for IE
+		if (element.childNodes[0]) {
+			result = element.childNodes[0].nodeValue;
+			if (result !== undefined) {
+				if (callback) {
+					callback(result);
+					return result;
+				}
+			}
 		}
 	}
 

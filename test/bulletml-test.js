@@ -7,7 +7,7 @@ BulletMLTest.prototype.testBuild = function() {
 	assertEquals("none", result.type);
 };
 
-BulletMLTest.prototype.testTypeDefaultValue = function() {
+BulletMLTest.prototype.testType = function() {
 	var result = BulletML.build("<bulletml type='horizontal'></bulletml>");
 	assertEquals("horizontal", result.type);
 };
@@ -15,10 +15,11 @@ BulletMLTest.prototype.testTypeDefaultValue = function() {
 BulletMLTest.prototype.testBuildXml = function() {
 	var dom = new DOMParser()
 			.parseFromString(
-					"<?xml version='1.0'?>"
-							+ "<!DOCTYPE bulletml SYSTEM 'http://www.asahi-net.or.jp/~cs8k-cyu/bulletml/bulletml.dtd'>"
-							+ "<bulletml xmlns='http://www.asahi-net.or.jp/~cs8k-cyu/bulletml'>"
-							+ "</bulletml>", "text/xml");
+					"<?xml version='1.0'?>\n"
+							+ "<!DOCTYPE bulletml SYSTEM 'http://www.asahi-net.or.jp/~cs8k-cyu/bulletml/bulletml.dtd'>\n"
+							+ "\n"
+							+ "<bulletml xmlns='http://www.asahi-net.or.jp/~cs8k-cyu/bulletml'>\n"
+							+ "</bulletml>", "application/xml");
 	var result = BulletML.build(dom);
 	assertEquals("none", result.type);
 };
@@ -77,7 +78,7 @@ BulletMLTest.prototype.testBuildTopLebelFires = function() {
 };
 
 BulletMLTest.prototype.testParseBullet = function() {
-	var result = BulletML.build("<bulletml><bullet label='b1'></bulletml>");
+	var result = BulletML.build("<bulletml><bullet label='b1'/></bulletml>");
 	var b1 = result.findBullet("b1");
 	assertNotUndefined(b1);
 	assertEquals("aim", b1.direction.type);
