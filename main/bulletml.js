@@ -75,6 +75,10 @@ var BulletML = {};
 		this.speed = new Speed();
 		this.actions = [];
 	};
+	var BulletRef = BulletML.BulletRef = function() {
+		this.label = null;
+		this.params = [];
+	};
 
 	// commandクラス --------------------------------------------
 
@@ -84,16 +88,29 @@ var BulletML = {};
 	 * Actionのcommands配列に格納される.
 	 */
 	var Command = BulletML.Command = function() {
+		this.root = null;
 	};
 	Command.prototype.execute = function() {
 	};
 
 	var Action = BulletML.Action = function() {
+		this.commandName = "action";
 		this.label = null;
 		this.root = null;
 		this.commands = [];
 	};
 	Action.prototype = new Command();
+	Action.prototype.clone = function(params) {
+	};
+
+	var ActionRef = BulletML.ActionRef = function() {
+		this.commandName = "actionRef";
+		this.label = null;
+		this.params = [];
+	};
+	ActionRef.prototype.getEntity = function() {
+		return root.findAction(this.label).clone(this.params);
+	};
 
 	var Fire = BulletML.Fire = function() {
 		this.commandName = "fire";
@@ -102,7 +119,6 @@ var BulletML = {};
 		this.direction = new Direction();
 		this.speed = new Speed();
 		this.bullet = null;
-		this.bulletRef = null;
 	};
 	Fire.prototype = new Command();
 
@@ -199,9 +215,8 @@ var BulletML = {};
 		var actions = root.getElementsByTagName("action");
 		if (actions) {
 			for ( var i = 0, end = actions.length; i < end; i++) {
-				var newAction = parseAction(actions[i]);
+				var newAction = parseAction(result, actions[i]);
 				if (newAction) {
-					newAction.root = result;
 					result.actions.push(newAction);
 				}
 			}
@@ -213,9 +228,8 @@ var BulletML = {};
 		var bullets = root.getElementsByTagName("bullet");
 		if (bullets) {
 			for ( var i = 0, end = bullets.length; i < end; i++) {
-				var newBullet = parseBullet(bullets[i]);
+				var newBullet = parseBullet(result, bullets[i]);
 				if (newBullet) {
-					newBullet.root = result;
 					result.bullets.push(newBullet);
 				}
 			}
@@ -225,9 +239,8 @@ var BulletML = {};
 		var fires = root.getElementsByTagName("fire");
 		if (fires) {
 			for ( var i = 0, end = fires.length; i < end; i++) {
-				var newFire = parseFire(fires[i]);
+				var newFire = parseFire(result, fires[i]);
 				if (newFire) {
-					newFire.root = result;
 					result.fires.push(newFire);
 				}
 			}
@@ -236,7 +249,7 @@ var BulletML = {};
 		return result;
 	}
 
-	function parseAction(element) {
+	function parseAction(root, element) {
 		var result = new Action();
 		attr(element, "label", function(label) {
 			result.label = label;
@@ -244,13 +257,13 @@ var BulletML = {};
 		each(element, ".", function(commandElm) {
 			switch (commandElm.tagName) {
 			case "action":
-				result.commands.push(parseAction(commandElm));
+				result.commands.push(parseAction(root, commandElm));
 				break;
 			case "actionRef":
-				result.commands.push(parseActionRef(commandElm));
+				result.commands.push(parseActionRef(root, commandElm));
 				break;
 			case "fire":
-				result.commands.push(parseFire(commandElm));
+				result.commands.push(parseFire(root, commandElm));
 				break;
 			case "changeDirection":
 				result.commands.push(parseChangeDirection(commandElm));
@@ -268,22 +281,27 @@ var BulletML = {};
 				result.commands.push(parseVanish(commandElm));
 				break;
 			case "repeat":
-				result.commands.push(parseRepeat(commandElm));
+				result.commands.push(parseRepeat(root, commandElm));
 				break;
 			}
 		});
+		result.root = root;
 		return result;
 	}
 
-	function parseActionRef(element) {
-		var result = attr(element, "label", function() {
-		}, function() {
-			throw new Exception("actionRef has no label.");
+	function parseActionRef(root, element) {
+		var result = new ActionRef();
+		attr(element, "label", function(label) {
+			result.label = label;
 		});
-		return result.value;
+		each(element, /param$/, function(param) {
+			result.params.push(text(param));
+		});
+		result.root = root;
+		return result;
 	}
 
-	function parseBullet(element) {
+	function parseBullet(root, element) {
 		var result = new Bullet();
 		attr(element, "label", function(label) {
 			result.label = label;
@@ -296,23 +314,28 @@ var BulletML = {};
 		});
 		each(element, /(action)|(actionRef)$/, function(action) {
 			if (action.tagName == "action") {
-				result.actions.push(parseAction(action));
+				result.actions.push(parseAction(root, action));
 			} else if (action.tagName == "actionRef") {
-				result.actions.push(parseActionRef(action));
+				result.actions.push(parseActionRef(root, action));
 			}
 		});
+		result.root = root;
 		return result;
 	}
 
-	function parseBulletRef(element) {
-		var result = attr(element, "label", function() {
-		}, function() {
-			throw new Exception("bulletRef has no label.");
+	function parseBulletRef(root, element) {
+		var result = new BulletRef();
+		attr(element, "label", function(label) {
+			result.label = label;
 		});
-		return result.value;
+		each(element, /param$/, function(param) {
+			result.params.push(text(param));
+		});
+		result.root = root;
+		return result;
 	}
 
-	function parseFire(element) {
+	function parseFire(root, element) {
 		var result = new Fire();
 
 		attr(element, "label", function(label) {
@@ -325,16 +348,17 @@ var BulletML = {};
 			result.speed = parseSpeed(speed);
 		})
 		get(element, "bullet", function(bullet) {
-			result.bullet = parseBullet(bullet);
+			result.bullet = parseBullet(root, bullet);
 		});
 		get(element, "bulletRef", function(bulletRef) {
-			result.bulletRef = parseBulletRef(bulletRef);
+			result.bullet = parseBulletRef(root, bulletRef);
 		});
 
 		if (!result.bullet && !result.bulletRef) {
 			throw new Exception("fire has no bullet or bulletRef.");
 		}
 
+		result.root = root;
 		return result;
 	}
 
@@ -392,14 +416,14 @@ var BulletML = {};
 		return new Vanish();
 	}
 
-	function parseRepeat(element) {
+	function parseRepeat(root, element) {
 		var result = new Repeat();
 
 		get(element, "action", function(action) {
-			result.action = parseAction(action);
+			result.action = parseAction(root, action);
 		});
 		get(element, "actionRef", function(actionRef) {
-			result.action = parseActionRef(actionRef);
+			result.action = parseActionRef(root, actionRef);
 		});
 		get(element, "times", function(times) {
 			result.times = text(times);

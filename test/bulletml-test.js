@@ -50,7 +50,7 @@ BulletMLTest.prototype.testFindAction = function() {
 	assertUndefined(result.findAction("xxx"));
 };
 
-BulletMLTest.prototype.testBuildTopLebelBullets = function() {
+BulletMLTest.prototype.testBuildTopLevelBullets = function() {
 	var result = BulletML
 			.build("<bulletml><bullet label='b1'/><bullet label='b2'/><bullet label='b3'/></bulletml>");
 	assertEquals("b1", result.bullets[0].label);
@@ -61,7 +61,7 @@ BulletMLTest.prototype.testBuildTopLebelBullets = function() {
 	assertEquals(result, result.bullets[2].root);
 };
 
-BulletMLTest.prototype.testBuildTopLebelFires = function() {
+BulletMLTest.prototype.testBuildTopLevelFires = function() {
 	var result = BulletML
 			.build("<bulletml><fire label='f1'><bulletRef label='b'/></fire>"
 					+ "<fire label='f2'><bulletRef label='b'/></fire>"
@@ -72,9 +72,9 @@ BulletMLTest.prototype.testBuildTopLebelFires = function() {
 	assertEquals(result, result.fires[0].root);
 	assertEquals(result, result.fires[1].root);
 	assertEquals(result, result.fires[2].root);
-	assertEquals("b", result.fires[0].bulletRef);
-	assertEquals("b", result.fires[1].bulletRef);
-	assertEquals("b", result.fires[2].bulletRef);
+	assertEquals("b", result.fires[0].bullet.label);
+	assertEquals("b", result.fires[1].bullet.label);
+	assertEquals("b", result.fires[2].bullet.label);
 };
 
 BulletMLTest.prototype.testParseBullet1 = function() {
@@ -88,16 +88,16 @@ BulletMLTest.prototype.testParseBullet1 = function() {
 };
 
 BulletMLTest.prototype.testParseBullet2 = function() {
-	var result = BulletML
-			.build("<bulletml><bullet label='b1'>"
-					+ "<action><fire><bullet/></fire></action>"
-					+ "<actionRef label='action2'/>"
-					+ "<action><changeDirection><direction>10</direction><term>20</term></changeDirection></action>"
-					+ "</bullet></bulletml>");
+	var result = BulletML.build("<bulletml><bullet label='b1'>"
+			+ "<action><fire><bullet/></fire></action>"
+			+ "<actionRef label='action2'/>"
+			+ "<action><changeDirection><direction>10</direction>"
+			+ "<term>20</term></changeDirection></action>"
+			+ "</bullet></bulletml>");
 	var b1 = result.findBullet("b1");
 	assertEquals(3, b1.actions.length);
 	assertEquals("fire", b1.actions[0].commands[0].commandName);
-	assertEquals("action2", b1.actions[1]);
+	assertEquals("actionRef", b1.actions[1].commandName);
 	assertEquals("changeDirection", b1.actions[2].commands[0].commandName);
 };
 
@@ -217,7 +217,7 @@ BulletMLTest.prototype.testParseRepeat1 = function() {
 			+ "</repeat></action></bulletml>");
 	var repeat = result.topAction.commands[0];
 	assertEquals("repeat", repeat.commandName);
-	assertEquals("a", repeat.action);
+	assertEquals("actionRef", repeat.action.commandName);
 };
 
 BulletMLTest.prototype.testParseRepeat2 = function() {
@@ -227,4 +227,38 @@ BulletMLTest.prototype.testParseRepeat2 = function() {
 	var repeat = result.topAction.commands[0];
 	assertEquals("repeat", repeat.commandName);
 	assertEquals("vanish", repeat.action.commands[0].commandName);
+};
+
+BulletMLTest.prototype.testParseActionRef = function() {
+	var result = BulletML.build("<bulletml><action label='top'>"
+			+ "<actionRef label='aaa'><param>1</param>"
+			+ "<param>1</param><param>2</param><param>3</param>"
+			+ "<param>5</param><param>8</param><param>13</param></actionRef>"
+			+ "</action><action label='aaa'></action></bulletml>");
+	var actionRef = result.topAction.commands[0];
+	assertEquals("actionRef", actionRef.commandName);
+	assertEquals("aaa", actionRef.label);
+	assertEquals(7, actionRef.params.length);
+	assertEquals(1, actionRef.params[0]);
+	assertEquals(1, actionRef.params[1]);
+	assertEquals(2, actionRef.params[2]);
+	assertEquals(3, actionRef.params[3]);
+	assertEquals(5, actionRef.params[4]);
+	assertEquals(8, actionRef.params[5]);
+	assertEquals(13, actionRef.params[6]);
+};
+
+BulletMLTest.prototype.testParseBulletRef = function() {
+	var result = BulletML.build("<bulletml><action label='top'><fire>"
+			+ "<bulletRef label='b'><param>3</param><param>1</param>"
+			+ "<param>4</param><param>1</param><param>5</param>"
+			+ "</bulletRef></fire></action></bulletml>");
+	var bulletRef = result.topAction.commands[0].bullet;
+	assertEquals("b", bulletRef.label);
+	assertEquals(5, bulletRef.params.length);
+	assertEquals("3", bulletRef.params[0]);
+	assertEquals("1", bulletRef.params[1]);
+	assertEquals("4", bulletRef.params[2]);
+	assertEquals("1", bulletRef.params[3]);
+	assertEquals("5", bulletRef.params[4]);
 };
