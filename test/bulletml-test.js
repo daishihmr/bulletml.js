@@ -123,7 +123,7 @@ BulletMLTest.prototype.testParseSpeed = function() {
 
 BulletMLTest.prototype.testParseFire1 = function() {
 	var result = BulletML.build("<bulletml><action label='top'>"
-			+ "<fire><bullet/></fire>" + "</action></bulletml>");
+			+ "<fire><bullet/></fire></action></bulletml>");
 	var fire = result.topAction.commands[0];
 	assertNotUndefined(fire.bullet);
 	assertEquals("aim", fire.direction.type);
@@ -135,7 +135,7 @@ BulletMLTest.prototype.testParseFire1 = function() {
 BulletMLTest.prototype.testParseFire2 = function() {
 	var result = BulletML.build("<bulletml><action label='top'><fire>"
 			+ "<direction type='relative'>180</direction>"
-			+ "<speed type='sequence'>(2+$1)*0.3</speed><bullet ></fire>"
+			+ "<speed type='sequence'>(2+$1)*0.3</speed><bullet/></fire>"
 			+ "</action></bulletml>");
 	var fire = result.topAction.commands[0];
 	assertNotUndefined(fire.bullet);
@@ -168,15 +168,31 @@ BulletMLTest.prototype.testParseChangeDirection2 = function() {
 	assertEquals("20+20", changeDirection.term);
 };
 
-BulletMLTest.prototype.testParseChangeSpeed1 = function() {
+BulletMLTest.prototype.testParseChangeSpeed = function() {
 	var result = BulletML
 			.build("<bulletml><bullet label='b'><action><actionRef label='other'/>"
 					+ "<changeSpeed><speed>11</speed><term>24</term></changeSpeed>"
 					+ "</action></bullet></bulletml>");
-	console.log(result.findBullet("b").actions[0]);
-
 	var changeSpeed = result.findBullet("b").actions[0].commands[1];
 	assertNotUndefined(changeSpeed);
 	assertEquals("11", changeSpeed.speed.value);
 	assertEquals("24", changeSpeed.term);
+};
+
+BulletMLTest.prototype.testParseAccel = function() {
+	var result = BulletML
+			.build("<bulletml><action label='top'>"
+					+ "<fire><bullet><actionRef label='a'/>"
+					+ "<action><action><accel><horizontal type='absolute'>5+5</horizontal>"
+					+ "<vertical type='relative'>3+8</vertical>"
+					+ "<term>9+$rand*50</term></accel></action></action>"
+					+ "</bullet></fire></action></bulletml>");
+	console.log(result.topAction);
+	var accel = result.topAction.commands[0].bullet.actions[1].commands[0].commands[0];
+	assertEquals("accel", accel.commandName);
+	assertEquals("absolute", accel.horizontal.type);
+	assertEquals("5+5", accel.horizontal.value);
+	assertEquals("relative", accel.vertical.type);
+	assertEquals("3+8", accel.vertical.value);
+	assertEquals("9+$rand*50", accel.term);
 };

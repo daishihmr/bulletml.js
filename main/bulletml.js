@@ -120,11 +120,11 @@ var BulletML = {};
 	};
 	ChangeSpeed.prototype = new Command();
 
-	var Accel = BulletML.Accel = function(horizontal, vertical, term) {
+	var Accel = BulletML.Accel = function() {
 		this.commandName = "accel";
-		this.horizontal = horizontal;
-		this.vertical = vertical;
-		this.term = term;
+		this.horizontal = new Horizontal();
+		this.vertical = new Vertical();
+		this.term = 0;
 	};
 	Accel.prototype = new Command();
 
@@ -164,13 +164,21 @@ var BulletML = {};
 			this.value = 1;
 		}
 	};
-	var Horizontal = BulletML.Horizontal = function(type, value) {
-		this.type = type;
-		this.value = value;
+	var Horizontal = BulletML.Horizontal = function(value) {
+		this.type = "relative";
+		if (value) {
+			this.value = vale;
+		} else {
+			this.value = 0;
+		}
 	};
-	var Vertical = BulletML.Vertical = function(type, value) {
-		this.type = type;
-		this.value = value;
+	var Vertical = BulletML.Vertical = function(value) {
+		this.type = "relative";
+		if (value) {
+			this.value = value;
+		} else {
+			this.value = 0;
+		}
 	};
 
 	// parse関数 -----------------------------------------------
@@ -245,6 +253,9 @@ var BulletML = {};
 				break;
 			case "changeSpeed":
 				result.commands.push(parseChangeSpeed(commandElm));
+				break;
+			case "accel":
+				result.commands.push(parseAccel(commandElm));
 				break;
 			}
 		});
@@ -340,26 +351,46 @@ var BulletML = {};
 		return result;
 	}
 
-	function parseDirection(element) {
-		var result = new Direction();
-		attr(element, "type", function(type) {
-			result.type = type;
+	function parseAccel(element) {
+		var result = new Accel();
+
+		get(element, "horizontal", function(horizontal) {
+			result.horizontal = parseHorizontal(horizontal);
 		});
-		text(element, function(val) {
-			result.value = val;
+		get(element, "vertical", function(vertical) {
+			result.vertical = parseVertical(vertical);
 		});
+		get(element, "term", function(term) {
+			result.term = text(term);
+		});
+
 		return result;
 	}
 
+	function parseDirection(element) {
+		return setTypeAndValue(new Direction(), element);
+	}
+
 	function parseSpeed(element) {
-		var result = new Speed();
+		return setTypeAndValue(new Speed(), element);
+	}
+
+	function parseHorizontal(element) {
+		return setTypeAndValue(new Horizontal(), element);
+	}
+
+	function parseVertical(element) {
+		return setTypeAndValue(new Vertical(), element);
+	}
+
+	function setTypeAndValue(obj, element) {
 		attr(element, "type", function(type) {
-			result.type = type;
+			obj.type = type;
 		});
 		text(element, function(val) {
-			result.value = val;
+			obj.value = val;
 		});
-		return result;
+		return obj;
 	}
 
 	// utility ---------------------------------------------------
