@@ -512,7 +512,7 @@ var BulletML = {};
 	function each(element, filter, callback) {
 		var children = element.childNodes;
 		for ( var i = 0, end = children.length; i < end; i++) {
-			if (children[i].tagName.match(filter)) {
+			if (children[i].tagName && children[i].tagName.match(filter)) {
 				callback(children[i]);
 			}
 		}
