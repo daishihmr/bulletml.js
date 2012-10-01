@@ -130,7 +130,11 @@ var BulletML = {};
 
 	var Wait = BulletML.Wait = function(value) {
 		this.commandName = "wait";
-		this.value = value;
+		if (value) {
+			this.value = value;
+		} else {
+			this.value = 0;
+		}
 	};
 	Wait.prototype = new Command();
 
@@ -257,6 +261,15 @@ var BulletML = {};
 			case "accel":
 				result.commands.push(parseAccel(commandElm));
 				break;
+			case "wait":
+				result.commands.push(parseWait(commandElm));
+				break;
+			case "vanish":
+				result.commands.push(parseVanish(commandElm));
+				break;
+			case "repeat":
+				result.commands.push(parseRepeat(commandElm));
+				break;
 			}
 		});
 		return result;
@@ -362,6 +375,34 @@ var BulletML = {};
 		});
 		get(element, "term", function(term) {
 			result.term = text(term);
+		});
+
+		return result;
+	}
+
+	function parseWait(element) {
+		var result = new Wait();
+
+		result.value = text(element);
+
+		return result;
+	}
+
+	function parseVanish(element) {
+		return new Vanish();
+	}
+
+	function parseRepeat(element) {
+		var result = new Repeat();
+
+		get(element, "action", function(action) {
+			result.action = parseAction(action);
+		});
+		get(element, "actionRef", function(actionRef) {
+			result.action = parseActionRef(actionRef);
+		});
+		get(element, "times", function(times) {
+			result.times = text(times);
 		});
 
 		return result;
