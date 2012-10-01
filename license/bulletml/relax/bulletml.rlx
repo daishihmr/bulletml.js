@@ -1,0 +1,224 @@
+<?xml version="1.0"?>
+<!DOCTYPE module SYSTEM "relaxCore.dtd">
+
+<!--
+  bulletml.rlx
+
+  Copyright 2001 Kenta Cho. All rights reserved. 
+-->
+
+<module 
+ moduleVersion="0.21"
+ relaxCoreVersion="1.0"
+ targetNamespace="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml"
+ xmlns="http://www.xml.gr.jp/xmlns/relaxCore">
+
+<interface>
+<export label="bulletml"/>
+</interface>
+
+
+<elementRule role="bulletml">
+<choice occurs="*">
+<ref label="action"/>
+<ref label="bullet"/>
+<ref label="fire"/>
+</choice>
+</elementRule>
+
+<hedgeRule label="bulletElm">
+<choice>
+<ref label="bullet"/>
+<ref label="bulletRef"/>
+</choice>
+</hedgeRule>
+
+<elementRule role="bulletRef">
+<choice occurs="*">
+<ref label="param"/>
+</choice>
+</elementRule>
+
+<elementRule role="param" type="string"/>
+
+<elementRule role="bullet">
+<sequence>
+<ref label="direction" occurs="?"/>
+<ref label="speed" occurs="?"/>
+<hedgeRef label="actionElm" occurs="*"/>
+</sequence>
+</elementRule>
+
+<elementRule role="direction" type="string"/>
+
+<elementRule role="speed" type="string"/>
+
+<hedgeRule label="actionElm">
+<choice>
+<ref label="action"/>
+<ref label="actionRef"/>
+</choice>
+</hedgeRule>
+
+<elementRule role="actionRef">
+<choice occurs="*">
+<ref label="param"/>
+</choice>
+</elementRule>
+
+<elementRule role="action">
+<choice occurs="*">
+<ref label="repeat"/>
+<hedgeRef label="fireElm"/>
+<ref label="changeSpeed"/>
+<ref label="changeDirection"/>
+<ref label="accel"/>
+<ref label="wait"/>
+<ref label="vanish"/>
+<hedgeRef label="actionElm"/>
+</choice>
+</elementRule>
+
+<elementRule role="repeat">
+<sequence>
+<ref label="times"/>
+<hedgeRef label="actionElm"/>
+</sequence>
+</elementRule>
+
+<elementRule role="times" type="string"/>
+
+<hedgeRule label="fireElm">
+<choice>
+<ref label="fire"/>
+<ref label="fireRef"/>
+</choice>
+</hedgeRule>
+
+<elementRule role="fireRef">
+<choice occurs="*">
+<ref label="param"/>
+</choice>
+</elementRule>
+
+<elementRule role="fire">
+<sequence>
+<ref label="direction" occurs="?"/>
+<ref label="speed" occurs="?"/>
+<hedgeRef label="bulletElm"/>
+</sequence>
+</elementRule>
+
+<elementRule role="changeSpeed">
+<sequence>
+<ref label="speed"/>
+<ref label="term"/>
+</sequence>
+</elementRule>
+
+<elementRule role="changeDirection">
+<sequence>
+<ref label="direction"/>
+<ref label="term"/>
+</sequence>
+</elementRule>
+
+<elementRule role="accel">
+<sequence>
+<ref label="horizontal" occurs="?"/>
+<ref label="vertical" occurs="?"/>
+<ref label="term"/>
+</sequence>
+</elementRule>
+
+<elementRule role="horizontal" type="string"/>
+
+<elementRule role="vertical" type="string"/>
+
+<elementRule role="term" type="string"/>
+
+<elementRule role="wait" type="string"/>
+
+<elementRule role="vanish" type="emptyString"/>
+
+
+<tag name="bulletml">
+<attribute name="xmlns" type="string"/>
+<attribute name="type" type="string">
+<enumeration value="none"/>
+<enumeration value="vertical"/>
+<enumeration value="horizontal"/>
+</attribute>
+</tag>
+
+<tag name="bullet">
+<attribute name="label" type="string"/>
+</tag>
+
+<tag name="bulletRef">
+<attribute name="label" required="true" type="string"/>
+</tag>
+
+<tag name="direction">
+<attribute name="type" type="string">
+<enumeration value="aim"/>
+<enumeration value="absolute"/>
+<enumeration value="relative"/>
+<enumeration value="sequence"/>
+</attribute>
+</tag>
+
+<tag name="speed">
+<attribute name="type" type="string">
+<enumeration value="absolute"/>
+<enumeration value="relative"/>
+<enumeration value="sequence"/>
+</attribute>
+</tag>
+
+<tag name="action">
+<attribute name="label" type="string"/>
+</tag>
+
+<tag name="actionRef">
+<attribute name="label" required="true" type="string"/>
+</tag>
+
+<tag name="fire">
+<attribute name="label" type="string"/>
+</tag>
+
+<tag name="fireRef">
+<attribute name="label" required="true" type="string"/>
+</tag>
+
+<tag name="repeat"/>
+<tag name="changeSpeed"/>
+<tag name="changeDirection"/>
+<tag name="accel"/>
+<tag name="wait"/>
+<tag name="vanish"/>
+
+<tag name="horizontal">
+<attribute name="type" type="string">
+<enumeration value="absolute"/>
+<enumeration value="relative"/>
+<enumeration value="sequence"/>
+</attribute>
+</tag>
+
+<tag name="vertical">
+<attribute name="type" type="string">
+<enumeration value="absolute"/>
+<enumeration value="relative"/>
+<enumeration value="sequence"/>
+</attribute>
+</tag>
+
+<tag name="term"/>
+
+<tag name="times"/>
+
+<tag name="param"/>
+
+</module>
