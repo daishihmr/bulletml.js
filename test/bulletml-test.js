@@ -77,7 +77,7 @@ BulletMLTest.prototype.testBuildTopLebelFires = function() {
 	assertEquals("b", result.fires[2].bulletRef);
 };
 
-BulletMLTest.prototype.testParseBullet = function() {
+BulletMLTest.prototype.testParseBullet1 = function() {
 	var result = BulletML.build("<bulletml><bullet label='b1'/></bulletml>");
 	var b1 = result.findBullet("b1");
 	assertNotUndefined(b1);
@@ -85,6 +85,20 @@ BulletMLTest.prototype.testParseBullet = function() {
 	assertEquals("0", b1.direction.value);
 	assertEquals("absolute", b1.speed.type);
 	assertEquals("1", b1.speed.value);
+};
+
+BulletMLTest.prototype.testParseBullet2 = function() {
+	var result = BulletML
+			.build("<bulletml><bullet label='b1'>"
+					+ "<action><fire><bullet/></fire></action>"
+					+ "<actionRef label='action2'/>"
+					+ "<action><changeDirection><direction>10</direction><term>20</term></changeDirection></action>"
+					+ "</bullet></bulletml>");
+	var b1 = result.findBullet("b1");
+	assertEquals(3, b1.actions.length);
+	assertEquals("fire", b1.actions[0].commands[0].commandName);
+	assertEquals("action2", b1.actions[1]);
+	assertEquals("changeDirection", b1.actions[2].commands[0].commandName);
 };
 
 BulletMLTest.prototype.testParseDirection = function() {
@@ -105,4 +119,64 @@ BulletMLTest.prototype.testParseSpeed = function() {
 	assertNotUndefined(b1);
 	assertEquals("sequence", b1.speed.type);
 	assertEquals("(2+$1)*0.3", b1.speed.value);
+};
+
+BulletMLTest.prototype.testParseFire1 = function() {
+	var result = BulletML.build("<bulletml><action label='top'>"
+			+ "<fire><bullet/></fire>" + "</action></bulletml>");
+	var fire = result.topAction.commands[0];
+	assertNotUndefined(fire.bullet);
+	assertEquals("aim", fire.direction.type);
+	assertEquals("0", fire.direction.value);
+	assertEquals("absolute", fire.speed.type);
+	assertEquals("1", fire.speed.value);
+};
+
+BulletMLTest.prototype.testParseFire2 = function() {
+	var result = BulletML.build("<bulletml><action label='top'><fire>"
+			+ "<direction type='relative'>180</direction>"
+			+ "<speed type='sequence'>(2+$1)*0.3</speed><bullet ></fire>"
+			+ "</action></bulletml>");
+	var fire = result.topAction.commands[0];
+	assertNotUndefined(fire.bullet);
+	assertEquals("relative", fire.direction.type);
+	assertEquals("180", fire.direction.value);
+	assertEquals("sequence", fire.speed.type);
+	assertEquals("(2+$1)*0.3", fire.speed.value);
+};
+
+BulletMLTest.prototype.testParseChangeDirection1 = function() {
+	var result = BulletML
+			.build("<bulletml><bullet label='b'><action><changeDirection>"
+					+ "<direction>10</direction><term>20</term></changeDirection>"
+					+ "</action></bullet></bulletml>");
+	var changeDirection = result.findBullet("b").actions[0].commands[0];
+	assertNotUndefined(changeDirection);
+	assertEquals("10", changeDirection.direction.value);
+	assertEquals("20", changeDirection.term);
+};
+
+BulletMLTest.prototype.testParseChangeDirection2 = function() {
+	var result = BulletML
+			.build("<bulletml><bullet label='b'><action><changeDirection>"
+					+ "<direction type='absolute'>10+10</direction><term>20+20</term></changeDirection>"
+					+ "</action></bullet></bulletml>");
+	var changeDirection = result.findBullet("b").actions[0].commands[0];
+	assertNotUndefined(changeDirection);
+	assertEquals("10+10", changeDirection.direction.value);
+	assertEquals("absolute", changeDirection.direction.type);
+	assertEquals("20+20", changeDirection.term);
+};
+
+BulletMLTest.prototype.testParseChangeSpeed1 = function() {
+	var result = BulletML
+			.build("<bulletml><bullet label='b'><action><actionRef label='other'/>"
+					+ "<changeSpeed><speed>11</speed><term>24</term></changeSpeed>"
+					+ "</action></bullet></bulletml>");
+	console.log(result.findBullet("b").actions[0]);
+
+	var changeSpeed = result.findBullet("b").actions[0].commands[1];
+	assertNotUndefined(changeSpeed);
+	assertEquals("11", changeSpeed.speed.value);
+	assertEquals("24", changeSpeed.term);
 };

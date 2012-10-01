@@ -30,7 +30,7 @@ var BulletML = {};
 	}
 
 	/**
-	 * 
+	 * bulletmlをパースしJavaScriptオブジェクトツリーを生成する.
 	 */
 	BulletML.build = function(xml) {
 		if (typeof (xml) == "string") {
@@ -43,38 +43,17 @@ var BulletML = {};
 		}
 	};
 
-	var Actor = BulletML.Actor = function() {
-		this.age = 0;
-		this.waitTo = -1;
-		this.x = 0;
-		this.y = 0;
-		this.lastFireDirection = 0;
-		this.speed = 0;
-	};
-	Actor.prototype.act = function(command) {
-		if (this.waitTo <= this.age) {
-			this.waitTo = -1;
-			command.execute(this);
-		}
-	};
-
-	var Bullet = BulletML.Bullet = function() {
-		this.label = null;
-		this.root = null;
-		this.speed = 1;
-		this.direction = new Direction();
-		this.speed = new Speed();
-	};
-	Bullet.prototype = new Actor();
-
+	/**
+	 * bulletmlのルート要素.
+	 */
 	var Root = BulletML.Root = function() {
 		this.type = "none";
 		this.root = this;
+		this.topAction = null;
 		this.actions = [];
 		this.bullets = [];
 		this.fires = [];
 	};
-	Root.prototype = new Actor();
 	Root.prototype.findAction = function(label) {
 		return search(this.actions, label);
 	};
@@ -85,6 +64,25 @@ var BulletML = {};
 		return search(this.fires, label);
 	};
 
+	/**
+	 * bullet要素.
+	 */
+	var Bullet = BulletML.Bullet = function() {
+		this.label = null;
+		this.root = null;
+		this.speed = 1;
+		this.direction = new Direction();
+		this.speed = new Speed();
+		this.actions = [];
+	};
+
+	// commandクラス --------------------------------------------
+
+	/**
+	 * 動作を表す抽象クラス.
+	 * 
+	 * Actionのcommands配列に格納される.
+	 */
 	var Command = BulletML.Command = function() {
 	};
 	Command.prototype.execute = function() {
@@ -98,6 +96,7 @@ var BulletML = {};
 	Action.prototype = new Command();
 
 	var Fire = BulletML.Fire = function() {
+		this.commandName = "fire";
 		this.label = null;
 		this.root = null;
 		this.direction = new Direction();
@@ -108,18 +107,21 @@ var BulletML = {};
 	Fire.prototype = new Command();
 
 	var ChangeDirection = function() {
+		this.commandName = "changeDirection";
 		this.direction = null;
 		this.term = 0;
 	};
 	ChangeDirection.prototype = new Command();
 
 	var ChangeSpeed = BulletML.ChangeSpeed = function() {
+		this.commandName = "changeSpeed";
 		this.speed = null;
 		this.term = 0;
 	};
 	ChangeSpeed.prototype = new Command();
 
 	var Accel = BulletML.Accel = function(horizontal, vertical, term) {
+		this.commandName = "accel";
 		this.horizontal = horizontal;
 		this.vertical = vertical;
 		this.term = term;
@@ -127,13 +129,24 @@ var BulletML = {};
 	Accel.prototype = new Command();
 
 	var Wait = BulletML.Wait = function(value) {
+		this.commandName = "wait";
 		this.value = value;
 	};
 	Wait.prototype = new Command();
 
 	var Vanish = BulletML.Vanish = function() {
+		this.commandName = "vanish";
 	};
 	Vanish.prototype = new Command();
+
+	var Repeat = BulletML.Repeat = function() {
+		this.commandName = "repeat";
+		this.times = 0;
+		this.action = null;
+	};
+	Repeat.prototype = new Command();
+
+	// valueクラス -----------------------------------------------
 
 	var Direction = BulletML.Direction = function(value) {
 		this.type = "aim";
@@ -143,7 +156,6 @@ var BulletML = {};
 			this.value = 0;
 		}
 	};
-
 	var Speed = BulletML.Speed = function(value) {
 		this.type = "absolute";
 		if (value) {
@@ -152,21 +164,21 @@ var BulletML = {};
 			this.value = 1;
 		}
 	};
-
 	var Horizontal = BulletML.Horizontal = function(type, value) {
 		this.type = type;
 		this.value = value;
 	};
-
 	var Vertical = BulletML.Vertical = function(type, value) {
 		this.type = type;
 		this.value = value;
 	};
 
-	function parse(dom) {
+	// parse関数 -----------------------------------------------
+
+	function parse(element) {
 		var result = new Root();
 
-		var root = dom.getElementsByTagName("bulletml")[0];
+		var root = element.getElementsByTagName("bulletml")[0];
 		attr(root, "type", function(type) {
 			result.type = type;
 		});
@@ -212,43 +224,86 @@ var BulletML = {};
 		return result;
 	}
 
-	function parseAction(dom) {
+	function parseAction(element) {
 		var result = new Action();
-		attr(dom, "label", function(label) {
+		attr(element, "label", function(label) {
 			result.label = label;
+		});
+		each(element, ".", function(commandElm) {
+			switch (commandElm.tagName) {
+			case "action":
+				result.commands.push(parseAction(commandElm));
+				break;
+			case "actionRef":
+				result.commands.push(parseActionRef(commandElm));
+				break;
+			case "fire":
+				result.commands.push(parseFire(commandElm));
+				break;
+			case "changeDirection":
+				result.commands.push(parseChangeDirection(commandElm));
+				break;
+			case "changeSpeed":
+				result.commands.push(parseChangeSpeed(commandElm));
+				break;
+			}
 		});
 		return result;
 	}
 
-	function parseBullet(dom) {
+	function parseActionRef(element) {
+		var result = attr(element, "label", function() {
+		}, function() {
+			throw new Exception("actionRef has no label.");
+		});
+		return result.value;
+	}
+
+	function parseBullet(element) {
 		var result = new Bullet();
-		attr(dom, "label", function(label) {
+		attr(element, "label", function(label) {
 			result.label = label;
 		});
-		get(dom, "direction", function(direction) {
+		get(element, "direction", function(direction) {
 			result.direction = parseDirection(direction);
 		});
-		get(dom, "speed", function(speed) {
+		get(element, "speed", function(speed) {
 			result.speed = parseSpeed(speed);
 		});
+		each(element, /(action)|(actionRef)$/, function(action) {
+			if (action.tagName == "action") {
+				result.actions.push(parseAction(action));
+			} else if (action.tagName == "actionRef") {
+				result.actions.push(parseActionRef(action));
+			}
+		});
 		return result;
 	}
 
-	function parseFire(dom) {
+	function parseBulletRef(element) {
+		var result = attr(element, "label", function() {
+		}, function() {
+			throw new Exception("bulletRef has no label.");
+		});
+		return result.value;
+	}
+
+	function parseFire(element) {
 		var result = new Fire();
-		attr(dom, "label", function(label) {
+
+		attr(element, "label", function(label) {
 			result.label = label;
 		});
-		get(dom, "direction", function(direction) {
+		get(element, "direction", function(direction) {
 			result.direction = parseDirection(direction);
 		})
-		get(dom, "speed", function(speed) {
-			reuslt.speed = parseSpeed(speed);
+		get(element, "speed", function(speed) {
+			result.speed = parseSpeed(speed);
 		})
-		get(dom, "bullet", function(bullet) {
+		get(element, "bullet", function(bullet) {
 			result.bullet = parseBullet(bullet);
 		});
-		get(dom, "bulletRef", function(bulletRef) {
+		get(element, "bulletRef", function(bulletRef) {
 			result.bulletRef = parseBulletRef(bulletRef);
 		});
 
@@ -259,35 +314,55 @@ var BulletML = {};
 		return result;
 	}
 
-	function parseDirection(dom) {
+	function parseChangeDirection(element) {
+		var result = new ChangeDirection();
+
+		get(element, "direction", function(direction) {
+			result.direction = parseDirection(direction);
+		});
+		get(element, "term", function(term) {
+			result.term = text(term);
+		});
+
+		return result;
+	}
+
+	function parseChangeSpeed(element) {
+		var result = new ChangeSpeed();
+
+		get(element, "speed", function(speed) {
+			result.speed = parseSpeed(speed);
+		});
+		get(element, "term", function(term) {
+			result.term = text(term);
+		});
+
+		return result;
+	}
+
+	function parseDirection(element) {
 		var result = new Direction();
-		attr(dom, "type", function(type) {
+		attr(element, "type", function(type) {
 			result.type = type;
 		});
-		text(dom, function(val) {
+		text(element, function(val) {
 			result.value = val;
 		});
 		return result;
 	}
 
-	function parseSpeed(dom) {
+	function parseSpeed(element) {
 		var result = new Speed();
-		attr(dom, "type", function(type) {
+		attr(element, "type", function(type) {
 			result.type = type;
 		});
-		text(dom, function(val) {
+		text(element, function(val) {
 			result.value = val;
 		});
 		return result;
 	}
 
-	function parseBulletRef(dom) {
-		var result = attr(dom, "label", function() {
-		}, function() {
-			throw new Exception("bulletRef has no label.");
-		});
-		return result.value;
-	}
+	// utility ---------------------------------------------------
 
 	function search(array, label) {
 		for ( var i = 0, end = array.length; i < end; i++) {
@@ -306,6 +381,14 @@ var BulletML = {};
 			return elms[0];
 		} else if (ifNotFound) {
 			ifNotFound();
+		}
+	}
+	function each(element, filter, callback) {
+		var children = element.childNodes;
+		for ( var i = 0, end = children.length; i < end; i++) {
+			if (children[i].tagName.match(filter)) {
+				callback(children[i]);
+			}
 		}
 	}
 	function attr(element, attrName, callback, ifNotFound) {
@@ -342,8 +425,8 @@ var BulletML = {};
 		if (result !== undefined) {
 			if (callback) {
 				callback(result);
-				return result;
 			}
+			return result;
 		}
 
 		// for IE
@@ -352,8 +435,8 @@ var BulletML = {};
 			if (result !== undefined) {
 				if (callback) {
 					callback(result);
-					return result;
 				}
+				return result;
 			}
 		}
 	}
