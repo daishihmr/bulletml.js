@@ -122,6 +122,13 @@ var BulletML = {};
 	};
 	Fire.prototype = new Command();
 
+	var FireRef = BulletML.FireRef = function() {
+		this.commandName = "fireRef";
+		this.label = null;
+		this.params = [];
+	};
+	FireRef.prototype = new Command();
+
 	var ChangeDirection = function() {
 		this.commandName = "changeDirection";
 		this.direction = null;
@@ -265,6 +272,9 @@ var BulletML = {};
 			case "fire":
 				result.commands.push(parseFire(root, commandElm));
 				break;
+			case "fireRef":
+				result.commands.push(parseFireRef(root, commandElm));
+				break;
 			case "changeDirection":
 				result.commands.push(parseChangeDirection(commandElm));
 				break;
@@ -291,6 +301,7 @@ var BulletML = {};
 
 	function parseActionRef(root, element) {
 		var result = new ActionRef();
+
 		attr(element, "label", function(label) {
 			result.label = label;
 		});
@@ -298,11 +309,13 @@ var BulletML = {};
 			result.params.push(text(param));
 		});
 		result.root = root;
+
 		return result;
 	}
 
 	function parseBullet(root, element) {
 		var result = new Bullet();
+
 		attr(element, "label", function(label) {
 			result.label = label;
 		});
@@ -320,11 +333,13 @@ var BulletML = {};
 			}
 		});
 		result.root = root;
+
 		return result;
 	}
 
 	function parseBulletRef(root, element) {
 		var result = new BulletRef();
+
 		attr(element, "label", function(label) {
 			result.label = label;
 		});
@@ -332,6 +347,7 @@ var BulletML = {};
 			result.params.push(text(param));
 		});
 		result.root = root;
+
 		return result;
 	}
 
@@ -359,6 +375,20 @@ var BulletML = {};
 		}
 
 		result.root = root;
+		return result;
+	}
+
+	function parseFireRef(root, element) {
+		var result = new FireRef();
+
+		attr(element, "label", function(label) {
+			result.label = label;
+		});
+		each(element, /param$/, function(param) {
+			result.params.push(text(param));
+		});
+		result.root = root;
+
 		return result;
 	}
 
