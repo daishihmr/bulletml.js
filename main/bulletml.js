@@ -95,6 +95,9 @@ var BulletML = {};
 				this.visit(command.action);
 			}
 			break;
+		case "fire":
+			this.result.push(command.clone(this.params()));
+			break;
 		default:
 			this.result.push(command.clone(this.params()));
 		}
@@ -120,9 +123,8 @@ var BulletML = {};
 	var Bullet = BulletML.Bullet = function() {
 		this.label = null;
 		this.root = null;
-		this.speed = 1;
-		this.direction = new Direction();
-		this.speed = new Speed();
+		this.direction = new Direction(0);
+		this.speed = new Speed(1);
 		this.actions = [];
 	};
 	Bullet.prototype.sequence = function() {
@@ -132,6 +134,25 @@ var BulletML = {};
 		}
 		return visitor.result;
 	};
+	Bullet.prototype.clone = function(params) {
+		var result = new Bullet();
+		result.label = this.label;
+		result.root = this.root;
+		if (this.direction) {
+			result.direction = new Direction(evalNumber(this.direction.value,
+					params));
+			result.direction.type = this.direction.type;
+		}
+		if (this.speed) {
+			result.speed = new Speed(evalNumber(this.speed.value, params));
+			result.speed.type = this.speed.type;
+		}
+		for ( var i = 0, end = this.actions.length; i < end; i++) {
+			result.actions.push(this.actions[i].clone(params));
+		}
+		return result;
+	};
+
 	var BulletRef = BulletML.BulletRef = function() {
 		this.label = null;
 		this.params = [];
@@ -159,22 +180,11 @@ var BulletML = {};
 		this.commands = [];
 	};
 	Action.prototype = new Command();
-	Action.prototype.reference = function(params) {
-		var result = new Action();
-		for ( var i = 0, end = this.commands.length; i < end; i++) {
-			var c = this.commands[i];
-			result.commands.push(c);
-		}
-		return result;
-	};
 
 	var ActionRef = BulletML.ActionRef = function() {
 		this.commandName = "actionRef";
 		this.label = null;
 		this.params = [];
-	};
-	ActionRef.prototype.getEntity = function() {
-		return root.findAction(this.label).clone(this.params);
 	};
 
 	var Fire = BulletML.Fire = function() {
@@ -186,6 +196,37 @@ var BulletML = {};
 		this.bullet = null;
 	};
 	Fire.prototype = new Command();
+	Fire.prototype.clone = function(params) {
+		var result = new Fire();
+		result.label = this.label;
+		result.root = this.root;
+		if (this.direction) {
+			result.direction = new Direction(evalNumber(this.direction.value,
+					params));
+			result.direction.type = this.direction.type;
+		}
+		if (this.speed) {
+			result.speed = new Speed(evalNumber(this.speed.value, params));
+			result.speed.type = this.speed.type;
+		}
+
+		if (this.bullet) {
+			if (this.bullet instanceof Bullet) {
+				result.bullet = this.bullet.clone(params);
+			} else if (this.bullet instanceof BulletRef) {
+				var origBullet = this.root.findBullet(this.bullet.label);
+				if (!origBullet) {
+					return result;
+				}
+				var newParam = [];
+				for ( var i = 0, end = this.bullet.params.length; i < end; i++) {
+					newParam.push(evalNumber(this.bullet.params[i], params));
+				}
+				result.bullet = origBullet.clone(newParam);
+			}
+		}
+		return result;
+	}
 
 	var FireRef = BulletML.FireRef = function() {
 		this.commandName = "fireRef";
@@ -593,6 +634,9 @@ var BulletML = {};
 	// utility ---------------------------------------------------
 
 	function evalNumber(value, params) {
+		if (typeof (value) == "number") {
+			return value;
+		}
 		value = value.replace(/\$rand/g, "Math.random()");
 		if (params) {
 			for ( var i = 0, end = params.length; i < end; i++) {
