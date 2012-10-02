@@ -14,8 +14,16 @@
 							+ 'Cannot load an asset: ' + src);
 				}
 
-				game.assets[src] = BulletML.build(req.responseXML);
-				callback();
+				if (req.responseXML != null) {
+					game.assets[src] = BulletML.build(req.responseXML);
+					callback();
+				} else if (req.responseText != null) {
+					game.assets[src] = BulletML.build(req.responseText);
+					callback();
+				} else {
+					throw new Error(req.status + ': '
+							+ 'Cannot load an asset: ' + src);
+				}
 			}
 		};
 		req.send(null);
@@ -82,9 +90,11 @@
 				var command = this.seq[this.cursor];
 				switch (command.commandName) {
 				case "fire":
+					console.log("fire");
 					this.fire(command, this.attacker.scene);
 					break;
 				case "wait":
+					console.log("wait");
 					this.waitTo = this.age + eval(command.value);
 					this.cursor++;
 					return;
@@ -115,8 +125,11 @@
 			b.y = this.attacker.y + (this.attacker.height - b.height) / 2;
 
 			var dv = toRadian(eval(fireCmd.direction.value));
-			if (fireCmd.direction.type == "aim") {
-
+			switch (fireCmd.direction.type) {
+			case "aim":
+				break;
+			case "absolute":
+				b.direction = dv;
 			}
 			b.speed = eval(fireCmd.speed.value);
 
@@ -153,7 +166,6 @@
 				if (this.x < 0 || this.scw + this.width < this.x || this.y < 0
 						|| this.sch + this.height < this.y) {
 					this.parentNode.removeChild(this);
-					console.log("remove");
 				}
 			}
 		}

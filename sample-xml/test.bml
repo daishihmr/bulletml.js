@@ -3,19 +3,19 @@
 <bulletml type="vertical" xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
 	<action label="top">
 		<repeat>
-			<times>500</times>
+			<times>10</times>
 			<action>
 				<repeat>
-					<times>3</times>
+					<times>5</times>
 					<action>
 						<fire>
-							<direction>$rand*180</direction>
+							<direction type="absolute">$rand*180</direction>
 							<bullet />
 						</fire>
 						<wait>1</wait>
 					</action>
 				</repeat>
-				<wait>5</wait>
+				<wait>30</wait>
 			</action>
 		</repeat>
 	</action>

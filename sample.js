@@ -33,7 +33,7 @@ window.onload = function() {
 		player.frameCount = 0;
 		player.x = (game.width - player.width) / 2;
 		player.y = game.height - 32 - player.height;
-		player.speed = 3;
+		player.speed = 2;
 		player.on("enterframe", function() {
 			if (this.age % 10 === 0) {
 				this.frame = [ 33, 34, 35, 34 ][(this.frameCount += 1) % 4];
