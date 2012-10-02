@@ -14,7 +14,7 @@ var bmlFiles = [ "sample-xml/[1943]_rolling_fire.bml",
 		"sample-xml/[Psyvariar]_X-A_boss_opening.bml",
 		"sample-xml/[Psyvariar]_X-A_boss_winder.bml",
 		"sample-xml/[Psyvariar]_X-B_colony_shape_satellite.bml",
-		"sample-xml/[XEVIOUS]_garu_zakato.bml" ];
+		"sample-xml/[XEVIOUS]_garu_zakato.bml", "sample-xml/test.bml" ];
 
 enchant();
 window.onload = function() {

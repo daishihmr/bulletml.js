@@ -347,6 +347,7 @@ var BulletML = {};
 		this.commandName = "loopEnd";
 		this.start = start;
 		this.times = times;
+		this.loopCount = -1;
 	};
 	LoopEnd.prototype = new Command();
 
