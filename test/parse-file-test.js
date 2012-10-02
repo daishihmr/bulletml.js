@@ -2,7 +2,7 @@
 
 var ParseFileTest = TestCase("ParseFileTest");
 
-ParseFileTest.prototype.test = function() {
+ParseFileTest.prototype.test = function(queue) {
 	var files = [ "[1943]_rolling_fire.xml", "[G_DARIUS]_homing_laser.xml",
 			"[Guwange]_round_2_boss_circle_fire.xml",
 			"[Guwange]_round_3_boss_fast_3way.xml",
@@ -20,10 +20,9 @@ ParseFileTest.prototype.test = function() {
 			"[Psyvariar]_X-B_colony_shape_satellite.xml",
 			"[XEVIOUS]_garu_zakato.xml" ];
 	for ( var i = 0, end = files.length; i < end; i++) {
-		var file = files[i];
-		ajax("/test/sample-xml/" + file, function(xml) {
-			var result = BulletML.build(xml);
-			assertNotUndefined(result);
+		ajax("/test/sample-xml/" + files[i], function(xml) {
+			var root = BulletML.build(xml);
+			root.sequence();
 		});
 	}
 };
@@ -50,6 +49,7 @@ function ajax(url, callback) {
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState == 4) {
 			if (xhr.status == 200) {
+				console.log("fetch " + url);
 				callback(xhr.responseXML);
 			}
 		}

@@ -12,45 +12,120 @@ enchant.Game._loadFuncs["bml"] = function(src, callback) {
 						+ src);
 			}
 
-			game.assets[src] = new enchant.bulletml.AttackPattern(BulletML
-					.build(req.responseXML));
+			game.assets[src] = BulletML.build(req.responseXML);
 			callback();
 		}
 	};
 	req.send(null);
 };
 
+enchant.Node.prototype.setAttackPattern = function(bml, config) {
+	this.attackPattern = new enchant.bulletml.AttackPattern(bml, config);
+	this.attackPattern.attacker = this;
+};
+enchant.Node.prototype.removeAttackPattern = function() {
+	this.attackPattern.attacker = null;
+	this.attackPattern = null;
+};
+
 enchant.bulletml = {};
-
 enchant.bulletml.AttackPattern = enchant.Class.create({
-	initialize : function(bulletml) {
+	initialize : function(bulletml, config) {
 		this.bulletml = bulletml;
+		this.seq = bulletml.sequence();
+
+		var defaultConf = {
+			width : 8,
+			height : 8,
+			image : enchant.Surface.load(enchant.bulletml.defaultImage),
+			frame : 0,
+			removeOnScreenOut : true,
+			target : null,
+			onfire : function() {
+			}
+		};
+		if (config) {
+			for ( var prop in defaultConf) {
+				if (defaultConf.hasOwnProperty(prop)) {
+					if (config[prop]) {
+						defaultConf[prop] = config[prop];
+					}
+				}
+			}
+		}
+		this.config = defaultConf;
+
+		this.age = 0;
+		this.cursor = 0;
+		this.waitTo = -1;
+		this.direction = 90;
+		this._attacker = null;
 	},
-	clone : function() {
-		var c = new enchant.bulletml.AttackPattern(this.bulletml);
-		return c;
+	attacker : {
+		get : function() {
+			return this._attacker;
+		},
+		set : function(attacker) {
+			this._attacker = attacker;
+			attacker.addEventListener("enterframe", function() {
+				if (this.attackPattern) {
+					this.attackPattern.tick();
+				}
+			});
+		}
 	},
-	tick : function(sprite) {
-		var commands = this.bulletml.nextCommands();
+	tick : function() {
+		if (this.age++ < this.waitTo) {
+			console.log("skip");
+			return;
+		}
+
+		for ( var end = this.seq.length; this.cursor < end; this.cursor++) {
+			var command = this.seq[this.cursor];
+			console.log(command.commandName);
+			switch (command.commandName) {
+			case "fire":
+				this.fire(command, this.attacker.scene);
+				break;
+			case "wait":
+				this.waitTo = this.age + command.value;
+				this.cursor++;
+				return;
+			}
+		}
+	},
+	fire : function(fireCmd, scene) {
+		var b = new enchant.bulletml.Bullet(this.config.width,
+				this.config.height);
+		b.image = this.config.image;
+		b.frame = this.config.frame;
+		b.x = this.attacker.x;
+		b.y = this.attacker.y;
+
+		b.seq = fireCmd.bullet.sequence();
+
+		if (scene) {
+			scene.addChild(b);
+		}
+		return b;
 	}
 });
 
-enchant.bulletml.Sprite = enchant.Class.create(enchant.Sprite, {
-	initialize : function(width, height) {
+enchant.bulletml.Bullet = enchant.Class.create(enchant.Sprite, {
+	initialize : function(width, height, attackPattern) {
 		enchant.Sprite.call(this, width, height);
-		this._attackPattern = null;
-		this.addEventListener("enterframe", function() {
-			if (this._attackPattern) {
-				this._attackPattern.tick(this);
-			}
-		});
+		this.parent = attackPattern;
+		this.cursor = 0;
+		this.waitTo = -1;
+		this.addEventListener("enterframe", this.tick);
+
+		this.direction = 0;
+		this.speed = 0;
+		this.accelH = 0;
+		this.accelV = 0;
 	},
-	attackPattern : {
-		get : function() {
-			return this._attackPattern;
-		},
-		set : function(attackPattern) {
-			this._attackPattern = attackPattern.clone();
-		}
+	tick : function() {
 	}
 });
+
+enchant.bulletml.defaultImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAa0lEQVQYV2NkgIL/DAw2QGYolLuakYHhCIgNpBkYgJITGWxs8hj8/CDymzYBpY9MAkrmM4J12tgcZlizhoFBXByi4OVLBoaQEJAiW5CCiQxdXXkMpaUw2yB0dzcDQ1nZJKIU4LeCoCMJeRMAewIxn7cIaLcAAAAASUVORK5CYII=";

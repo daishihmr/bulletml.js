@@ -65,6 +65,9 @@ var BulletML = {};
 		return search(this.fires, label);
 	};
 	Root.prototype.sequence = function() {
+		if (!this.topAction) {
+			throw new Error("has no top action.");
+		}
 		var visitor = new Visitor(this);
 		visitor.visit(this.topAction);
 		return visitor.result;
@@ -91,9 +94,13 @@ var BulletML = {};
 			this.paramsStack.pop(command.params);
 			break;
 		case "repeat":
-			for ( var i = 0, end = evalNumber(command.times, this.params()); i < end; i++) {
-				this.visit(command.action);
-			}
+			var start = new LoopStart();
+			var times = evalNumber(command.times, this.params());
+			var end = new LoopEnd(start, times);
+
+			this.result.push(start);
+			this.visit(command.action);
+			this.result.push(end);
 			break;
 		default:
 			this.result.push(command.clone(this.params()));
@@ -331,6 +338,17 @@ var BulletML = {};
 		this.action = null;
 	};
 	Repeat.prototype = new Command();
+
+	var LoopStart = BulletML.LoopStart = function() {
+		this.commandName = "loopStart";
+	};
+	LoopStart.prototype = new Command();
+	var LoopEnd = BulletML.LoopEnd = function(start, times) {
+		this.commandName = "loopEnd";
+		this.start = start;
+		this.times = times;
+	};
+	LoopEnd.prototype = new Command();
 
 	// valueクラス -----------------------------------------------
 
@@ -654,6 +672,7 @@ var BulletML = {};
 			return value;
 		}
 		value = value.replace(/\$rand/g, "Math.random()");
+		value = value.replace(/\$rank/g, "0");
 		if (params) {
 			for ( var i = 0, end = params.length; i < end; i++) {
 				var pat = new RegExp("\\$" + (i + 1), "g");

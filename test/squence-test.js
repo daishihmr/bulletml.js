@@ -74,9 +74,10 @@ RuntimeTest.prototype.testRepeat = function() {
 			+ "</action></bulletml>");
 	var commands = bulletml.sequence();
 	assertEquals(3, commands.length);
-	assertEquals("vanish", commands[0].commandName);
+	assertEquals("loopStart", commands[0].commandName);
 	assertEquals("vanish", commands[1].commandName);
-	assertEquals("vanish", commands[2].commandName);
+	assertEquals("loopEnd", commands[2].commandName);
+	assertEquals(commands[0], commands[2].start);
 };
 
 RuntimeTest.prototype.testRepeat2 = function() {
@@ -85,9 +86,10 @@ RuntimeTest.prototype.testRepeat2 = function() {
 			+ "</action><action label='v'><vanish/></action></bulletml>");
 	var commands = bulletml.sequence();
 	assertEquals(3, commands.length);
-	assertEquals("vanish", commands[0].commandName);
+	assertEquals("loopStart", commands[0].commandName);
 	assertEquals("vanish", commands[1].commandName);
-	assertEquals("vanish", commands[2].commandName);
+	assertEquals("loopEnd", commands[2].commandName);
+	assertEquals(3, commands[2].times);
 };
 
 RuntimeTest.prototype.testRepeatExp1 = function() {
@@ -95,7 +97,7 @@ RuntimeTest.prototype.testRepeatExp1 = function() {
 			+ "<repeat><times>5+5</times><action><vanish/></action></repeat>"
 			+ "</action></bulletml>");
 	var commands = bulletml.sequence();
-	assertEquals(10, commands.length);
+	assertEquals(3, commands.length);
 };
 
 RuntimeTest.prototype.testRepeatExp2 = function() {
@@ -103,7 +105,7 @@ RuntimeTest.prototype.testRepeatExp2 = function() {
 			+ "<repeat><times>3-1</times><action><vanish/></action></repeat>"
 			+ "</action></bulletml>");
 	var commands = bulletml.sequence();
-	assertEquals(2, commands.length);
+	assertEquals(3, commands.length);
 };
 
 RuntimeTest.prototype.testRepeatExp3 = function() {
@@ -111,7 +113,8 @@ RuntimeTest.prototype.testRepeatExp3 = function() {
 			+ "<repeat><times>2*5</times><action><vanish/></action></repeat>"
 			+ "</action></bulletml>");
 	var commands = bulletml.sequence();
-	assertEquals(10, commands.length);
+	assertEquals(3, commands.length);
+	assertEquals(10, commands[2].times);
 };
 
 RuntimeTest.prototype.testRepeatExp4 = function() {
@@ -127,7 +130,8 @@ RuntimeTest.prototype.testRepeatExp5 = function() {
 			+ "<repeat><times>47%3</times><action><vanish/></action></repeat>"
 			+ "</action></bulletml>");
 	var commands = bulletml.sequence();
-	assertEquals(2, commands.length);
+	assertEquals(3, commands.length);
+	assertEquals(2, commands[2].times);
 };
 
 RuntimeTest.prototype.testRepeatExp6 = function() {
@@ -140,13 +144,19 @@ RuntimeTest.prototype.testRepeatExp6 = function() {
 					+ "<action label='r'><repeat><times>$1</times><action><vanish/></action></repeat>"
 					+ "</action></bulletml>");
 	var commands = bulletml.sequence();
-	assertEquals(6, commands.length);
-	assertEquals("vanish", commands[0].commandName);
+	assertEquals(9, commands.length);
+	assertEquals("loopStart", commands[0].commandName);
 	assertEquals("vanish", commands[1].commandName);
-	assertEquals("vanish", commands[2].commandName);
-	assertEquals("vanish", commands[3].commandName);
+	assertEquals("loopEnd", commands[2].commandName);
+	assertEquals(1, commands[2].times);
+	assertEquals("loopStart", commands[3].commandName);
 	assertEquals("vanish", commands[4].commandName);
-	assertEquals("vanish", commands[5].commandName);
+	assertEquals("loopEnd", commands[5].commandName);
+	assertEquals(2, commands[5].times);
+	assertEquals("loopStart", commands[6].commandName);
+	assertEquals("vanish", commands[7].commandName);
+	assertEquals("loopEnd", commands[8].commandName);
+	assertEquals(3, commands[8].times);
 };
 
 RuntimeTest.prototype.testRepeatExp7 = function() {
@@ -159,10 +169,7 @@ RuntimeTest.prototype.testRepeatExp7 = function() {
 					+ "<action label='r2'><repeat><times>$1</times><action><vanish/></action></repeat></action>"
 					+ "</bulletml>");
 	var commands = bulletml.sequence();
-	assertEquals(1 * 2 + 3 * 4, commands.length);
-	for ( var i = 0; i < 1 * 2 + 3 * 4; i++) {
-		assertEquals("vanish", commands[i].commandName);
-	}
+	assertEquals(6, commands.length);
 };
 
 RuntimeTest.prototype.testChangeDirectionExp = function() {

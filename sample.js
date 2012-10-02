@@ -20,49 +20,17 @@ enchant();
 window.onload = function() {
 	var game = new Game();
 	var assets = [ "images/chara0.png", "images/chara6.png", "images/icon1.png" ];
-	assets.concat(bmlFiles);
+	assets = assets.concat(bmlFiles);
 	game.preload(assets);
 	game.onload = function() {
 		var scene = game.rootScene;
-
-		// 敵
-		var enemy = new Sprite(32, 32);
-		enemy.image = game.assets["images/chara6.png"];
-		enemy.frame = 3;
-		enemy.frameCount = 0;
-		enemy.x = (game.width - enemy.width) / 2;
-		enemy.y = 32;
-		enemy.on("enterframe", function() {
-			if (this.age % 10 === 0) {
-				this.frame = [ 3, 4, 5, 4 ][(this.frameCount += 1) % 4];
-			}
-		});
-
-		// 攻撃パターンにBulletMLをセット
-		enemy.attackPattern = game.assets[bmlFiles[0]];
-		// 弾の設定
-		enemy.bulletConfig = {
-			width : 16,
-			height : 16,
-			image : "",
-			frame : 0,
-			removeOnScreenOut : true,
-			onfire : function(bullet) {
-			},
-			onenterframe : function(bullet) {
-			},
-			onremove : function(bullet) {
-			}
-		};
-
-		scene.addChild(enemy);
 
 		// 自機
 		var player = new Sprite(32, 32);
 		player.image = game.assets["images/chara0.png"];
 		player.frame = 33;
 		player.frameCount = 0;
-		player.x = (game.width - enemy.width) / 2;
+		player.x = (game.width - player.width) / 2;
 		player.y = game.height - 32 - player.height;
 		player.speed = 3;
 		player.on("enterframe", function() {
@@ -88,6 +56,29 @@ window.onload = function() {
 			}
 		});
 		scene.addChild(player);
+
+		// 敵
+		var enemy = new Sprite(32, 32);
+		enemy.image = game.assets["images/chara6.png"];
+		enemy.frame = 3;
+		enemy.frameCount = 0;
+		enemy.x = (game.width - enemy.width) / 2;
+		enemy.y = 32;
+		enemy.on("enterframe", function() {
+			if (this.age % 10 === 0) {
+				this.frame = [ 3, 4, 5, 4 ][(this.frameCount += 1) % 4];
+			}
+		});
+
+		// 攻撃パターンにBulletMLをセット
+		enemy.setAttackPattern(
+				game.assets["sample-xml/[G_DARIUS]_homing_laser.bml"], {
+					target : player,
+					onenterframe : function(bullet) {
+					}
+				});
+
+		scene.addChild(enemy);
 
 		// タッチ操作用パネル
 		var ctrlPanel = new Sprite(game.width, game.height);
