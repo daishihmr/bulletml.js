@@ -19,6 +19,7 @@ var bmlFiles = [ "sample-xml/[1943]_rolling_fire.bml",
 enchant();
 window.onload = function() {
 	var game = new Game();
+	game.fps = 60;
 	var assets = [ "images/chara0.png", "images/chara6.png", "images/icon1.png" ];
 	assets = assets.concat(bmlFiles);
 	game.preload(assets);
@@ -71,12 +72,11 @@ window.onload = function() {
 		});
 
 		// 攻撃パターンにBulletMLをセット
-		enemy.setAttackPattern(
-				game.assets["sample-xml/[G_DARIUS]_homing_laser.bml"], {
-					target : player,
-					onenterframe : function(bullet) {
-					}
-				});
+		enemy.setAttackPattern(game.assets["sample-xml/test.bml"], {
+			target : player,
+			onenterframe : function(bullet) {
+			}
+		});
 
 		scene.addChild(enemy);
 

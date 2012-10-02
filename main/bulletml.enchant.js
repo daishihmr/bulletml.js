@@ -36,7 +36,7 @@
 			this.bulletml = bulletml;
 			this.seq = bulletml.sequence();
 
-			var defaultConf = {
+			this.config = {
 				width : 8,
 				height : 8,
 				image : enchant.Surface.load(enchant.bulletml.defaultImage),
@@ -47,15 +47,12 @@
 				}
 			};
 			if (config) {
-				for ( var prop in defaultConf) {
-					if (defaultConf.hasOwnProperty(prop)) {
-						if (config[prop]) {
-							defaultConf[prop] = config[prop];
-						}
+				for ( var prop in config) {
+					if (config.hasOwnProperty(prop)) {
+						this.config[prop] = config[prop];
 					}
 				}
 			}
-			this.config = defaultConf;
 
 			this.age = 0;
 			this.cursor = 0;
@@ -85,12 +82,10 @@
 				var command = this.seq[this.cursor];
 				switch (command.commandName) {
 				case "fire":
-					console.log("fire");
 					this.fire(command, this.attacker.scene);
 					break;
 				case "wait":
-					console.log("wait");
-					this.waitTo = this.age + command.value;
+					this.waitTo = this.age + eval(command.value);
 					this.cursor++;
 					return;
 				case "loopEnd":
@@ -113,11 +108,17 @@
 		},
 		fire : function(fireCmd, scene) {
 			var b = new enchant.bulletml.Bullet(this.config.width,
-					this.config.height);
+					this.config.height, this);
 			b.image = this.config.image;
 			b.frame = this.config.frame;
-			b.x = this.attacker.x;
-			b.y = this.attacker.y;
+			b.x = this.attacker.x + (this.attacker.width - b.width) / 2;
+			b.y = this.attacker.y + (this.attacker.height - b.height) / 2;
+
+			var dv = toRadian(eval(fireCmd.direction.value));
+			if (fireCmd.direction.type == "aim") {
+
+			}
+			b.speed = eval(fireCmd.speed.value);
 
 			b.seq = fireCmd.bullet.sequence();
 
@@ -140,10 +141,21 @@
 			this.speed = 1;
 			this.accelH = 0;
 			this.accelV = 0;
+
+			this.scw = enchant.Game.instance.width;
+			this.sch = enchant.Game.instance.height;
 		},
 		tick : function() {
 			this.x += Math.cos(this.direction) * this.speed;
 			this.y += Math.sin(this.direction) * this.speed;
+
+			if (this.parent.config.removeOnScreenOut) {
+				if (this.x < 0 || this.scw + this.width < this.x || this.y < 0
+						|| this.sch + this.height < this.y) {
+					this.parentNode.removeChild(this);
+					console.log("remove");
+				}
+			}
 		}
 	});
 

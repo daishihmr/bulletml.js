@@ -677,10 +677,10 @@ var BulletML = {};
 		if (params) {
 			for ( var i = 0, end = params.length; i < end; i++) {
 				var pat = new RegExp("\\$" + (i + 1), "g");
-				value = value.replace(pat, params[i]);
+				value = value.replace(pat, "(" + params[i] + ")");
 			}
 		}
-		return eval(value);
+		return value;
 	}
 
 	function search(array, label) {

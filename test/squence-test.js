@@ -114,7 +114,7 @@ RuntimeTest.prototype.testRepeatExp3 = function() {
 			+ "</action></bulletml>");
 	var commands = bulletml.sequence();
 	assertEquals(3, commands.length);
-	assertEquals(10, commands[2].times);
+	assertEquals("2*5", commands[2].times);
 };
 
 RuntimeTest.prototype.testRepeatExp4 = function() {
@@ -131,7 +131,7 @@ RuntimeTest.prototype.testRepeatExp5 = function() {
 			+ "</action></bulletml>");
 	var commands = bulletml.sequence();
 	assertEquals(3, commands.length);
-	assertEquals(2, commands[2].times);
+	assertEquals("47%3", commands[2].times);
 };
 
 RuntimeTest.prototype.testRepeatExp6 = function() {
@@ -148,15 +148,15 @@ RuntimeTest.prototype.testRepeatExp6 = function() {
 	assertEquals("loopStart", commands[0].commandName);
 	assertEquals("vanish", commands[1].commandName);
 	assertEquals("loopEnd", commands[2].commandName);
-	assertEquals(1, commands[2].times);
+	assertEquals("(1)", commands[2].times);
 	assertEquals("loopStart", commands[3].commandName);
 	assertEquals("vanish", commands[4].commandName);
 	assertEquals("loopEnd", commands[5].commandName);
-	assertEquals(2, commands[5].times);
+	assertEquals("(2)", commands[5].times);
 	assertEquals("loopStart", commands[6].commandName);
 	assertEquals("vanish", commands[7].commandName);
 	assertEquals("loopEnd", commands[8].commandName);
-	assertEquals(3, commands[8].times);
+	assertEquals("(3)", commands[8].times);
 };
 
 RuntimeTest.prototype.testRepeatExp7 = function() {
@@ -183,10 +183,10 @@ RuntimeTest.prototype.testChangeDirectionExp = function() {
 					+ "</bulletml>");
 	var commands = bulletml.sequence();
 	assertEquals(2, commands.length);
-	assertEquals("1", commands[0].direction.value);
-	assertEquals("2", commands[0].term);
-	assertEquals("3", commands[1].direction.value);
-	assertEquals("4", commands[1].term);
+	assertEquals("(1)", commands[0].direction.value);
+	assertEquals("(2)", commands[0].term);
+	assertEquals("(3)", commands[1].direction.value);
+	assertEquals("(4)", commands[1].term);
 };
 
 RuntimeTest.prototype.testChangeSpeedExp = function() {
@@ -199,10 +199,10 @@ RuntimeTest.prototype.testChangeSpeedExp = function() {
 					+ "<term>$2</term></changeSpeed></action></bulletml>");
 	var commands = bulletml.sequence();
 	assertEquals(2, commands.length);
-	assertEquals("1", commands[0].speed.value);
-	assertEquals("2", commands[0].term);
-	assertEquals("3", commands[1].speed.value);
-	assertEquals("4", commands[1].term);
+	assertEquals("(1)", commands[0].speed.value);
+	assertEquals("(2)", commands[0].term);
+	assertEquals("(3)", commands[1].speed.value);
+	assertEquals("(4)", commands[1].term);
 };
 
 RuntimeTest.prototype.testAccelExp = function() {
@@ -215,12 +215,12 @@ RuntimeTest.prototype.testAccelExp = function() {
 					+ "<term>$3</term></accel></action></bulletml>");
 	var commands = bulletml.sequence();
 	assertEquals(2, commands.length);
-	assertEquals("1", commands[0].horizontal.value);
-	assertEquals("2", commands[0].vertical.value);
-	assertEquals("3", commands[0].term);
-	assertEquals("4", commands[1].horizontal.value);
-	assertEquals("5", commands[1].vertical.value);
-	assertEquals("6", commands[1].term);
+	assertEquals("(1)", commands[0].horizontal.value);
+	assertEquals("(2)", commands[0].vertical.value);
+	assertEquals("(3)", commands[0].term);
+	assertEquals("(4)", commands[1].horizontal.value);
+	assertEquals("(5)", commands[1].vertical.value);
+	assertEquals("(6)", commands[1].term);
 };
 
 RuntimeTest.prototype.testWaitExp = function() {
@@ -230,8 +230,8 @@ RuntimeTest.prototype.testWaitExp = function() {
 			+ "<action label='r'><wait>$1</wait></action></bulletml>");
 	var commands = bulletml.sequence();
 	assertEquals(2, commands.length);
-	assertEquals("1", commands[0].value);
-	assertEquals("2", commands[1].value);
+	assertEquals("(1)", commands[0].value);
+	assertEquals("(2)", commands[1].value);
 };
 
 RuntimeTest.prototype.testFireBullet = function() {
@@ -245,10 +245,10 @@ RuntimeTest.prototype.testFireBullet = function() {
 					+ "</bulletml>");
 	var commands = bulletml.sequence();
 	assertEquals(1, commands.length);
-	assertEquals(10, commands[0].direction.value);
-	assertEquals(20, commands[0].speed.value);
-	assertEquals(100, commands[0].bullet.direction.value);
-	assertEquals(200, commands[0].bullet.speed.value);
+	assertEquals("(1)*10", commands[0].direction.value);
+	assertEquals("(2)*10", commands[0].speed.value);
+	assertEquals("(1)*100", commands[0].bullet.direction.value);
+	assertEquals("(2)*100", commands[0].bullet.speed.value);
 };
 
 RuntimeTest.prototype.testFireBulletRef = function() {
@@ -262,11 +262,11 @@ RuntimeTest.prototype.testFireBulletRef = function() {
 					+ "<bullet label='b'><direction>$1*10</direction><speed>$2*10</speed></bullet></bulletml>");
 	var commands = bulletml.sequence();
 	assertEquals(1, commands.length);
-	assertEquals(10, commands[0].direction.value);
-	assertEquals(20, commands[0].speed.value);
+	assertEquals("(1)*10", commands[0].direction.value);
+	assertEquals("(2)*10", commands[0].speed.value);
 	assertEquals("b", commands[0].bullet.label);
-	assertEquals(300, commands[0].bullet.direction.value);
-	assertEquals(400, commands[0].bullet.speed.value);
+	assertEquals("((3)*10)*10", commands[0].bullet.direction.value);
+	assertEquals("((4)*10)*10", commands[0].bullet.speed.value);
 };
 
 RuntimeTest.prototype.testBulletAction = function() {
@@ -308,9 +308,9 @@ RuntimeTest.prototype.testBulletActionRef2 = function() {
 	var bulletCommands = bullet.sequence();
 	assertEquals(2, bulletCommands.length);
 	assertEquals("wait", bulletCommands[0].commandName);
-	assertEquals(5, bulletCommands[0].value);
+	assertEquals("5", bulletCommands[0].value);
 	assertEquals("wait", bulletCommands[1].commandName);
-	assertEquals(30, bulletCommands[1].value);
+	assertEquals("(3)*10", bulletCommands[1].value);
 };
 
 RuntimeTest.prototype.testBulletActionRef3 = function() {
@@ -327,7 +327,7 @@ RuntimeTest.prototype.testBulletActionRef3 = function() {
 	assertEquals("wait", bulletCommands[0].commandName);
 	assertEquals(5, bulletCommands[0].value);
 	assertEquals("wait", bulletCommands[1].commandName);
-	assertEquals(160, bulletCommands[1].value);
+	assertEquals("((8)*2)*10", bulletCommands[1].value);
 };
 
 RuntimeTest.prototype.testFireRef = function() {
