@@ -23,20 +23,41 @@ window.onload = function() {
 	assets.concat(bmlFiles);
 	game.preload(assets);
 	game.onload = function() {
+		var scene = game.rootScene;
+
+		// 敵
 		var enemy = new Sprite(32, 32);
 		enemy.image = game.assets["images/chara6.png"];
 		enemy.frame = 3;
 		enemy.frameCount = 0;
 		enemy.x = (game.width - enemy.width) / 2;
 		enemy.y = 32;
-		enemy.attackPattern = game.assets[bmlFiles[0]];
 		enemy.on("enterframe", function() {
 			if (this.age % 10 === 0) {
 				this.frame = [ 3, 4, 5, 4 ][(this.frameCount += 1) % 4];
 			}
 		});
-		game.rootScene.addChild(enemy);
 
+		// 攻撃パターンにBulletMLをセット
+		enemy.attackPattern = game.assets[bmlFiles[0]];
+		// 弾の設定
+		enemy.bulletConfig = {
+			width : 16,
+			height : 16,
+			image : "",
+			frame : 0,
+			removeOnScreenOut : true,
+			onfire : function(bullet) {
+			},
+			onenterframe : function(bullet) {
+			},
+			onremove : function(bullet) {
+			}
+		};
+
+		scene.addChild(enemy);
+
+		// 自機
 		var player = new Sprite(32, 32);
 		player.image = game.assets["images/chara0.png"];
 		player.frame = 33;
@@ -66,8 +87,9 @@ window.onload = function() {
 				this.x = game.width - this.width;
 			}
 		});
-		game.rootScene.addChild(player);
+		scene.addChild(player);
 
+		// タッチ操作用
 		var ctrlPanel = new Sprite(game.width, game.height);
 		ctrlPanel.sense = 1.2;
 		ctrlPanel.on("touchstart", function(e) {
@@ -95,9 +117,7 @@ window.onload = function() {
 				this.startY = e.y;
 			}
 		});
-		ctrlPanel.on("touchend", function() {
-		});
-		game.rootScene.addChild(ctrlPanel);
+		scene.addChild(ctrlPanel);
 	};
 	game.start();
 };
