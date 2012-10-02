@@ -89,7 +89,7 @@ window.onload = function() {
 		});
 		scene.addChild(player);
 
-		// タッチ操作用
+		// タッチ操作用パネル
 		var ctrlPanel = new Sprite(game.width, game.height);
 		ctrlPanel.sense = 1.2;
 		ctrlPanel.on("touchstart", function(e) {
