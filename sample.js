@@ -55,6 +55,11 @@ window.onload = function() {
 			} else if (game.width - this.width < this.x) {
 				this.x = game.width - this.width;
 			}
+			if (this.y < 0) {
+				this.y = 0;
+			} else if (game.height - this.height < this.y) {
+				this.y = game.height - this.height;
+			}
 		});
 		scene.addChild(player);
 

@@ -5,14 +5,19 @@
 		<repeat>
 			<times>10</times>
 			<action>
+				<fire>
+					<direction type="aim">0</direction>
+					<bullet />
+				</fire>
+				<wait>5</wait>
 				<repeat>
-					<times>5</times>
+					<times>19</times>
 					<action>
 						<fire>
-							<direction type="absolute">$rand*180</direction>
+							<direction type="sequence">360/20</direction>
 							<bullet />
 						</fire>
-						<wait>1</wait>
+						<wait>5</wait>
 					</action>
 				</repeat>
 				<wait>30</wait>
@@ -20,4 +25,3 @@
 		</repeat>
 	</action>
 </bulletml>
-

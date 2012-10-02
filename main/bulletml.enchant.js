@@ -5,28 +5,32 @@
 	// BulletML(*.bml)をpreloadで読み込めるようにする.
 	enchant.Game._loadFuncs["bml"] = function(src, callback) {
 		var game = this;
-		var req = new XMLHttpRequest();
-		req.open('GET', src, true);
-		req.onreadystatechange = function(e) {
-			if (req.readyState === 4) {
-				if (req.status !== 200 && req.status !== 0) {
-					throw new Error(req.status + ': '
+		var xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = function(e) {
+			if (xhr.readyState === 4) {
+				if (xhr.status !== 200 && xhr.status !== 0) {
+					throw new Error(xhr.status + ': '
 							+ 'Cannot load an asset: ' + src);
 				}
 
-				if (req.responseXML != null) {
-					game.assets[src] = BulletML.build(req.responseXML);
+				if (xhr.responseXML != null) {
+					game.assets[src] = BulletML.build(xhr.responseXML);
 					callback();
-				} else if (req.responseText != null) {
-					game.assets[src] = BulletML.build(req.responseText);
+				} else if (xhr.responseText != null) {
+					game.assets[src] = BulletML.build(xhr.responseText);
 					callback();
 				} else {
-					throw new Error(req.status + ': '
+					throw new Error(xhr.status + ': '
 							+ 'Cannot load an asset: ' + src);
 				}
 			}
 		};
-		req.send(null);
+
+		xhr.open('GET', src, true);
+		if (xhr.overrideMimeType) {
+			xhr.overrideMimeType("application/xml");
+		}
+		xhr.send(null);
 	};
 
 	enchant.Node.prototype.setAttackPattern = function(bml, config) {
@@ -65,7 +69,7 @@
 			this.age = 0;
 			this.cursor = 0;
 			this.waitTo = -1;
-			this.direction = 90;
+			this.direction = 0;
 			this._attacker = null;
 		},
 		attacker : {
@@ -90,11 +94,9 @@
 				var command = this.seq[this.cursor];
 				switch (command.commandName) {
 				case "fire":
-					console.log("fire");
 					this.fire(command, this.attacker.scene);
 					break;
 				case "wait":
-					console.log("wait");
 					this.waitTo = this.age + eval(command.value);
 					this.cursor++;
 					return;
@@ -126,11 +128,25 @@
 
 			var dv = toRadian(eval(fireCmd.direction.value));
 			switch (fireCmd.direction.type) {
-			case "aim":
-				break;
 			case "absolute":
 				b.direction = dv;
+				break;
+			case "sequence":
+				b.direction = this.direction + dv;
+				break;
+			case "aim":
+			default:
+				if (this.config.target) {
+					var t = this.config.target;
+					var a = this.attacker;
+					b.direction = Math.atan2(t.y - a.y, t.x - a.x) + dv;
+				} else {
+					b.direction = dv;
+				}
+				break;
 			}
+			this.direction = b.direction;
+
 			b.speed = eval(fireCmd.speed.value);
 
 			b.seq = fireCmd.bullet.sequence();
@@ -150,7 +166,7 @@
 			this.waitTo = -1;
 			this.addEventListener("enterframe", this.tick);
 
-			this.direction = toRadian(90);
+			this.direction = 0;
 			this.speed = 1;
 			this.accelH = 0;
 			this.accelV = 0;
