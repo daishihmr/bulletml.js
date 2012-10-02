@@ -227,7 +227,24 @@ RuntimeTest.prototype.testWaitExp = function() {
 	assertEquals("2", commands[1].value);
 };
 
-RuntimeTest.prototype.testFire = function() {
+RuntimeTest.prototype.testFireBullet = function() {
+	var bulletml = BulletML
+			.build("<bulletml><action label='top'>"
+					+ "<actionRef label='s'>"
+					+ "<param>1</param><param>2</param><param>3</param><param>4</param>"
+					+ "</actionRef></action>"
+					+ "<action label='s'><fire><direction>$1*10</direction><speed>$2*10</speed>"
+					+ "<bullet><direction>$1*100</direction><speed>$2*100</speed></bullet></fire></action>"
+					+ "</bulletml>");
+	var commands = bulletml.sequence();
+	assertEquals(1, commands.length);
+	assertEquals(10, commands[0].direction.value);
+	assertEquals(20, commands[0].speed.value);
+	assertEquals(100, commands[0].bullet.direction.value);
+	assertEquals(200, commands[0].bullet.speed.value);
+};
+
+RuntimeTest.prototype.testFireBulletRef = function() {
 	var bulletml = BulletML
 			.build("<bulletml><action label='top'>"
 					+ "<actionRef label='s'>"
@@ -243,4 +260,65 @@ RuntimeTest.prototype.testFire = function() {
 	assertEquals("b", commands[0].bullet.label);
 	assertEquals(300, commands[0].bullet.direction.value);
 	assertEquals(400, commands[0].bullet.speed.value);
+};
+
+RuntimeTest.prototype.testBulletAction = function() {
+	var bulletml = BulletML
+			.build("<bulletml><action label='top'><fire><bullet>"
+					+ "<action><wait>5</wait></action>"
+					+ "<action><vanish/></action></bullet></fire>"
+					+ "</action></bulletml>");
+	var commands = bulletml.sequence();
+	var bullet = commands[0].bullet;
+	var bulletCommands = bullet.sequence();
+	assertEquals(2, bulletCommands.length);
+	assertEquals("wait", bulletCommands[0].commandName);
+	assertEquals("vanish", bulletCommands[1].commandName);
+};
+
+RuntimeTest.prototype.testBulletActionRef = function() {
+	var bulletml = BulletML
+			.build("<bulletml><action label='top'><fire><bullet>"
+					+ "<action><wait>5</wait></action>"
+					+ "<actionRef label='a'/></bullet></fire></action>"
+					+ "<action label='a'><vanish/></action></bulletml>");
+	var commands = bulletml.sequence();
+	var bullet = commands[0].bullet;
+	var bulletCommands = bullet.sequence();
+	assertEquals(2, bulletCommands.length);
+	assertEquals("wait", bulletCommands[0].commandName);
+	assertEquals("vanish", bulletCommands[1].commandName);
+};
+
+RuntimeTest.prototype.testBulletActionRef2 = function() {
+	var bulletml = BulletML
+			.build("<bulletml><action label='top'><fire><bullet>"
+					+ "<action><wait>5</wait></action>"
+					+ "<actionRef label='a'><param>3</param></actionRef></bullet></fire></action>"
+					+ "<action label='a'><wait>$1*10</wait></action></bulletml>");
+	var commands = bulletml.sequence();
+	var bullet = commands[0].bullet;
+	var bulletCommands = bullet.sequence();
+	assertEquals(2, bulletCommands.length);
+	assertEquals("wait", bulletCommands[0].commandName);
+	assertEquals(5, bulletCommands[0].value);
+	assertEquals("wait", bulletCommands[1].commandName);
+	assertEquals(30, bulletCommands[1].value);
+};
+
+RuntimeTest.prototype.testBulletActionRef3 = function() {
+	var bulletml = BulletML.build("<bulletml><action label='top'><fire>"
+			+ "<bulletRef label='b'><param>8</param></bulletRef>"
+			+ "</fire></action>"
+			+ "<bullet label='b'><action><wait>5</wait></action>"
+			+ "<actionRef label='a'><param>$1*2</param></actionRef></bullet>"
+			+ "<action label='a'><wait>$1*10</wait></action></bulletml>");
+	var commands = bulletml.sequence();
+	var bullet = commands[0].bullet;
+	var bulletCommands = bullet.sequence();
+	assertEquals(2, bulletCommands.length);
+	assertEquals("wait", bulletCommands[0].commandName);
+	assertEquals(5, bulletCommands[0].value);
+	assertEquals("wait", bulletCommands[1].commandName);
+	assertEquals(160, bulletCommands[1].value);
 };

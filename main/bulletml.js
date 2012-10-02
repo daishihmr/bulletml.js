@@ -186,6 +186,15 @@ var BulletML = {};
 		this.label = null;
 		this.params = [];
 	};
+	ActionRef.prototype = new Command();
+	ActionRef.prototype.clone = function(params) {
+		var result = new ActionRef();
+		result.label = this.label;
+		for ( var i = 0, end = this.params.length; i < end; i++) {
+			result.params.push(evalNumber(this.params[i], params));
+		}
+		return result;
+	};
 
 	var Fire = BulletML.Fire = function() {
 		this.commandName = "fire";
