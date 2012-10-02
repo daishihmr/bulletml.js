@@ -53,7 +53,7 @@ var BulletML = {};
 		this.actions = [];
 		this.bullets = [];
 		this.fires = [];
-		this.visitor = new Visitor();
+		this.rank = 0;
 	};
 	Root.prototype.findAction = function(label) {
 		return search(this.actions, label);
@@ -64,35 +64,54 @@ var BulletML = {};
 	Root.prototype.findFire = function(label) {
 		return search(this.fires, label);
 	};
-	Root.prototype.tick = function() {
-		if (this.visitor.currentCommand == null) {
-			this.visitor.currentCommand = this.topAction;
-		}
-		this.visitor.getNextCommands();
-		return this.visitor.commands;
+	Root.prototype.sequence = function() {
+		var visitor = new Visitor(this);
+		visitor.visit(this.topAction);
+		return visitor.result;
 	};
 
-	var Visitor = function() {
-		this.currentCommand = null;
-		this.commands = [];
-	};
-	Visitor.prototype.getNextCommands = function() {
-		this.commands = [];
-		this.currentCommand.accept(this);
+	var Visitor = function(root) {
+		this.root = root;
+		this.result = [];
+		this.paramsStack = [];
 	};
 	Visitor.prototype.visit = function(command) {
 		switch (command.commandName) {
 		case "action":
 			for ( var i = 0, end = command.commands.length; i < end; i++) {
-				command.commands[i].accept(this);
+				this.visit(command.commands[i]);
 			}
 			break;
-		case "wait":
+		case "actionRef":
+			this.pushParams(command.params);
+			var action = this.root.findAction(command.label);
+			for ( var i = 0, end = action.commands.length; i < end; i++) {
+				this.visit(action.commands[i]);
+			}
+			this.paramsStack.pop(command.params);
+			break;
+		case "repeat":
+			for ( var i = 0, end = evalNumber(command.times, this.params()); i < end; i++) {
+				this.visit(command.action);
+			}
 			break;
 		default:
-			this.commands.push(command);
-			break;
+			this.result.push(command.clone(this.params()));
 		}
+	};
+	Visitor.prototype.pushParams = function(params) {
+		var cp = this.params();
+		var result = [];
+		for ( var i = 0, end = params.length; i < end; i++) {
+			result.push(evalNumber(params[i], cp))
+		}
+		this.paramsStack.push(result);
+	};
+	Visitor.prototype.params = function() {
+		if (this.paramsStack.length == 0) {
+			return [];
+		}
+		return this.paramsStack[this.paramsStack.length - 1];
 	};
 
 	/**
@@ -105,6 +124,13 @@ var BulletML = {};
 		this.direction = new Direction();
 		this.speed = new Speed();
 		this.actions = [];
+	};
+	Bullet.prototype.sequence = function() {
+		var visitor = new Visitor(this.root);
+		for ( var i = 0, end = this.actions.length; i < end; i++) {
+			visitor.visit(this.actions[i]);
+		}
+		return visitor.result;
 	};
 	var BulletRef = BulletML.BulletRef = function() {
 		this.label = null;
@@ -122,8 +148,8 @@ var BulletML = {};
 		this.root = null;
 		this.commandName = null;
 	};
-	Command.prototype.accept = function(visitor) {
-		visitor.visit(this);
+	Command.prototype.clone = function() {
+		return this;
 	};
 
 	var Action = BulletML.Action = function() {
@@ -133,7 +159,13 @@ var BulletML = {};
 		this.commands = [];
 	};
 	Action.prototype = new Command();
-	Action.prototype.clone = function(params) {
+	Action.prototype.reference = function(params) {
+		var result = new Action();
+		for ( var i = 0, end = this.commands.length; i < end; i++) {
+			var c = this.commands[i];
+			result.commands.push(c);
+		}
+		return result;
 	};
 
 	var ActionRef = BulletML.ActionRef = function() {
@@ -162,12 +194,22 @@ var BulletML = {};
 	};
 	FireRef.prototype = new Command();
 
-	var ChangeDirection = function() {
+	var ChangeDirection = BulletML.ChangeDirection = function() {
 		this.commandName = "changeDirection";
 		this.direction = null;
 		this.term = 0;
 	};
 	ChangeDirection.prototype = new Command();
+	ChangeDirection.prototype.clone = function(params) {
+		var result = new ChangeDirection();
+		if (this.direction) {
+			result.direction = new Direction(evalNumber(this.direction.value,
+					params));
+			result.direction.type = this.direction.type;
+		}
+		result.term = evalNumber(this.term, params);
+		return result;
+	};
 
 	var ChangeSpeed = BulletML.ChangeSpeed = function() {
 		this.commandName = "changeSpeed";
@@ -175,14 +217,38 @@ var BulletML = {};
 		this.term = 0;
 	};
 	ChangeSpeed.prototype = new Command();
+	ChangeSpeed.prototype.clone = function(params) {
+		var result = new ChangeSpeed();
+		if (this.speed) {
+			result.speed = new Speed(evalNumber(this.speed.value, params));
+			result.speed.type = this.speed.type;
+		}
+		result.term = evalNumber(this.term, params);
+		return result;
+	};
 
 	var Accel = BulletML.Accel = function() {
 		this.commandName = "accel";
-		this.horizontal = new Horizontal();
-		this.vertical = new Vertical();
+		this.horizontal = null;
+		this.vertical = null;
 		this.term = 0;
 	};
 	Accel.prototype = new Command();
+	Accel.prototype.clone = function(params) {
+		var result = new Accel();
+		if (this.horizontal) {
+			result.horizontal = new Horizontal(evalNumber(
+					this.horizontal.value, params));
+			result.horizontal.type = this.horizontal.type;
+		}
+		if (this.vertical) {
+			result.vertical = new Vertical(evalNumber(this.vertical.value,
+					params));
+			result.vertical.type = this.vertical.type;
+		}
+		result.term = evalNumber(this.term, params);
+		return result;
+	};
 
 	var Wait = BulletML.Wait = function(value) {
 		this.commandName = "wait";
@@ -193,7 +259,8 @@ var BulletML = {};
 		}
 	};
 	Wait.prototype = new Command();
-	Wait.prototype.accept = function(visitor) {
+	Wait.prototype.clone = function(params) {
+		return new Wait(evalNumber(this.value, params));
 	};
 
 	var Vanish = BulletML.Vanish = function() {
@@ -229,7 +296,7 @@ var BulletML = {};
 	var Horizontal = BulletML.Horizontal = function(value) {
 		this.type = "relative";
 		if (value) {
-			this.value = vale;
+			this.value = value;
 		} else {
 			this.value = 0;
 		}
@@ -524,6 +591,17 @@ var BulletML = {};
 	}
 
 	// utility ---------------------------------------------------
+
+	function evalNumber(value, params) {
+		value = value.replace(/\$rand/g, "Math.random()");
+		if (params) {
+			for ( var i = 0, end = params.length; i < end; i++) {
+				var pat = new RegExp("\\$" + (i + 1), "g");
+				value = value.replace(pat, params[i]);
+			}
+		}
+		return eval(value);
+	}
 
 	function search(array, label) {
 		for ( var i = 0, end = array.length; i < end; i++) {
