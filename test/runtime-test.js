@@ -322,3 +322,13 @@ RuntimeTest.prototype.testBulletActionRef3 = function() {
 	assertEquals("wait", bulletCommands[1].commandName);
 	assertEquals(160, bulletCommands[1].value);
 };
+
+RuntimeTest.prototype.testFireRef = function() {
+	var bulletml = BulletML.build("<bulletml><action label='top'>"
+			+ "<fireRef label='f'><param>5</param></fireRef></action>"
+			+ "<fire label='f'><speed>5</speed><bullet/></fire></bulletml>");
+	var commands = bulletml.sequence();
+	assertEquals(1, commands.length);
+	assertEquals("fire", commands[0].commandName);
+	assertEquals(5, commands[0].speed.value);
+};

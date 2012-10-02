@@ -95,9 +95,6 @@ var BulletML = {};
 				this.visit(command.action);
 			}
 			break;
-		case "fire":
-			this.result.push(command.clone(this.params()));
-			break;
 		default:
 			this.result.push(command.clone(this.params()));
 		}
@@ -243,6 +240,16 @@ var BulletML = {};
 		this.params = [];
 	};
 	FireRef.prototype = new Command();
+	FireRef.prototype.clone = function(params) {
+		var orig = this.root.findFire(this.label);
+		if (orig) {
+			var newParams = [];
+			for ( var i = 0, end = this.params.length; i < end; i++) {
+				newParams.push(evalNumber(this.params[i], params));
+			}
+			return orig.clone(newParams);
+		}
+	};
 
 	var ChangeDirection = BulletML.ChangeDirection = function() {
 		this.commandName = "changeDirection";
