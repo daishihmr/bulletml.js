@@ -19,16 +19,34 @@ ParseFileTest.prototype.test = function() {
 			"[Psyvariar]_X-A_boss_winder.xml",
 			"[Psyvariar]_X-B_colony_shape_satellite.xml",
 			"[XEVIOUS]_garu_zakato.xml" ];
-	files.forEach(function(file) {
+	for ( var i = 0, end = files.length; i < end; i++) {
+		var file = files[i];
 		ajax("/test/sample-xml/" + file, function(xml) {
 			var result = BulletML.build(xml);
 			assertNotUndefined(result);
 		});
-	});
+	}
 };
 
 function ajax(url, callback) {
-	var xhr = new XMLHttpRequest();
+	var xhr;
+	if (XMLHttpRequest) {
+		xhr = new XMLHttpRequest();
+	} else {
+		try {
+			xhr = new ActiveXObject('MSXML2.XMLHTTP.6.0');
+		} catch (e) {
+			try {
+				xhr = new ActiveXObject('MSXML2.XMLHTTP.3.0');
+			} catch (e) {
+				try {
+					xhr = new ActiveXObject('MSXML2.XMLHTTP');
+				} catch (e) {
+					throw new Exception("ActiveX is disabled.");
+				}
+			}
+		}
+	}
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState == 4) {
 			if (xhr.status == 200) {

@@ -64,11 +64,11 @@ var BulletML = {};
 	Root.prototype.findFire = function(label) {
 		return search(this.fires, label);
 	};
-	Root.prototype.nextCommands = function() {
+	Root.prototype.tick = function() {
 		if (this.visitor.currentCommand == null) {
 			this.visitor.currentCommand = this.topAction;
 		}
-		this.visitor.goNext();
+		this.visitor.getNextCommands();
 		return this.visitor.commands;
 	};
 
@@ -76,12 +76,11 @@ var BulletML = {};
 		this.currentCommand = null;
 		this.commands = [];
 	};
-	Visitor.prototype.goNext = function() {
+	Visitor.prototype.getNextCommands = function() {
 		this.commands = [];
 		this.currentCommand.accept(this);
 	};
 	Visitor.prototype.visit = function(command) {
-		console.debug("visit", command);
 		switch (command.commandName) {
 		case "action":
 			for ( var i = 0, end = command.commands.length; i < end; i++) {

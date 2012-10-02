@@ -9,7 +9,7 @@ RuntimeTest.prototype.testVisitor1 = function() {
 			+ "<fire><bulletRef label='bullet3'/></fire>"
 			+ "<fire><bulletRef label='bullet4'/></fire>"
 			+ "</action></bulletml>");
-	var commands = bulletml.nextCommands();
+	var commands = bulletml.tick();
 	assertEquals(4, commands.length);
 	assertEquals("bullet1", commands[0].bullet.label);
 	assertEquals("bullet2", commands[1].bullet.label);
@@ -24,7 +24,7 @@ RuntimeTest.prototype.testVisitor2 = function() {
 			+ "<action><fire><bulletRef label='bullet3'/></fire></action>"
 			+ "<fire><bulletRef label='bullet4'/></fire>"
 			+ "</action></bulletml>");
-	var commands = bulletml.nextCommands();
+	var commands = bulletml.tick();
 	assertEquals(4, commands.length);
 	assertEquals("bullet1", commands[0].bullet.label);
 	assertEquals("bullet2", commands[1].bullet.label);
