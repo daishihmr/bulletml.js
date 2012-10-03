@@ -79,7 +79,6 @@ var BulletML = {};
 		this.paramsStack = [];
 	};
 	Visitor.prototype.visit = function(command) {
-		console.log(command.commandName);
 		switch (command.commandName) {
 		case "action":
 			for ( var i = 0, end = command.commands.length; i < end; i++) {
@@ -185,6 +184,15 @@ var BulletML = {};
 		this.commands = [];
 	};
 	Action.prototype = new Command();
+	Action.prototype.clone = function(params) {
+		var result = new Action();
+		result.label = this.label;
+		result.root = this.root;
+		for ( var i = 0, end = this.commands.length; i < end; i++) {
+			result.commands.push(this.commands[i].clone(params));
+		}
+		return result;
+	};
 
 	var ActionRef = BulletML.ActionRef = function() {
 		this.commandName = "actionRef";
@@ -205,8 +213,8 @@ var BulletML = {};
 		this.commandName = "fire";
 		this.label = null;
 		this.root = null;
-		this.direction = new Direction();
-		this.speed = new Speed();
+		this.direction = null;
+		this.speed = null;
 		this.bullet = null;
 	};
 	Fire.prototype = new Command();

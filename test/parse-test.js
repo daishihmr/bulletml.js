@@ -139,10 +139,8 @@ ParseTest.prototype.testParseFire1 = function() {
 			+ "<fire><bullet/></fire></action></bulletml>");
 	var fire = result.topAction.commands[0];
 	assertNotUndefined(fire.bullet);
-	assertEquals("aim", fire.direction.type);
-	assertEquals("0", fire.direction.value);
-	assertEquals("absolute", fire.speed.type);
-	assertEquals("1", fire.speed.value);
+	assertNull(fire.direction);
+	assertNull(fire.speed);
 };
 
 ParseTest.prototype.testParseFire2 = function() {
