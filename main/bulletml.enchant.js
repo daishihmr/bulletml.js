@@ -70,6 +70,7 @@
 			this.cursor = 0;
 			this.waitTo = -1;
 			this.direction = 0;
+			this.speed = 1;
 			this._attacker = null;
 		},
 		attacker : {
@@ -94,7 +95,8 @@
 				var command = this.seq[this.cursor];
 				switch (command.commandName) {
 				case "fire":
-					this.fire(command, this.attacker.scene);
+					console.log(command.direction.value);
+					this.fire(command, this._attacker.scene);
 					break;
 				case "wait":
 					this.waitTo = this.age + eval(command.value);
@@ -120,34 +122,49 @@
 		},
 		fire : function(fireCmd, scene) {
 			var b = new enchant.bulletml.Bullet(this.config.width,
-					this.config.height, this);
+					this.config.height, this, fireCmd.bullet);
 			b.image = this.config.image;
 			b.frame = this.config.frame;
-			b.x = this.attacker.x + (this.attacker.width - b.width) / 2;
-			b.y = this.attacker.y + (this.attacker.height - b.height) / 2;
+			b.x = this._attacker.x + (this._attacker.width - b.width) / 2;
+			b.y = this._attacker.y + (this._attacker.height - b.height) / 2;
 
-			var dv = toRadian(eval(fireCmd.direction.value));
-			switch (fireCmd.direction.type) {
-			case "absolute":
-				b.direction = dv;
-				break;
-			case "sequence":
-				b.direction = this.direction + dv;
-				break;
-			case "aim":
-			default:
-				if (this.config.target) {
-					var t = this.config.target;
-					var a = this.attacker;
-					b.direction = Math.atan2(t.y - a.y, t.x - a.x) + dv;
-				} else {
-					b.direction = dv;
+			if (fireCmd.direction) {
+				var dv = toRadian(eval(fireCmd.direction.value));
+				switch (fireCmd.direction.type) {
+				case "absolute":
+					b.direction = dv - Math.PI / 2; // 真上が0度
+					break;
+				case "sequence":
+					b.direction = this.direction + dv;
+					break;
+				case "aim":
+				default:
+					if (this.config.target) {
+						var t = this.config.target;
+						var a = this._attacker;
+						b.direction = Math.atan2(t.y - a.y, t.x - a.x) + dv;
+					} else {
+						b.direction = dv;
+					}
+					break;
 				}
-				break;
 			}
 			this.direction = b.direction;
 
-			b.speed = eval(fireCmd.speed.value);
+			if (fireCmd.speed) {
+				var sv = eval(fireCmd.speed.value);
+				switch (fireCmd.speed.type) {
+				case "relative":
+				case "sequence":
+					b.speed = this.speed + sv;
+					break;
+				case "absolute":
+				default:
+					b.speed = sv;
+					break;
+				}
+			}
+			this.speed = b.speed;
 
 			b.seq = fireCmd.bullet.sequence();
 
@@ -159,7 +176,7 @@
 	});
 
 	enchant.bulletml.Bullet = enchant.Class.create(enchant.Sprite, {
-		initialize : function(width, height, attackPattern) {
+		initialize : function(width, height, attackPattern, bulletSpec) {
 			enchant.Sprite.call(this, width, height);
 			this.parent = attackPattern;
 			this.cursor = 0;

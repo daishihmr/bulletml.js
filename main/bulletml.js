@@ -79,6 +79,7 @@ var BulletML = {};
 		this.paramsStack = [];
 	};
 	Visitor.prototype.visit = function(command) {
+		console.log(command.commandName);
 		switch (command.commandName) {
 		case "action":
 			for ( var i = 0, end = command.commands.length; i < end; i++) {
@@ -692,13 +693,16 @@ var BulletML = {};
 	}
 
 	function get(element, tagName, callback, ifNotFound) {
-		var elms = element.getElementsByTagName(tagName);
-		if (elms && elms[0]) {
-			if (callback) {
-				callback(elms[0]);
+		var children = element.childNodes;
+		for ( var i = 0, end = children.length; i < end; i++) {
+			if (children[i].tagName && children[i].tagName == tagName) {
+				if (callback) {
+					callback(children[i]);
+				}
+				return callback(children[i]);
 			}
-			return elms[0];
-		} else if (ifNotFound) {
+		}
+		if (ifNotFound) {
 			ifNotFound();
 		}
 	}

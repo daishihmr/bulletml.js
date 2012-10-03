@@ -41,6 +41,19 @@ ParseTest.prototype.testBuildTopAction = function() {
 	assertNotUndefined(result.topAction);
 };
 
+ParseTest.prototype.testRepeat2ActionRef = function() {
+	var result = BulletML
+			.build("<bulletml>"
+					+ "<action label='top'><repeat><times>5</times>"
+					+ "<action><actionRef label='sub'/><actionRef label='sub'/></action></action>"
+					+ "<action label='sub'></actoin></bulletml>");
+	var repeat = result.topAction.commands[0];
+	assertEquals("repeat", repeat.commandName);
+	assertEquals(2, repeat.action.commands.length);
+	assertEquals("actionRef", repeat.action.commands[0].commandName);
+	assertEquals("actionRef", repeat.action.commands[1].commandName);
+};
+
 ParseTest.prototype.testFindAction = function() {
 	var result = BulletML
 			.build("<bulletml><action label='a1'/><action label='a2'/><action label='a3'/></bulletml>");

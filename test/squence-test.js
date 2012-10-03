@@ -339,3 +339,13 @@ RuntimeTest.prototype.testFireRef = function() {
 	assertEquals("fire", commands[0].commandName);
 	assertEquals(5, commands[0].speed.value);
 };
+
+RuntimeTest.prototype.testRepeatNestedActionRef = function() {
+	var bulletml = BulletML.build("<bulletml>"
+			+ "<action label='top'><repeat><times>5</times><action>"
+			+ "<actionRef label='shot'/><actionRef label='shot'/>"
+			+ "</action></repeat></action>"
+			+ "<action label='shot'><vanish/></action></bulletml>");
+	var commands = bulletml.sequence();
+	assertEquals(4, commands.length);
+}

@@ -5,23 +5,34 @@
 		<repeat>
 			<times>10</times>
 			<action>
-				<fire>
-					<direction type="aim">0</direction>
-					<bullet />
-				</fire>
-				<wait>5</wait>
-				<repeat>
-					<times>19</times>
-					<action>
-						<fire>
-							<direction type="sequence">360/20</direction>
-							<bullet />
-						</fire>
-						<wait>5</wait>
-					</action>
-				</repeat>
-				<wait>30</wait>
+				<actionRef label="shot">
+					<param>1</param>
+				</actionRef>
+				<actionRef label="shot">
+					<param>-1</param>
+				</actionRef>
 			</action>
 		</repeat>
 	</action>
+
+	<action label="shot">
+		<fire>
+			<direction type="aim">-15*$1</direction>
+			<speed type="absolute">1.0</speed>
+			<bullet />
+		</fire>
+		<wait>0.1</wait>
+		<repeat>
+			<times>30</times>
+			<action>
+				<fire>
+					<direction type="sequence">$1</direction>
+					<speed type="sequence">0.1</speed>
+					<bullet />
+				</fire>
+				<wait>1</wait>
+			</action>
+		</repeat>
+	</action>
+
 </bulletml>
