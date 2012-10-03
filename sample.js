@@ -87,7 +87,7 @@ window.onload = function() {
 
 		// タッチ操作用パネル
 		var ctrlPanel = new Sprite(game.width, game.height);
-		ctrlPanel.sense = 1.2;
+		ctrlPanel.sense = 1.4;
 		ctrlPanel.on("touchstart", function(e) {
 			this.startX = e.x;
 			this.startY = e.y;
