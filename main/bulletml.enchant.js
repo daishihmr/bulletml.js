@@ -63,6 +63,8 @@
 				removeOnScreenOut : true,
 				target : null,
 				onfire : function() {
+				},
+				onenterframe : function() {
 				}
 			};
 			if (config) {
@@ -125,14 +127,20 @@
 					}
 				}
 			}
+			this._attacker.dispatchEvent(new Event("completeAttack"));
 		},
+		restart : function() {
+			this.cursor = 0;
+			this.waitTo = -1;
+			this.seq = this.bulletml.sequence();
+		}
 	});
 
 	/**
 	 * 弾を発射.
 	 */
 	enchant.bulletml.fireBullet = function(fireCmd, scene, config, attacker) {
-		console.log(fireCmd.direction.type, fireCmd.direction.value);
+		// console.log(fireCmd.direction.type, fireCmd.direction.value);
 		var pattern;
 		if (this instanceof enchant.bulletml.AttackPattern) {
 			pattern = this;
@@ -164,7 +172,11 @@
 				b.direction = dv - Math.PI / 2; // 真上が0度
 				break;
 			case "relative":
-				b.direction = this.direction + dv;
+				if (this.direction) {
+					b.direction = this.direction + dv;
+				} else if (this.lastDirection) {
+					b.direction = this.lastDirection + dv;
+				}
 				break;
 			case "sequence":
 				b.direction = this.lastDirection + dv;
@@ -194,9 +206,10 @@
 		if (scene) {
 			scene.addChild(b);
 		}
-		
-		console.log(b.direction);
 
+		// console.log(b.direction);
+
+		pattern.config.onfire.call(b);
 		return b;
 	};
 
@@ -261,6 +274,8 @@
 			this.addEventListener("enterframe", this.tick);
 		},
 		tick : function() {
+			this.parent.config.onenterframe.call(this);
+
 			this._changeDirection && this._changeDirection();
 			this._changeSpeed && this._changeSpeed();
 

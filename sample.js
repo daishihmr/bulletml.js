@@ -60,8 +60,23 @@ window.onload = function() {
 			} else if (game.height - this.height < this.y) {
 				this.y = game.height - this.height;
 			}
+
+			h.x = player.x + (player.width - h.width) / 2;
+			h.y = player.y + (player.height - h.height) / 2;
 		});
 		scene.addChild(player);
+		var h = new Sprite(4, 4);
+		(function() {
+			h.image = new Surface(4, 4);
+			var c = h.image.context;
+			var g = c.createRadialGradient(2, 2, 0, 2, 2, 2);
+			g.addColorStop(0.0, "#ffffff");
+			g.addColorStop(0.8, "#00ff00");
+			g.addColorStop(1.0, "rgba(0,255,0,0)");
+			c.fillStyle = g;
+			c.fillRect(0, 0, 4, 4);
+		})();
+		scene.addChild(h);
 
 		// 敵
 		var enemy = new Sprite(32, 32);
@@ -77,10 +92,27 @@ window.onload = function() {
 		});
 
 		// 攻撃パターンにBulletMLをセット
-		enemy.setAttackPattern(game.assets["sample-xml/test.bml"], {
-			target : player,
-			onenterframe : function(bullet) {
-			}
+		enemy.setAttackPattern(
+				game.assets["sample-xml/[G_DARIUS]_homing_laser.bml"], {
+					target : player,
+					onfire : function() {
+						console.log("発射! ", this.x, this.y);
+					},
+					onenterframe : function() {
+						var x1 = this.x + this.width / 2;
+						var y1 = this.y + this.height / 2;
+						var x2 = player.x + player.width / 2;
+						var y2 = player.y + player.height / 2;
+						var dx = (x1 - x2) * (x1 - x2);
+						var dy = (y1 - y2) * (y1 - y2);
+						if (dx + dy < 4 * 4) {
+							this.parentNode.removeChild(this);
+						}
+					}
+				});
+		enemy.on("completeAttack", function() {
+			console.log("攻撃再開");
+			this.attackPattern.restart();
 		});
 
 		scene.addChild(enemy);
