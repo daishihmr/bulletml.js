@@ -66,6 +66,8 @@
 				onfire : function() {
 				},
 				onenterframe : function() {
+				},
+				onremove : function() {
 				}
 			};
 			if (config) {
@@ -281,8 +283,8 @@
 			this._changeDirection && this._changeDirection();
 			this._changeSpeed && this._changeSpeed();
 
-			this.x += Math.cos(this.direction) * this.speed;
-			this.y += Math.sin(this.direction) * this.speed;
+			this.x += Math.cos(this.direction) * this.speed * 2;
+			this.y += Math.sin(this.direction) * this.speed * 2;
 
 			if (this.pattern.config.removeOnScreenOut) {
 				if (this.x < 0 || this.scw + this.width < this.x || this.y < 0
