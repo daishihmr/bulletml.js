@@ -146,8 +146,8 @@
 		var pattern;
 		if (this instanceof enchant.bulletml.AttackPattern) {
 			pattern = this;
-		} else if (this.parent) {
-			pattern = this.parent;
+		} else if (this.pattern) {
+			pattern = this.pattern;
 		}
 
 		var w = config.width;
@@ -223,7 +223,7 @@
 			enchant.Sprite.call(this, width, height);
 			this.x = x;
 			this.y = y;
-			this.parent = attackPattern;
+			this.pattern = attackPattern;
 			this.cursor = 0;
 			this.waitTo = -1;
 			this.lastDirection = 0;
@@ -276,7 +276,7 @@
 			this.addEventListener("enterframe", this.tick);
 		},
 		tick : function() {
-			this.parent.config.onenterframe.call(this);
+			this.pattern.config.onenterframe.call(this);
 
 			this._changeDirection && this._changeDirection();
 			this._changeSpeed && this._changeSpeed();
@@ -284,9 +284,10 @@
 			this.x += Math.cos(this.direction) * this.speed;
 			this.y += Math.sin(this.direction) * this.speed;
 
-			if (this.parent.config.removeOnScreenOut) {
+			if (this.pattern.config.removeOnScreenOut) {
 				if (this.x < 0 || this.scw + this.width < this.x || this.y < 0
 						|| this.sch + this.height < this.y) {
+					this.pattern.config.onremove.call(this);
 					this.parentNode.removeChild(this);
 				}
 			}
@@ -300,7 +301,7 @@
 				switch (command.commandName) {
 				case "fire":
 					enchant.bulletml.fireBullet.call(this, command, this.scene,
-							this.parent.config, this);
+							this.pattern.config, this);
 					break;
 				case "wait":
 					this.waitTo = this.age + eval(command.value);
@@ -331,6 +332,7 @@
 					// TODO
 					break;
 				case "vanish":
+					this.pattern.config.onremove.call(this);
 					if (this.parentNode) {
 						this.parentNode.removeChild(this);
 					}
@@ -347,7 +349,7 @@
 			var t = eval(cmd.term);
 			switch (cmd.direction.type) {
 			case "aim":
-				var tar = this.parent.config.target;
+				var tar = this.pattern.config.target;
 				if (!tar) {
 					return;
 				}
