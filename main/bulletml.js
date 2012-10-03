@@ -64,12 +64,18 @@ var BulletML = {};
 	Root.prototype.findFire = function(label) {
 		return search(this.fires, label);
 	};
-	Root.prototype.sequence = function() {
-		if (!this.topAction) {
-			throw new Error("has no top action.");
+	Root.prototype.sequence = function(actionLabel) {
+		if (!actionLabel && !this.topAction) {
+			throw new Error("has no top action(s).");
+		}
+		var topAction;
+		if (actionLabel) {
+			topAction = this.findAction(actionLabel);
+		} else {
+			topAction = this.topAction;
 		}
 		var visitor = new Visitor(this);
-		visitor.visit(this.topAction);
+		visitor.visit(topAction);
 		return visitor.result;
 	};
 
@@ -242,7 +248,8 @@ var BulletML = {};
 				}
 				var newParam = [];
 				for ( var i = 0, end = this.bullet.params.length; i < end; i++) {
-					newParam.push(evalNumberFixRand(this.bullet.params[i], params));
+					newParam.push(evalNumberFixRand(this.bullet.params[i],
+							params));
 				}
 				result.bullet = origBullet.clone(newParam);
 			}
@@ -417,6 +424,9 @@ var BulletML = {};
 		}
 		// find topAction
 		result.topAction = search(result.actions, "top");
+		if (!result.topAction) {
+			result.topAction = search(result.actions, "top1");
+		}
 
 		// Top Level Bullets
 		var bullets = root.getElementsByTagName("bullet");

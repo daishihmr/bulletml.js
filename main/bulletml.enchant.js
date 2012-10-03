@@ -54,6 +54,7 @@
 		initialize : function(bulletml, config) {
 			this.bulletml = bulletml;
 			this.seq = bulletml.sequence();
+			console.log(this.seq);
 
 			this.config = {
 				width : 8,
@@ -125,6 +126,7 @@
 					} else {
 						command.loopCount = -1;
 					}
+					break;
 				}
 			}
 			this._attacker.dispatchEvent(new Event("completeAttack"));
@@ -318,7 +320,7 @@
 					} else {
 						command.loopCount = -1;
 					}
-					return;
+					break;
 				case "changeDirection":
 					this.changeDirection(command);
 					break;

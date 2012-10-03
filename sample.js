@@ -93,7 +93,7 @@ window.onload = function() {
 
 		// 攻撃パターンにBulletMLをセット
 		enemy.setAttackPattern(
-				game.assets["sample-xml/[G_DARIUS]_homing_laser.bml"], {
+				game.assets["sample-xml/test.bml"], {
 					target : player,
 					onfire : function() {
 						console.log("発射! ", this.x, this.y);
@@ -110,10 +110,10 @@ window.onload = function() {
 						}
 					}
 				});
-		enemy.on("completeAttack", function() {
-			console.log("攻撃再開");
-			this.attackPattern.restart();
-		});
+//		enemy.on("completeAttack", function() {
+//			console.log("攻撃再開");
+//			this.attackPattern.restart();
+//		});
 
 		scene.addChild(enemy);
 
