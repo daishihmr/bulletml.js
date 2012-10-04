@@ -12,7 +12,6 @@ var xmlFiles = [ "sample-assets/[1943]_rolling_fire.xml",
         "sample-assets/[Progear]_round_5_middle_boss_rockets.xml",
         "sample-assets/[Progear]_round_6_boss_parabola_shot.xml",
         "sample-assets/[Psyvariar]_X-A_boss_opening.xml",
-        "sample-assets/[Psyvariar]_X-A_boss_winder.xml",
         "sample-assets/[Psyvariar]_X-B_colony_shape_satellite.xml",
         "sample-assets/[XEVIOUS]_garu_zakato.xml" ];
 
@@ -36,36 +35,18 @@ window.onload = function() {
         player.y = game.height - 32 - player.height;
         player.speed = 2;
         player.on("enterframe", function() {
+            // テクテク歩く
             if (this.age % 10 === 0) {
                 this.frame = [ 33, 34, 35, 34 ][(this.frameCount += 1) % 4];
             }
 
-            if (game.input.up) {
-                this.y -= this.speed;
-            } else if (game.input.down) {
-                this.y += this.speed;
-            }
-            if (game.input.left) {
-                this.x -= this.speed;
-            } else if (game.input.right) {
-                this.x += this.speed;
-            }
-
-            if (this.x < 0) {
-                this.x = 0;
-            } else if (game.width - this.width < this.x) {
-                this.x = game.width - this.width;
-            }
-            if (this.y < 0) {
-                this.y = 0;
-            } else if (game.height - this.height < this.y) {
-                this.y = game.height - this.height;
-            }
-
-            h.x = player.x + (player.width - h.width) / 2;
-            h.y = player.y + (player.height - h.height) / 2;
+            // 自機中心マーカーを移動させる
+            h.x = this.x + (this.width - h.width) / 2;
+            h.y = this.y + (this.height - h.height) / 2;
         });
         scene.addChild(player);
+
+        // 自機の中心マーカー
         var h = new Sprite(8, 8);
         (function() {
             h.image = new Surface(8, 8);
@@ -79,11 +60,13 @@ window.onload = function() {
         })();
         scene.addChild(h);
 
+        // 爆発
         var explode = function(x, y) {
             var e = new Sprite(32, 32);
             e.x = x - 16;
             e.y = y - 16;
             e.scale(2);
+            e.rotate(Math.random() * 360);
             e.image = game.assets["sample-assets/explosion.png"];
             e.on("enterframe", function() {
                 this.frame += 1;
@@ -103,11 +86,13 @@ window.onload = function() {
         enemy.x = (game.width - enemy.width) / 2;
         enemy.y = 32;
         enemy.on("enterframe", function() {
+            // テクテク歩く
             if (this.age % 10 === 0) {
                 this.frame = [ 3, 4, 5, 4 ][(this.frameCount += 1) % 4];
             }
         });
 
+        // 攻撃パターン
         var attackPattern = new AttackPattern(game.assets[xmlFiles[4]], {
             target : player,
             onfire : function() {
@@ -130,6 +115,7 @@ window.onload = function() {
                 console.log("onRemove");
             }
         });
+
         // 攻撃パターンにBulletMLをセット
         enemy.setAttackPattern(attackPattern);
         enemy.on("completeAttack", function() {
@@ -143,7 +129,6 @@ window.onload = function() {
                 }
             });
         });
-
         scene.addChild(enemy);
 
         // タッチ操作用パネル

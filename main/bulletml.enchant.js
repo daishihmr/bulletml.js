@@ -189,11 +189,14 @@
          *            [bulletml] BulletMLデータ
          * @param {Object}
          *            [config] 発射される弾に関する設定
+         * @param {string}
+         *            topActionLabel 最初に読み込むactionのラベル.デフォルトは"top"
          * @constructs
          */
-        initialize : function(bulletml, config) {
+        initialize : function(bulletml, config, topActionLabel) {
             this.bulletml = bulletml;
-            this.seq = bulletml.sequence();
+            this.topLabel = topActionLabel || "top";
+            this.seq = bulletml.sequence(this.topLabel);
             this.config = {
                 width : 8,
                 height : 8,
@@ -283,7 +286,7 @@
             this.cursor = 0;
             this.waitTo = -1;
             this.completed = false;
-            this.seq = this.bulletml.sequence();
+            this.seq = this.bulletml.sequence(this.topLabel);
         },
         /**
          * パターンを複製する.
@@ -292,7 +295,7 @@
          */
         clone : function() {
             return new enchant.bulletml.AttackPattern(this.bulletml,
-                    this.config);
+                    this.config, this.topLabel);
         }
     });
 
