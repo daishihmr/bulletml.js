@@ -25,6 +25,7 @@ window.onload = function() {
     game.preload(assets);
     game.onload = function() {
         var scene = game.rootScene;
+        scene.backgroundColor = "#000044";
 
         // 自機
         var player = new Sprite(32, 32);
@@ -93,10 +94,10 @@ window.onload = function() {
         });
 
         // 攻撃パターン
-        var attackPattern = new AttackPattern(game.assets[xmlFiles[4]], {
+        var attackPattern = new AttackPattern(game.assets[xmlFiles[14]], {
             target : player,
             onfire : function() {
-                console.log("onFire");
+                // console.log("onFire");
             },
             onenterframe : function() {
                 // 衝突判定（自機と弾との距離が4未満）
@@ -112,18 +113,27 @@ window.onload = function() {
                 }
             },
             onremove : function() {
-                console.log("onRemove");
+                // console.log("onRemove");
             }
         });
 
         // 攻撃パターンにBulletMLをセット
         enemy.setAttackPattern(attackPattern);
+
+        // 終わったら次のパターンに差し替える
+        var pattern = [ 4, 4, 4, 14, 1, 1, 1, 2, 2 ];
+        pattern.index = 0;
+        pattern.next = function() {
+            this.index = (this.index + 1) % this.length;
+            return this[this.index];
+        };
         enemy.on("completeAttack", function() {
-            console.log(this);
             var restartAge = this.age + 60;
             this.on("enterframe", function() {
                 if (this.age == restartAge) {
                     console.log("攻撃再開");
+                    this.attackPattern.bulletml = game.assets[xmlFiles[pattern
+                            .next()]];
                     this.attackPattern.restart();
                     this.removeEventListener("enterframe", arguments.callee);
                 }

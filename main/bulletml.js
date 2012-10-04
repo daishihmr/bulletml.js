@@ -132,7 +132,7 @@ var BulletML = {};
          * @type {number}
          * @field
          */
-        this.rank = 0;
+        this.rank = 0.5;
     };
     /**
      * find top level action element by label.
@@ -312,12 +312,12 @@ var BulletML = {};
         result.root = this.root;
         if (this.direction) {
             result.direction = new BulletML.Direction(evalNumber(
-                    this.direction.value, params));
+                    this.direction.value, params, this.root.rank));
             result.direction.type = this.direction.type;
         }
         if (this.speed) {
             result.speed = new BulletML.Speed(evalNumber(this.speed.value,
-                    params));
+                    params, this.root.rank));
             result.speed.type = this.speed.type;
         }
         for ( var i = 0, end = this.actions.length; i < end; i++) {
@@ -435,6 +435,7 @@ var BulletML = {};
     BulletML.ActionRef.prototype.clone = function(params) {
         var result = new BulletML.ActionRef();
         result.label = this.label;
+        result.root = this.root;
         for ( var i = 0, end = this.params.length; i < end; i++) {
             result.params.push(evalNumberFixRand(this.params[i], params,
                     this.root.rank));
@@ -485,12 +486,12 @@ var BulletML = {};
         result.root = this.root;
         if (this.direction) {
             result.direction = new BulletML.Direction(evalNumber(
-                    this.direction.value, params));
+                    this.direction.value, params, this.root.rank));
             result.direction.type = this.direction.type;
         }
         if (this.speed) {
             result.speed = new BulletML.Speed(evalNumber(this.speed.value,
-                    params));
+                    params, this.root.rank));
             result.speed.type = this.speed.type;
         }
 
@@ -574,12 +575,13 @@ var BulletML = {};
      */
     BulletML.ChangeDirection.prototype.clone = function(params) {
         var result = new BulletML.ChangeDirection();
+        result.root = this.root;
         if (this.direction) {
             result.direction = new BulletML.Direction(evalNumber(
-                    this.direction.value, params));
+                    this.direction.value, params, this.root.rank));
             result.direction.type = this.direction.type;
         }
-        result.term = evalNumber(this.term, params);
+        result.term = evalNumber(this.term, params, this.root.rank);
         return result;
     };
 
@@ -608,12 +610,13 @@ var BulletML = {};
      */
     BulletML.ChangeSpeed.prototype.clone = function(params) {
         var result = new BulletML.ChangeSpeed();
+        result.root = this.root;
         if (this.speed) {
             result.speed = new BulletML.Speed(evalNumber(this.speed.value,
-                    params));
+                    params, this.root.rank));
             result.speed.type = this.speed.type;
         }
-        result.term = evalNumber(this.term, params);
+        result.term = evalNumber(this.term, params, this.root.rank);
         return result;
     };
 
@@ -646,17 +649,18 @@ var BulletML = {};
      */
     BulletML.Accel.prototype.clone = function(params) {
         var result = new BulletML.Accel();
+        result.root = this.root;
         if (this.horizontal) {
             result.horizontal = new BulletML.Horizontal(evalNumber(
-                    this.horizontal.value, params));
+                    this.horizontal.value, params, this.root.rank));
             result.horizontal.type = this.horizontal.type;
         }
         if (this.vertical) {
             result.vertical = new BulletML.Vertical(evalNumber(
-                    this.vertical.value, params));
+                    this.vertical.value, params, this.root.rank));
             result.vertical.type = this.vertical.type;
         }
-        result.term = evalNumber(this.term, params);
+        result.term = evalNumber(this.term, params, this.root.rank);
         return result;
     };
 
@@ -685,7 +689,10 @@ var BulletML = {};
      * @memberOf BulletML.Wait.prototype
      */
     BulletML.Wait.prototype.clone = function(params) {
-        return new BulletML.Wait(evalNumber(this.value, params));
+        var result = new BulletML.Wait(evalNumber(this.value, params,
+                this.root.rank));
+        result.root = this.root;
+        return result;
     };
 
     /**
@@ -809,7 +816,7 @@ var BulletML = {};
          * @type {string}
          * @field
          */
-        this.type = "relative";
+        this.type = "absolute";
         if (value) {
             /**
              * @type {string}
@@ -829,7 +836,7 @@ var BulletML = {};
          * @type {string}
          * @field
          */
-        this.type = "relative";
+        this.type = "absolute";
         if (value) {
             /**
              * @type {string}
@@ -907,25 +914,26 @@ var BulletML = {};
                 result.commands.push(parseFireRef(root, commandElm));
                 break;
             case "changeDirection":
-                result.commands.push(parseChangeDirection(commandElm));
+                result.commands.push(parseChangeDirection(root, commandElm));
                 break;
             case "changeSpeed":
-                result.commands.push(parseChangeSpeed(commandElm));
+                result.commands.push(parseChangeSpeed(root, commandElm));
                 break;
             case "accel":
-                result.commands.push(parseAccel(commandElm));
+                result.commands.push(parseAccel(root, commandElm));
                 break;
             case "wait":
-                result.commands.push(parseWait(commandElm));
+                result.commands.push(parseWait(root, commandElm));
                 break;
             case "vanish":
-                result.commands.push(parseVanish(commandElm));
+                result.commands.push(parseVanish(root, commandElm));
                 break;
             case "repeat":
                 result.commands.push(parseRepeat(root, commandElm));
                 break;
             }
         });
+
         result.root = root;
         return result;
     }
@@ -1023,8 +1031,9 @@ var BulletML = {};
         return result;
     }
 
-    function parseChangeDirection(element) {
+    function parseChangeDirection(root, element) {
         var result = new BulletML.ChangeDirection();
+        result.root = root;
 
         get(element, "direction", function(direction) {
             result.direction = parseDirection(direction);
@@ -1036,8 +1045,9 @@ var BulletML = {};
         return result;
     }
 
-    function parseChangeSpeed(element) {
+    function parseChangeSpeed(root, element) {
         var result = new BulletML.ChangeSpeed();
+        result.root = root;
 
         get(element, "speed", function(speed) {
             result.speed = parseSpeed(speed);
@@ -1049,8 +1059,9 @@ var BulletML = {};
         return result;
     }
 
-    function parseAccel(element) {
+    function parseAccel(root, element) {
         var result = new BulletML.Accel();
+        result.root = root;
 
         get(element, "horizontal", function(horizontal) {
             result.horizontal = parseHorizontal(horizontal);
@@ -1065,16 +1076,19 @@ var BulletML = {};
         return result;
     }
 
-    function parseWait(element) {
+    function parseWait(root, element) {
         var result = new BulletML.Wait();
+        result.root = root;
 
         result.value = text(element);
 
         return result;
     }
 
-    function parseVanish(element) {
-        return new BulletML.Vanish();
+    function parseVanish(root, element) {
+        var result = new BulletML.Vanish();
+        result.root = root;
+        return result;
     }
 
     function parseRepeat(root, element) {
