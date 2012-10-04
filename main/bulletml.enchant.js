@@ -65,10 +65,17 @@
     enchant.Node.prototype.setAttackPattern = function(attackPattern) {
         this.attackPattern = attackPattern;
         this.attackPattern.attacker = this;
+        this._attackTick = function() {
+            if (this.attackPattern) {
+                this.attackPattern.tick();
+            }
+        };
+        this.addEventListener("enterframe", this._attackTick);
     };
     enchant.Node.prototype.removeAttackPattern = function() {
         this.attackPattern.attacker = null;
         this.attackPattern = null;
+        this.removeEventListener("enterframe", this._attackTick);
     };
 
     /**
@@ -81,6 +88,7 @@
      * 
      * 単一の敵機に対応する.
      * 
+     * @constructor
      * @scope enchant.bulletml.AttackPattern.prototype
      * @example
      * 
@@ -100,6 +108,83 @@
      */
     enchant.bulletml.AttackPattern = enchant.Class.create({
         /**
+         * 攻撃パターンのコンストラクタ.
+         * 
+         * 第2引数configで発射される弾に関する設定を行う. <br>
+         * <table border=1>
+         * <tr>
+         * <th>プロパティ名</th>
+         * <th>型.<br>
+         * 設定内容</th>
+         * <th>デフォルト値</th>
+         * <th>必須</th>
+         * </tr>
+         * <tr>
+         * <td>target</td>
+         * <td>enchant.Node.<br>
+         * 攻撃の標的となるオブジェクト.</td>
+         * <td>null</td>
+         * <td>○</td>
+         * </tr>
+         * <tr>
+         * <td>widtd</td>
+         * <td>Number.<br>
+         * 弾スプライトの幅.Bulletのコンストラクタ引数に使用される.</td>
+         * <td>8</td>
+         * <td></td>
+         * </tr>
+         * <tr>
+         * <td>height</td>
+         * <td>Number.<br>
+         * 弾スプライトの高さ.Bulletのコンストラクタ引数に使用される.</td>
+         * <td>8</td>
+         * <td></td>
+         * </tr>
+         * <tr>
+         * <td>image</td>
+         * <td>enchant.Surface.<br>
+         * 弾スプライトの画像</td>
+         * <td>赤い球状の画像</td>
+         * <td></td>
+         * </tr>
+         * <tr>
+         * <td>frame</td>
+         * <td>Number<br>
+         * 弾スプライトのフレーム番号</td>
+         * <td>0</td>
+         * <td></td>
+         * </tr>
+         * <tr>
+         * <td>removeOnScreenOut</td>
+         * <td>Boolean<br>
+         * 弾が画面外に出た時に消去するかどうか</td>
+         * <td>true</td>
+         * <td></td>
+         * </tr>
+         * <tr>
+         * <td>onfire</td>
+         * <td>Function.<br>
+         * 弾が発射される時に呼び出される</td>
+         * <td></td>
+         * <td></td>
+         * </tr>
+         * <tr>
+         * <td>onenterframe</td>
+         * <td>Function.<br>
+         * 毎フレーム開始時に呼び出される</td>
+         * <td></td>
+         * <td></td>
+         * </tr>
+         * <tr>
+         * <td>onremove</td>
+         * <td>Function.<br>
+         * 弾が消去される直前に呼び出される<br>
+         * vanishコマンド実行時, removeOnScreenOutがtrueの場合に画面外に出た時</td>
+         * <td></td>
+         * <td></td>
+         * </tr>
+         * </table>
+         * 
          * @param {BulletML.Root}
          *            [bulletml] BulletMLデータ
          * @param {Object}
@@ -109,8 +194,6 @@
         initialize : function(bulletml, config) {
             this.bulletml = bulletml;
             this.seq = bulletml.sequence();
-            console.log(this.seq);
-
             this.config = {
                 width : 8,
                 height : 8,
@@ -144,7 +227,7 @@
         /**
          * 攻撃を行う敵機.
          * 
-         * @type {enchant.Sprite}
+         * @type {enchant.Node}
          */
         attacker : {
             get : function() {
@@ -152,15 +235,10 @@
             },
             set : function(attacker) {
                 this._attacker = attacker;
-                attacker.addEventListener("enterframe", function() {
-                    if (this.attackPattern) {
-                        this.attackPattern.tick();
-                    }
-                });
             }
         },
         /**
-         * 
+         * フレームごとに呼び出される.
          */
         tick : function() {
             if (this.age++ < this.waitTo || this.completed) {
@@ -198,12 +276,20 @@
             this._attacker.dispatchEvent(new Event("completeAttack"));
             this.completed = true;
         },
+        /**
+         * 攻撃パターンを最初からやりなおす.
+         */
         restart : function() {
             this.cursor = 0;
             this.waitTo = -1;
             this.completed = false;
             this.seq = this.bulletml.sequence();
         },
+        /**
+         * パターンを複製する.
+         * 
+         * @return {enchant.bulletml.AttackPattern}
+         */
         clone : function() {
             return new enchant.bulletml.AttackPattern(this.bulletml,
                     this.config);
@@ -211,7 +297,16 @@
     });
 
     /**
-     * 弾を発射.
+     * 弾を発射する.
+     * 
+     * @param {BulletML.Fire}
+     *            fireCmd 発射コマンド
+     * @param {enchant.Group}
+     *            scene 弾スプライトの親となるノード
+     * @param {Object}
+     *            config 設定
+     * @param {enchant.Node}
+     *            attacker 弾を発射するオブジェクト
      */
     enchant.bulletml.fireBullet = function(fireCmd, scene, config, attacker) {
         // console.log(fireCmd.direction.type, fireCmd.direction.value);
@@ -288,9 +383,28 @@
     };
 
     /**
-     * 弾.
+     * 弾クラス.
+     * 
+     * @constructor
+     * @scope enchant.bulletml.Bullet.prototype
+     * @extends {enchant.Sprite}
      */
     enchant.bulletml.Bullet = enchant.Class.create(enchant.Sprite, {
+        /**
+         * @param {number}
+         *            x 初期位置x
+         * @param {number}
+         *            y 初期位置y
+         * @param {number}
+         *            width スプライトの幅
+         * @param {number}
+         *            height スプライトの高さ
+         * @param {enchant.bulletml.AttackPattern}
+         *            attackPattern 攻撃パターン
+         * @param {BulletML.Bullet}
+         *            bulletSpec 弾
+         * @constructs
+         */
         initialize : function(x, y, width, height, attackPattern, bulletSpec) {
             enchant.Sprite.call(this, width, height);
             this.x = x;
@@ -347,6 +461,9 @@
 
             this.addEventListener("enterframe", this.tick);
         },
+        /**
+         * 
+         */
         tick : function() {
             this.pattern.config.onenterframe.call(this);
 
@@ -415,6 +532,10 @@
                 }
             }
         },
+        /**
+         * @param {BulletML.ChangeDirection}
+         *            cmd
+         */
         changeDirection : function(cmd) {
             var incr;
             var finalVal;
@@ -454,6 +575,10 @@
                 }
             };
         },
+        /**
+         * @param {BulletML.ChangeSpeed}
+         *            cmd
+         */
         changeSpeed : function(cmd) {
             var incr;
             var finalVal;
@@ -487,14 +612,30 @@
         }
     });
 
+    /**
+     * 弾の画像が指定されなかった場合に使用される.
+     * 
+     * 8px x 8px.赤い球状の弾.
+     * 
+     * @memberOf enchant.bulletml
+     */
     enchant.bulletml.defaultImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAa0lEQVQYV2NkgIL/DAw2QGYolLuakYHhCIgNpBkYgJITGWxs8hj8/CDymzYBpY9MAkrmM4J12tgcZlizhoFBXByi4OVLBoaQEJAiW5CCiQxdXXkMpaUw2yB0dzcDQ1nZJKIU4LeCoCMJeRMAewIxn7cIaLcAAAAASUVORK5CYII=";
 
+    /**
+     * ラジアン→度
+     */
     function toDegree(radian) {
         return radian * 180 / Math.PI;
     }
+    /**
+     * 度→ラジアン
+     */
     function toRadian(degree) {
         return degree * Math.PI / 180;
     }
+    /**
+     * ラジアンを -π<= rad < π の範囲に正規化する.
+     */
     function rel(radian) {
         while (radian <= -Math.PI) {
             radian += Math.PI * 2;
@@ -504,6 +645,14 @@
         }
         return radian;
     }
+    /**
+     * スプライトAから見たスプライトBの方向をラジアンで返す.
+     * 
+     * @param {enchant.Node}
+     *            a スプライトA
+     * @param {enchant.Node}
+     *            b スプライトB
+     */
     function radiusAtoB(a, b) {
         var ca = {
             x : a.x + (a.width || 0) / 2,
