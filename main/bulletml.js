@@ -65,14 +65,19 @@ var BulletML = {};
      * @return {BulletML.Root}
      */
     BulletML.build = function(xml) {
+        var result;
         if (typeof (xml) == "string") {
             var domParser = new DOMParser();
-            return parse(domParser.parseFromString(xml, "application/xml"));
+            result = parse(domParser.parseFromString(xml, "application/xml"));
         } else if (xml.getElementsByTagName("bulletml")) {
-            return parse(xml);
+            result = parse(xml);
         } else {
             throw new Exception("cannot build " + xml);
         }
+
+        // find topAction
+        result.topAction = search(result.actions, "top");
+        return result;
     };
 
     /**
@@ -855,11 +860,6 @@ var BulletML = {};
                     result.actions.push(newAction);
                 }
             }
-        }
-        // find topAction
-        result.topAction = search(result.actions, "top");
-        if (!result.topAction) {
-            result.topAction = search(result.actions, "top1");
         }
 
         // Top Level Bullets
