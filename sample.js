@@ -96,7 +96,7 @@ window.onload = function() {
 		});
 
 		// 攻撃パターン
-		var attackPattern = new AttackPattern(game.assets[xmlFiles[14]], {
+		var attackPattern = new AttackPattern(game.assets[xmlFiles[0]], {
 			target : player,
 			bulletParent : scene,
 			onfire : function() {
@@ -124,11 +124,9 @@ window.onload = function() {
 		enemy.setAttackPattern(attackPattern);
 
 		// 終わったら次のパターンに差し替える
-		var pattern = [ 4, 4, 4, 14, 1, 1, 1, 2, 2 ];
-		pattern.index = 0;
+		var pattern = [ 0, 1, 2, 3, 4, 6, 10, 13, 14, 15 ];
 		pattern.next = function() {
-			this.index = (this.index + 1) % this.length;
-			return this[this.index];
+			return this[~~(Math.random() * this.length)];
 		};
 		enemy.on("completeAttack", function() {
 			var restartAge = this.age + 60;
