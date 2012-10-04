@@ -157,8 +157,8 @@
 
 		var w = config.width;
 		var h = config.height;
-		var x = attacker.x + (attacker.width - w) / 2;
-		var y = attacker.y + (attacker.height - h) / 2;
+		var x = attacker.x + ((attacker.width || 0) - w) / 2;
+		var y = attacker.y + ((attacker.height || 0) - h) / 2;
 		var b = new enchant.bulletml.Bullet(x, y, w, h, pattern, fireCmd.bullet);
 
 		b.image = config.image;
@@ -288,6 +288,9 @@
 
 			this.x += Math.cos(this.direction) * this.speed * 2;
 			this.y += Math.sin(this.direction) * this.speed * 2;
+			if (this.rotation != undefined) {
+				this.rotation = this.direction;
+			}
 
 			if (this.pattern.config.removeOnScreenOut) {
 				if (this.x < 0 || this.scw + this.width < this.x || this.y < 0
@@ -436,12 +439,12 @@
 	}
 	function radiusAtoB(a, b) {
 		var ca = {
-			x : a.x + a.width / 2,
-			y : a.y + a.height / 2
+			x : a.x + (a.width || 0) / 2,
+			y : a.y + (a.height || 0) / 2
 		};
 		var cb = {
-			x : b.x + b.width / 2,
-			y : b.y + b.height / 2
+			x : b.x + (b.width || 0) / 2,
+			y : b.y + (b.height || 0) / 2
 		};
 		return Math.atan2(cb.y - ca.y, cb.x - ca.x);
 	}
