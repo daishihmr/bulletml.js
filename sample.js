@@ -33,7 +33,7 @@ window.onload = function() {
 		player.frameCount = 0;
 		player.x = (game.width - player.width) / 2;
 		player.y = game.height - 32 - player.height;
-		player.speed = 3;
+		player.speed = 2;
 		player.on("enterframe", function() {
 			if (this.age % 10 === 0) {
 				this.frame = [ 33, 34, 35, 34 ][(this.frameCount += 1) % 4];
@@ -55,8 +55,28 @@ window.onload = function() {
 			} else if (game.width - this.width < this.x) {
 				this.x = game.width - this.width;
 			}
+			if (this.y < 0) {
+				this.y = 0;
+			} else if (game.height - this.height < this.y) {
+				this.y = game.height - this.height;
+			}
+
+			h.x = player.x + (player.width - h.width) / 2;
+			h.y = player.y + (player.height - h.height) / 2;
 		});
 		scene.addChild(player);
+		var h = new Sprite(4, 4);
+		(function() {
+			h.image = new Surface(4, 4);
+			var c = h.image.context;
+			var g = c.createRadialGradient(2, 2, 0, 2, 2, 2);
+			g.addColorStop(0.0, "#ffffff");
+			g.addColorStop(0.8, "#00ff00");
+			g.addColorStop(1.0, "rgba(0,255,0,0)");
+			c.fillStyle = g;
+			c.fillRect(0, 0, 4, 4);
+		})();
+		scene.addChild(h);
 
 		// 敵
 		var enemy = new Sprite(32, 32);
@@ -72,17 +92,34 @@ window.onload = function() {
 		});
 
 		// 攻撃パターンにBulletMLをセット
-		enemy.setAttackPattern(game.assets["sample-assets/test.xml"], {
-			target : player,
-			onenterframe : function(bullet) {
-			}
-		});
+		enemy.setAttackPattern(
+				game.assets["sample-assets/test.bml"], {
+					target : player,
+					onfire : function() {
+						console.log("発射! ", this.x, this.y);
+					},
+					onenterframe : function() {
+						var x1 = this.x + this.width / 2;
+						var y1 = this.y + this.height / 2;
+						var x2 = player.x + player.width / 2;
+						var y2 = player.y + player.height / 2;
+						var dx = (x1 - x2) * (x1 - x2);
+						var dy = (y1 - y2) * (y1 - y2);
+						if (dx + dy < 4 * 4) {
+							this.parentNode.removeChild(this);
+						}
+					}
+				});
+//		enemy.on("completeAttack", function() {
+//			console.log("攻撃再開");
+//			this.attackPattern.restart();
+//		});
 
 		scene.addChild(enemy);
 
 		// タッチ操作用パネル
 		var ctrlPanel = new Sprite(game.width, game.height);
-		ctrlPanel.sense = 1.2;
+		ctrlPanel.sense = 1.4;
 		ctrlPanel.on("touchstart", function(e) {
 			this.startX = e.x;
 			this.startY = e.y;

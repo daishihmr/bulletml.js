@@ -64,12 +64,18 @@ var BulletML = {};
 	Root.prototype.findFire = function(label) {
 		return search(this.fires, label);
 	};
-	Root.prototype.sequence = function() {
-		if (!this.topAction) {
-			throw new Error("has no top action.");
+	Root.prototype.sequence = function(actionLabel) {
+		if (!actionLabel && !this.topAction) {
+			throw new Error("has no top action(s).");
+		}
+		var topAction;
+		if (actionLabel) {
+			topAction = this.findAction(actionLabel);
+		} else {
+			topAction = this.topAction;
 		}
 		var visitor = new Visitor(this);
-		visitor.visit(this.topAction);
+		visitor.visit(topAction);
 		return visitor.result;
 	};
 
@@ -91,7 +97,7 @@ var BulletML = {};
 			for ( var i = 0, end = action.commands.length; i < end; i++) {
 				this.visit(action.commands[i]);
 			}
-			this.paramsStack.pop(command.params);
+			this.paramsStack.pop();
 			break;
 		case "repeat":
 			var start = new LoopStart();
@@ -110,7 +116,7 @@ var BulletML = {};
 		var cp = this.params();
 		var result = [];
 		for ( var i = 0, end = params.length; i < end; i++) {
-			result.push(evalNumber(params[i], cp))
+			result.push(evalNumberFixRand(params[i], cp))
 		}
 		this.paramsStack.push(result);
 	};
@@ -184,6 +190,15 @@ var BulletML = {};
 		this.commands = [];
 	};
 	Action.prototype = new Command();
+	Action.prototype.clone = function(params) {
+		var result = new Action();
+		result.label = this.label;
+		result.root = this.root;
+		for ( var i = 0, end = this.commands.length; i < end; i++) {
+			result.commands.push(this.commands[i].clone(params));
+		}
+		return result;
+	};
 
 	var ActionRef = BulletML.ActionRef = function() {
 		this.commandName = "actionRef";
@@ -195,7 +210,7 @@ var BulletML = {};
 		var result = new ActionRef();
 		result.label = this.label;
 		for ( var i = 0, end = this.params.length; i < end; i++) {
-			result.params.push(evalNumber(this.params[i], params));
+			result.params.push(evalNumberFixRand(this.params[i], params));
 		}
 		return result;
 	};
@@ -204,8 +219,8 @@ var BulletML = {};
 		this.commandName = "fire";
 		this.label = null;
 		this.root = null;
-		this.direction = new Direction();
-		this.speed = new Speed();
+		this.direction = null;
+		this.speed = null;
 		this.bullet = null;
 	};
 	Fire.prototype = new Command();
@@ -233,7 +248,8 @@ var BulletML = {};
 				}
 				var newParam = [];
 				for ( var i = 0, end = this.bullet.params.length; i < end; i++) {
-					newParam.push(evalNumber(this.bullet.params[i], params));
+					newParam.push(evalNumberFixRand(this.bullet.params[i],
+							params));
 				}
 				result.bullet = origBullet.clone(newParam);
 			}
@@ -252,7 +268,7 @@ var BulletML = {};
 		if (orig) {
 			var newParams = [];
 			for ( var i = 0, end = this.params.length; i < end; i++) {
-				newParams.push(evalNumber(this.params[i], params));
+				newParams.push(evalNumberFixRand(this.params[i], params));
 			}
 			return orig.clone(newParams);
 		}
@@ -408,6 +424,9 @@ var BulletML = {};
 		}
 		// find topAction
 		result.topAction = search(result.actions, "top");
+		if (!result.topAction) {
+			result.topAction = search(result.actions, "top1");
+		}
 
 		// Top Level Bullets
 		var bullets = root.getElementsByTagName("bullet");
@@ -668,6 +687,21 @@ var BulletML = {};
 
 	// utility ---------------------------------------------------
 
+	function evalNumberFixRand(value, params) {
+		if (typeof (value) == "number") {
+			return value;
+		}
+		value = value.replace(/\$rand/g, "(" + Math.random() + ")");
+		value = value.replace(/\$rank/g, "0");
+		if (params) {
+			for ( var i = 0, end = params.length; i < end; i++) {
+				var pat = new RegExp("\\$" + (i + 1), "g");
+				value = value.replace(pat, "(" + params[i] + ")");
+			}
+		}
+		return value;
+	}
+
 	function evalNumber(value, params) {
 		if (typeof (value) == "number") {
 			return value;
@@ -692,13 +726,16 @@ var BulletML = {};
 	}
 
 	function get(element, tagName, callback, ifNotFound) {
-		var elms = element.getElementsByTagName(tagName);
-		if (elms && elms[0]) {
-			if (callback) {
-				callback(elms[0]);
+		var children = element.childNodes;
+		for ( var i = 0, end = children.length; i < end; i++) {
+			if (children[i].tagName && children[i].tagName == tagName) {
+				if (callback) {
+					callback(children[i]);
+				}
+				return callback(children[i]);
 			}
-			return elms[0];
-		} else if (ifNotFound) {
+		}
+		if (ifNotFound) {
 			ifNotFound();
 		}
 	}

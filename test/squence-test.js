@@ -339,3 +339,24 @@ RuntimeTest.prototype.testFireRef = function() {
 	assertEquals("fire", commands[0].commandName);
 	assertEquals(5, commands[0].speed.value);
 };
+
+RuntimeTest.prototype.testRepeatNestedActionRef = function() {
+	var bulletml = BulletML.build("<bulletml>"
+			+ "<action label='top'><repeat><times>5</times><action>"
+			+ "<actionRef label='shot'/><actionRef label='shot'/>"
+			+ "</action></repeat></action>"
+			+ "<action label='shot'><vanish/></action></bulletml>");
+	var commands = bulletml.sequence();
+	assertEquals(4, commands.length);
+};
+
+RuntimeTest.prototype.testActionRefBullet = function() {
+	var bulletml = BulletML
+			.build("<bulletml>"
+					+ "<action label='top'><actionRef label='sub'><param>5</param></actionRef></action>"
+					+ "<action label='sub'><fire><bullet><action><wait>$1</wait></action></bullet></fire></action>"
+					+ "</bulletml>");
+	var commands = bulletml.sequence()[0].bullet.sequence();
+	assertEquals("wait", commands[0].commandName);
+	assertEquals("(5)", commands[0].value);
+}

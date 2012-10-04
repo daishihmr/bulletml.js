@@ -5,20 +5,32 @@
 	// BulletML(*.bml)をpreloadで読み込めるようにする.
 	enchant.Game._loadFuncs["bml"] = function(src, callback) {
 		var game = this;
-		var req = new XMLHttpRequest();
-		req.open('GET', src, true);
-		req.onreadystatechange = function(e) {
-			if (req.readyState === 4) {
-				if (req.status !== 200 && req.status !== 0) {
-					throw new Error(req.status + ': '
+		var xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = function(e) {
+			if (xhr.readyState === 4) {
+				if (xhr.status !== 200 && xhr.status !== 0) {
+					throw new Error(xhr.status + ': '
 							+ 'Cannot load an asset: ' + src);
 				}
 
-				game.assets[src] = BulletML.build(req.responseXML);
-				callback();
+				if (xhr.responseXML != null) {
+					game.assets[src] = BulletML.build(xhr.responseXML);
+					callback();
+				} else if (xhr.responseText != null) {
+					game.assets[src] = BulletML.build(xhr.responseText);
+					callback();
+				} else {
+					throw new Error(xhr.status + ': '
+							+ 'Cannot load an asset: ' + src);
+				}
 			}
 		};
-		req.send(null);
+
+		xhr.open('GET', src, true);
+		if (xhr.overrideMimeType) {
+			xhr.overrideMimeType("application/xml");
+		}
+		xhr.send(null);
 	};
 
 	enchant.Node.prototype.setAttackPattern = function(bml, config) {
@@ -30,11 +42,19 @@
 		this.attackPattern = null;
 	};
 
+	/**
+	 * namespace.
+	 */
 	enchant.bulletml = {};
+
+	/**
+	 * 攻撃パターン.
+	 */
 	enchant.bulletml.AttackPattern = enchant.Class.create({
 		initialize : function(bulletml, config) {
 			this.bulletml = bulletml;
 			this.seq = bulletml.sequence();
+			console.log(this.seq);
 
 			this.config = {
 				width : 8,
@@ -44,6 +64,10 @@
 				removeOnScreenOut : true,
 				target : null,
 				onfire : function() {
+				},
+				onenterframe : function() {
+				},
+				onremove : function() {
 				}
 			};
 			if (config) {
@@ -57,7 +81,8 @@
 			this.age = 0;
 			this.cursor = 0;
 			this.waitTo = -1;
-			this.direction = 90;
+			this.lastDirection = 0;
+			this.lastSpeed = 1;
 			this._attacker = null;
 		},
 		attacker : {
@@ -82,15 +107,15 @@
 				var command = this.seq[this.cursor];
 				switch (command.commandName) {
 				case "fire":
-					this.fire(command, this.attacker.scene);
+					enchant.bulletml.fireBullet.call(this, command,
+							this._attacker.scene, this.config, this._attacker);
 					break;
 				case "wait":
 					this.waitTo = this.age + eval(command.value);
-					this.cursor++;
+					this.cursor += 1;
 					return;
 				case "loopEnd":
-					if (command.loopCount == -1
-							|| command.loopCount == undefined) {
+					if (command.loopCount == -1) {
 						command.loopCount = 0;
 					} else {
 						command.loopCount += 1;
@@ -103,57 +128,287 @@
 					} else {
 						command.loopCount = -1;
 					}
+					break;
 				}
 			}
+			this._attacker.dispatchEvent(new Event("completeAttack"));
 		},
-		fire : function(fireCmd, scene) {
-			var b = new enchant.bulletml.Bullet(this.config.width,
-					this.config.height, this);
-			b.image = this.config.image;
-			b.frame = this.config.frame;
-			b.x = this.attacker.x + (this.attacker.width - b.width) / 2;
-			b.y = this.attacker.y + (this.attacker.height - b.height) / 2;
-
-			var dv = toRadian(eval(fireCmd.direction.value));
-			if (fireCmd.direction.type == "aim") {
-
-			}
-			b.speed = eval(fireCmd.speed.value);
-
-			b.seq = fireCmd.bullet.sequence();
-
-			if (scene) {
-				scene.addChild(b);
-			}
-			return b;
+		restart : function() {
+			this.cursor = 0;
+			this.waitTo = -1;
+			this.seq = this.bulletml.sequence();
 		}
 	});
 
+	/**
+	 * 弾を発射.
+	 */
+	enchant.bulletml.fireBullet = function(fireCmd, scene, config, attacker) {
+		// console.log(fireCmd.direction.type, fireCmd.direction.value);
+		var pattern;
+		if (this instanceof enchant.bulletml.AttackPattern) {
+			pattern = this;
+		} else if (this.pattern) {
+			pattern = this.pattern;
+		}
+
+		var w = config.width;
+		var h = config.height;
+		var x = attacker.x + (attacker.width - w) / 2;
+		var y = attacker.y + (attacker.height - h) / 2;
+		var b = new enchant.bulletml.Bullet(x, y, w, h, pattern, fireCmd.bullet);
+
+		b.image = config.image;
+		b.frame = config.frame;
+
+		if (fireCmd.direction) {
+			var dv = toRadian(eval(fireCmd.direction.value));
+			switch (fireCmd.direction.type) {
+			case "aim":
+				if (config.target) {
+					var t = config.target;
+					b.direction = radiusAtoB(b, t) + dv;
+				} else {
+					b.direction = dv;
+				}
+				break;
+			case "absolute":
+				b.direction = dv - Math.PI / 2; // 真上が0度
+				break;
+			case "relative":
+				if (this.direction) {
+					b.direction = this.direction + dv;
+				} else if (this.lastDirection) {
+					b.direction = this.lastDirection + dv;
+				}
+				break;
+			case "sequence":
+				b.direction = this.lastDirection + dv;
+				break;
+			}
+		}
+
+		this.lastDirection = b.direction;
+
+		if (fireCmd.speed) {
+			var sv = eval(fireCmd.speed.value);
+			switch (fireCmd.speed.type) {
+			case "relative":
+			case "sequence":
+				b.speed = this.lastSpeed + sv;
+				break;
+			case "absolute":
+			default:
+				b.speed = sv;
+				break;
+			}
+		}
+		this.lastSpeed = b.speed;
+
+		b.seq = fireCmd.bullet.sequence();
+
+		if (scene) {
+			scene.addChild(b);
+		}
+
+		// console.log(b.direction);
+
+		pattern.config.onfire.call(b);
+		return b;
+	};
+
+	/**
+	 * 弾.
+	 */
 	enchant.bulletml.Bullet = enchant.Class.create(enchant.Sprite, {
-		initialize : function(width, height, attackPattern) {
+		initialize : function(x, y, width, height, attackPattern, bulletSpec) {
 			enchant.Sprite.call(this, width, height);
-			this.parent = attackPattern;
+			this.x = x;
+			this.y = y;
+			this.pattern = attackPattern;
 			this.cursor = 0;
 			this.waitTo = -1;
-			this.addEventListener("enterframe", this.tick);
+			this.lastDirection = 0;
+			this.lastSpeed = 1;
 
-			this.direction = toRadian(90);
-			this.speed = 1;
+			if (bulletSpec.direction) {
+				var dv = toRadian(eval(bulletSpec.direction.value));
+				switch (bulletSpec.direction.type) {
+				case "absolute":
+					this.direction = dv - Math.PI / 2; // 真上が0度
+					break;
+				case "sequence":
+					this.direction = attackPattern.lastDirection + dv;
+					break;
+				case "aim":
+					if (attackPattern.config.target) {
+						var a = attackPattern.attacker;
+						var t = attackPattern.config.target;
+						this.direction = radiusAtoB(a, t) + dv;
+					} else {
+						this.direction = dv;
+					}
+					break;
+				}
+			}
+
+			if (bulletSpec.speed) {
+				var sv = eval(bulletSpec.speed.value);
+				switch (bulletSpec.speed.type) {
+				case "absolute":
+				case "relative":
+					this.speed = sv;
+					break;
+				case "sequence":
+					this.speed = attackPattern.lastSpeed + sv;
+					break;
+				}
+			}
+			attackPattern.lastSpeed = this.speed;
+
 			this.accelH = 0;
 			this.accelV = 0;
 
+			this._changeDirection = null;
+			this._changeSpeed = null;
+
 			this.scw = enchant.Game.instance.width;
 			this.sch = enchant.Game.instance.height;
+
+			this.addEventListener("enterframe", this.tick);
 		},
 		tick : function() {
-			this.x += Math.cos(this.direction) * this.speed;
-			this.y += Math.sin(this.direction) * this.speed;
+			this.pattern.config.onenterframe.call(this);
 
-			if (this.parent.config.removeOnScreenOut) {
+			this._changeDirection && this._changeDirection();
+			this._changeSpeed && this._changeSpeed();
+
+			this.x += Math.cos(this.direction) * this.speed * 2;
+			this.y += Math.sin(this.direction) * this.speed * 2;
+
+			if (this.pattern.config.removeOnScreenOut) {
 				if (this.x < 0 || this.scw + this.width < this.x || this.y < 0
 						|| this.sch + this.height < this.y) {
+					this.pattern.config.onremove.call(this);
 					this.parentNode.removeChild(this);
-					console.log("remove");
+				}
+			}
+
+			if (this.age < this.waitTo) {
+				return;
+			}
+
+			for ( var end = this.seq.length; this.cursor < end; this.cursor++) {
+				var command = this.seq[this.cursor];
+				switch (command.commandName) {
+				case "fire":
+					enchant.bulletml.fireBullet.call(this, command, this.scene,
+							this.pattern.config, this);
+					break;
+				case "wait":
+					this.waitTo = this.age + eval(command.value);
+					this.cursor += 1;
+					return;
+				case "loopEnd":
+					if (command.loopCount == -1) {
+						command.loopCount = 0;
+					} else {
+						command.loopCount += 1;
+					}
+					if (command.loopCount < command.times - 1) {
+						while (0 < this.cursor
+								&& this.seq[this.cursor] != command.start) {
+							this.cursor -= 1;
+						}
+					} else {
+						command.loopCount = -1;
+					}
+					break;
+				case "changeDirection":
+					this.changeDirection(command);
+					break;
+				case "changeSpeed":
+					this.changeSpeed(command);
+					break;
+				case "accel":
+					// TODO
+					break;
+				case "vanish":
+					this.pattern.config.onremove.call(this);
+					if (this.parentNode) {
+						this.parentNode.removeChild(this);
+					}
+					return;
+				}
+			}
+		},
+		changeDirection : function(cmd) {
+			var incr;
+			var finalVal;
+			var endAge;
+
+			var d = eval(cmd.direction.value);
+			var t = eval(cmd.term);
+			switch (cmd.direction.type) {
+			case "aim":
+				var tar = this.pattern.config.target;
+				if (!tar) {
+					return;
+				}
+				finalVal = radiusAtoB(this, tar) + toRadian(d);
+				incr = rel(finalVal - this.direction) / t;
+				break;
+			case "absolute":
+				finalVal = toRadian(d) - Math.PI / 2;
+				incr = rel(finalVal - this.direction) / t;
+				break;
+			case "relative":
+				finalVal = this.direction + toRadian(d);
+				incr = rel(finalVal - this.direction) / t;
+				break;
+			case "sequence":
+				incr = toRadian(d);
+				finalVal = this.direction + incr * t;
+				break;
+			}
+			endAge = this.age + t;
+
+			this._changeDirection = function() {
+				this.direction += incr;
+				if (this.age == endAge) {
+					this.direction = finalVal;
+					this._changeDirection = null;
+				}
+			};
+		},
+		changeSpeed : function(cmd) {
+			var incr;
+			var finalVal;
+			var endAge;
+
+			var s = eval(cmd.speed.value);
+			var t = eval(cmd.term);
+			switch (cmd.speed.type) {
+			case "absolute":
+				finalVal = s;
+				incr = (finalVal - this.speed) / t;
+				break;
+			case "relative":
+				finalVal = s + this.speed;
+				incr = (finalVal - this.speed) / t;
+				break;
+			case "sequence":
+				incr = s;
+				finalVal = this.speed + incr * t;
+				break;
+			}
+			endAge = this.age + t;
+
+			this._changeSpeed = function() {
+				this.speed += incr;
+				if (this.age == endAge) {
+					this.speed = finalVal;
+					this._changeSpeed = null;
 				}
 			}
 		}
@@ -166,6 +421,26 @@
 	}
 	function toRadian(degree) {
 		return degree * Math.PI / 180;
+	}
+	function rel(radian) {
+		while (radian <= -Math.PI) {
+			radian += Math.PI * 2;
+		}
+		while (Math.PI < radian) {
+			radian -= Math.PI * 2;
+		}
+		return radian;
+	}
+	function radiusAtoB(a, b) {
+		var ca = {
+			x : a.x + a.width / 2,
+			y : a.y + a.height / 2
+		};
+		var cb = {
+			x : b.x + b.width / 2,
+			y : b.y + b.height / 2
+		};
+		return Math.atan2(cb.y - ca.y, cb.x - ca.x);
 	}
 
 })();
