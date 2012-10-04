@@ -2,8 +2,8 @@
 
 (function() {
 
-	// BulletML(*.bml)をpreloadで読み込めるようにする.
-	enchant.Game._loadFuncs["bml"] = function(src, callback) {
+	// BulletML(*.xml)をpreloadで読み込めるようにする.
+	enchant.Game._loadFuncs["xml"] = function(src, callback) {
 		var game = this;
 		var xhr = new XMLHttpRequest();
 		xhr.onreadystatechange = function(e) {
@@ -84,6 +84,7 @@
 			this.lastDirection = 0;
 			this.lastSpeed = 1;
 			this._attacker = null;
+			this.completed = false;
 		},
 		attacker : {
 			get : function() {
@@ -99,7 +100,7 @@
 			}
 		},
 		tick : function() {
-			if (this.age++ < this.waitTo) {
+			if (this.age++ < this.waitTo || this.completed) {
 				return;
 			}
 
@@ -132,10 +133,12 @@
 				}
 			}
 			this._attacker.dispatchEvent(new Event("completeAttack"));
+			this.completed = true;
 		},
 		restart : function() {
 			this.cursor = 0;
 			this.waitTo = -1;
+			this.completed = false;
 			this.seq = this.bulletml.sequence();
 		}
 	});

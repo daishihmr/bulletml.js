@@ -65,16 +65,16 @@ window.onload = function() {
 			h.y = player.y + (player.height - h.height) / 2;
 		});
 		scene.addChild(player);
-		var h = new Sprite(4, 4);
+		var h = new Sprite(8, 8);
 		(function() {
-			h.image = new Surface(4, 4);
+			h.image = new Surface(8, 8);
 			var c = h.image.context;
-			var g = c.createRadialGradient(2, 2, 0, 2, 2, 2);
+			var g = c.createRadialGradient(4, 4, 0, 4, 4, 4);
 			g.addColorStop(0.0, "#ffffff");
-			g.addColorStop(0.8, "#00ff00");
+			g.addColorStop(0.5, "#aaffaa");
 			g.addColorStop(1.0, "rgba(0,255,0,0)");
 			c.fillStyle = g;
-			c.fillRect(0, 0, 4, 4);
+			c.fillRect(0, 0, 8, 8);
 		})();
 		scene.addChild(h);
 
@@ -93,7 +93,7 @@ window.onload = function() {
 
 		// 攻撃パターンにBulletMLをセット
 		enemy.setAttackPattern(
-				game.assets["sample-assets/test.bml"], {
+				game.assets[xmlFiles[4]], {
 					target : player,
 					onfire : function() {
 						console.log("発射! ", this.x, this.y);
@@ -110,10 +110,17 @@ window.onload = function() {
 						}
 					}
 				});
-//		enemy.on("completeAttack", function() {
-//			console.log("攻撃再開");
-//			this.attackPattern.restart();
-//		});
+		enemy.on("completeAttack", function() {
+			console.log(this);
+			var restartAge = this.age + 60;
+			this.on("enterframe", function() {
+				if (this.age == restartAge) {
+					console.log("攻撃再開");
+					this.attackPattern.restart();
+					this.removeEventListener("enterframe", arguments.callee);
+				}
+			});
+		});
 
 		scene.addChild(enemy);
 
