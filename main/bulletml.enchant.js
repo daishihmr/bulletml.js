@@ -418,6 +418,7 @@
             this.lastDirection = 0;
             this.lastSpeed = 1;
 
+            this.direction = 0;
             if (bulletSpec.direction) {
                 var dv = toRadian(eval(bulletSpec.direction.value));
                 switch (bulletSpec.direction.type) {
@@ -439,6 +440,7 @@
                 }
             }
 
+            this.speed = 1;
             if (bulletSpec.speed) {
                 var sv = eval(bulletSpec.speed.value);
                 switch (bulletSpec.speed.type) {
@@ -453,11 +455,12 @@
             }
             attackPattern.lastSpeed = this.speed;
 
-            this.accelH = 0;
-            this.accelV = 0;
+            this.speedH = 0;
+            this.speedV = 0;
 
             this._changeDirection = null;
             this._changeSpeed = null;
+            this._accel = null;
 
             this.scw = enchant.Game.instance.width;
             this.sch = enchant.Game.instance.height;
@@ -465,23 +468,28 @@
             this.addEventListener("enterframe", this.tick);
         },
         /**
-         * 
+         * フレームごとに呼び出される.
          */
         tick : function() {
             this.pattern.config.onenterframe.call(this);
 
             this._changeDirection && this._changeDirection();
             this._changeSpeed && this._changeSpeed();
+            this._accel && this._accel();
 
-            this.x += Math.cos(this.direction) * this.speed * 2;
+            this.x += Math.cos(this.direction) * this.speed * 2
             this.y += Math.sin(this.direction) * this.speed * 2;
+
+            this.x += this.speedH * 2;
+            this.y += this.speedV * 2;
+
             if (this.rotation != undefined) {
                 this.rotation = this.direction;
             }
 
             if (this.pattern.config.removeOnScreenOut) {
-                if (this.x < 0 || this.scw + this.width < this.x || this.y < 0
-                        || this.sch + this.height < this.y) {
+                if (this.x < -this.width || this.scw < this.x
+                        || this.y < -this.height || this.sch < this.y) {
                     this.pattern.config.onremove.call(this);
                     this.parentNode.removeChild(this);
                 }
@@ -524,7 +532,7 @@
                     this.changeSpeed(command);
                     break;
                 case "accel":
-                    // TODO
+                    this.accel(command);
                     break;
                 case "vanish":
                     this.pattern.config.onremove.call(this);
@@ -611,7 +619,65 @@
                     this.speed = finalVal;
                     this._changeSpeed = null;
                 }
+            };
+        },
+        /**
+         * @param {BulletML.Accel}
+         *            cmd
+         */
+        accel : function(cmd) {
+            var t = eval(cmd.term);
+            var endAge = this.age + t;
+
+            var incrH;
+            var finalValH;
+            if (cmd.horizontal) {
+                var h = eval(cmd.horizontal.value);
+                switch (cmd.horizontal.type) {
+                case "absolute":
+                case "sequence":
+                    incrH = (h - this.speedH) / t;
+                    finalValH = h;
+                    break;
+                case "relative":
+                    incrH = h;
+                    finalValH = (h - this.speedH) * t;
+                    break;
+                }
+            } else {
+                incrH = 0;
+                finalValH = this.speedH;
             }
+
+            var incrV;
+            var finalValV;
+            if (cmd.vertical) {
+                var v = eval(cmd.vertical.value);
+                switch (cmd.vertical.type) {
+                case "absolute":
+                case "sequence":
+                    incrV = (v - this.speedV) / t;
+                    finalValV = v;
+                    break;
+                case "relative":
+                    incrV = v;
+                    finalValV = (v - this.speedV) * t;
+                    break;
+                }
+            } else {
+                incrV = 0;
+                finalValV = this.speedV;
+            }
+
+            this._accel = function() {
+                this.speedH += incrH;
+                this.speedV += incrV;
+                if (this.age == endAge) {
+                    this.speedH = finalValH;
+                    this.speedV = finalValV;
+                    this._accel = null;
+                }
+            };
         }
     });
 
