@@ -117,7 +117,7 @@ window.onload = function() {
             }
         });
 
-        // 攻撃パターンにBulletMLをセット
+        // 敵に攻撃パターンをセット
         enemy.setAttackPattern(attackPattern);
 
         // 終わったら次のパターンに差し替える
