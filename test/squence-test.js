@@ -359,4 +359,20 @@ RuntimeTest.prototype.testActionRefBullet = function() {
     var commands = bulletml.sequence()[0].bullet.sequence();
     assertEquals("wait", commands[0].commandName);
     assertEquals("(5)", commands[0].value);
-}
+};
+
+RuntimeTest.prototype.testRank = function() {
+    var bulletml = BulletML
+            .build("<bulletml><action label='top'><wait>$rank</wait></action></bulletml>");
+    var wait = bulletml.sequence()[0];
+    assertEquals("wait", wait.commandName);
+    assertEquals("(0)", wait.value);
+};
+
+RuntimeTest.prototype.testRank2 = function() {
+    var bulletml = BulletML
+            .build("<bulletml><action label='top'><wait>$rank</wait></action></bulletml>");
+    var wait = bulletml.sequence("top", 0.5)[0];
+    assertEquals("wait", wait.commandName);
+    assertEquals("(0.5)", wait.value);
+};

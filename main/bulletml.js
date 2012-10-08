@@ -132,7 +132,7 @@ var BulletML = {};
          * @type {number}
          * @field
          */
-        this.rank = 0.5;
+        this.rank = 0;
     };
     /**
      * find top level action element by label.
@@ -174,13 +174,18 @@ var BulletML = {};
      * ランク（$rank）、乱数（$rand）もこの時点で確定される.
      * 
      * @param {string}
-     *            label label attribute value
+     *            actionLabel 初めに実行するactionのラベル
+     * @param {number}
+     *            rank ランク
      * @return {Array.<BulletML.Command>}
      * @memberOf BulletML.Root.prototype
      */
-    BulletML.Root.prototype.sequence = function(actionLabel) {
+    BulletML.Root.prototype.sequence = function(actionLabel, rank) {
         if (!actionLabel && !this.topAction) {
             throw new Error("has no top action(s).");
+        }
+        if (rank != undefined) {
+            this.rank = rank;
         }
         var topAction;
         if (actionLabel) {
