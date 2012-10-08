@@ -235,6 +235,10 @@
             this._attacker = null;
             this.completed = false;
         },
+        createTicker : function() {
+            return function() {
+            };
+        },
         /**
          * 攻撃を行う敵機.
          * 
