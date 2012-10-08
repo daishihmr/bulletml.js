@@ -25,8 +25,11 @@ window.onload = function() {
     game.preload(assets);
     game.onload = function() {
         // var scene = game.rootScene;
-        var scene = new CanvasGroup();
-        game.rootScene.addChild(scene);
+        var scene = (function() {
+            var result = new CanvasGroup();
+            game.rootScene.addChild(result);
+            return result;
+        })();
         scene.backgroundColor = "#000044";
 
         // 自機
@@ -34,7 +37,7 @@ window.onload = function() {
         player.image = game.assets["sample-assets/chara0.png"];
         player.frame = 33;
         player.frameCount = 0;
-        player.x = (game.width - player.width) / 2;
+        player.x = 160;
         player.y = game.height - 32 - player.height;
         player.speed = 2;
         player.on("enterframe", function() {
@@ -94,53 +97,29 @@ window.onload = function() {
                 this.frame = [ 3, 4, 5, 4 ][(this.frameCount += 1) % 4];
             }
         });
+        scene.addChild(enemy);
 
         // 攻撃パターン
-        var attackPattern = new AttackPattern(game.assets[xmlFiles[0]], {
-            target : player,
-            bulletParent : scene,
-            onfire : function() {
-                // console.log("onFire");
-            },
-            onenterframe : function() {
-                // 衝突判定（自機と弾との距離が4未満）
-                var x1 = this.x + this.width / 2;
-                var y1 = this.y + this.height / 2;
-                var x2 = player.x + player.width / 2;
-                var y2 = player.y + player.height / 2;
-                var dx = (x1 - x2) * (x1 - x2);
-                var dy = (y1 - y2) * (y1 - y2);
-                if (dx + dy < 4 * 4) {
-                    this.parentNode.removeChild(this);
-                    explode(x1, y1);
-                }
-            },
-            onremove : function() {
-                // console.log("onRemove");
-            }
-        });
+        var test = BulletML
+                .build("<bulletml><action label='top'><fire><bullet/></fire></action></bulletml>");
+        var attackPattern = new AttackPattern(test);
+        enemy.on("enterframe", attackPattern.createTicker({
+            target : player
+        }));
 
-        // 敵に攻撃パターンをセット
-        enemy.setAttackPattern(attackPattern);
-
-        // 終わったら次のパターンに差し替える
-        var pattern = [ 0, 1, 2, 3, 4, 6, 10, 13, 14, 15 ];
-        pattern.next = function() {
-            return this[~~(Math.random() * this.length)];
-        };
-        enemy.on("completeAttack", function() {
-            var restartAge = this.age + 60;
-            this.on("enterframe", function() {
-                if (this.age == restartAge) {
-                    console.log("攻撃再開");
-                    this.attackPattern.bulletml = game.assets[xmlFiles[pattern
-                            .next()]];
-                    this.attackPattern.restart();
-                    this.removeEventListener("enterframe", arguments.callee);
-                }
-            });
-        });
-        scene.addChild(enemy);
+        // var histTest = function() {
+        // // 衝突判定（自機と弾との距離が4未満）
+        // var x1 = this.x + this.width / 2;
+        // var y1 = this.y + this.height / 2;
+        // var x2 = player.x + player.width / 2;
+        // var y2 = player.y + player.height / 2;
+        // var dx = (x1 - x2) * (x1 - x2);
+        // var dy = (y1 - y2) * (y1 - y2);
+        // if (dx + dy < 4 * 4) {
+        // this.parentNode.removeChild(this);
+        // explode(x1, y1);
+        // }
+        // };
 
         // タッチ操作用パネル
         var ctrlPanel = new Sprite(game.width, game.height);
