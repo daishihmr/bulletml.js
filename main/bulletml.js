@@ -181,20 +181,18 @@ var BulletML = {};
      * @memberOf BulletML.Root.prototype
      */
     BulletML.Root.prototype.sequence = function(actionLabel, rank) {
-        if (!actionLabel && !this.topAction) {
-            throw new Error("has no top action(s).");
+        if (!actionLabel) {
+            actionLabel = "top";
         }
         if (rank != undefined) {
             this.rank = rank;
         }
-        var topAction;
-        if (actionLabel) {
-            topAction = this.findAction(actionLabel);
-        } else {
-            topAction = this.topAction;
+        var action = this.findAction(actionLabel);
+        if (!action) {
+            throw new Error("action labeld '" + actionLabel + "' is not found.");
         }
         var visitor = new BulletML.Visitor(this);
-        visitor.visit(topAction);
+        visitor.visit(action);
         return visitor.result;
     };
 
@@ -335,6 +333,7 @@ var BulletML = {};
      * @constructor
      */
     BulletML.BulletRef = function() {
+        this.root = null;
         /**
          * @type {string}
          * @field
@@ -345,7 +344,23 @@ var BulletML = {};
          */
         this.params = [];
     };
-    BulletML.BulletRef = BulletML.BulletRef
+    BulletML.BulletRef.prototype.clone = function(params) {
+        // console.log("BulletRef#clone");
+        // console.log("params", params);
+        // console.log("this.params", this.params);
+        var origBullet = this.root.findBullet(this.label);
+        if (!origBullet) {
+            throw new Error("bulletRef reference not found.(label = "
+                    + this.label + ")");
+        }
+        var newParam = [];
+        for ( var i = 0, end = this.params.length; i < end; i++) {
+            newParam.push(evalNumberFixRand(this.params[i], params,
+                    this.root.rank));
+        }
+        // console.log("newParam", newParam);
+        return origBullet.clone(newParam);
+    };
 
     // commandクラス --------------------------------------------
 
@@ -404,6 +419,8 @@ var BulletML = {};
      * @memberOf BulletML.Action.prototype
      */
     BulletML.Action.prototype.clone = function(params) {
+        // console.log("Action#clone");
+        // console.log("params", params);
         var result = new BulletML.Action();
         result.label = this.label;
         result.root = this.root;
@@ -501,20 +518,9 @@ var BulletML = {};
         }
 
         if (this.bullet) {
-            if (this.bullet instanceof BulletML.Bullet) {
-                result.bullet = this.bullet.clone(params);
-            } else if (this.bullet instanceof BulletML.BulletRef) {
-                var origBullet = this.root.findBullet(this.bullet.label);
-                if (!origBullet) {
-                    return result;
-                }
-                var newParam = [];
-                for ( var i = 0, end = this.bullet.params.length; i < end; i++) {
-                    newParam.push(evalNumberFixRand(this.bullet.params[i],
-                            params, this.root.rank));
-                }
-                result.bullet = origBullet.clone(newParam);
-            }
+            result.bullet = this.bullet.clone(params);
+        } else {
+            throw new Error("fire has no bullet (or bulletRef).");
         }
         return result;
     }
@@ -734,6 +740,15 @@ var BulletML = {};
         this.action = null;
     };
     BulletML.Repeat.prototype = new BulletML.Command();
+    BulletML.Repeat.prototype.clone = function(params) {
+        // console.log("Repeat#clone");
+        // console.log("params", params);
+        var result = new BulletML.Repeat();
+        result.root = this.root;
+        result.times = evalNumber(this.times, params, this.root.rank);
+        result.action = this.action.clone(params);
+        return result;
+    };
 
     /**
      * @constructor
@@ -1108,6 +1123,7 @@ var BulletML = {};
         get(element, "times", function(times) {
             result.times = text(times);
         });
+        result.root = root;
 
         return result;
     }
