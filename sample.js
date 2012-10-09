@@ -102,10 +102,26 @@ window.onload = function() {
         // 攻撃パターン
         var test = BulletML
                 .build("<bulletml><action label='top'><fire><bullet/></fire></action></bulletml>");
-        var attackPattern = new AttackPattern(test);
-        enemy.on("enterframe", attackPattern.createTicker({
+        var attackPattern = new AttackPattern(game.assets[xmlFiles[1]]);
+
+        // enterframeイベントリスナを作成
+        var ticker = attackPattern.createTicker({
             target : player
-        }));
+        });
+
+        // 作成したenterframeイベントリスナを敵機にセット
+        enemy.on("enterframe", ticker);
+
+        // 攻撃完了イベント
+        enemy.on("completeAttack", function() {
+            this.removeEventListener("enterframe", ticker);
+            var xml = xmlFiles[~~(Math.random() * xmlFiles.length)];
+            console.log(xml);
+            ticker = new AttackPattern(game.assets[xml]).createTicker({
+                target : player
+            });
+            this.on("enterframe", ticker);
+        });
 
         // var histTest = function() {
         // // 衝突判定（自機と弾との距離が4未満）
