@@ -257,24 +257,28 @@
                                 break;
                             }
                         }
-                        this.dispatchEvent(new Event("completeAttack"));
+
                         t.completed = true;
+                        this.dispatchEvent(new Event("completeAttack"));
                     };
 
-                    onEnterframeListener.cursor = 0;
-                    onEnterframeListener.waitTo = -1;
-                    onEnterframeListener.completed = false;
+                    onEnterframeListener.restart = function() {
+                        this.cursor = 0;
+                        this.waitTo = -1;
+                        this.completed = false;
 
-                    onEnterframeListener.direction = 0;
-                    onEnterframeListener.lastDirection = 0;
-                    onEnterframeListener.speed = 0;
-                    onEnterframeListener.lastSpeed = 0;
-                    onEnterframeListener.speedH = 0;
-                    onEnterframeListener.speedV = 0;
+                        this.direction = 0;
+                        this.lastDirection = 0;
+                        this.speed = 0;
+                        this.lastSpeed = 0;
+                        this.speedH = 0;
+                        this.speedV = 0;
 
-                    onEnterframeListener._changeDirection = null;
-                    onEnterframeListener._changeSpeed = null;
-                    onEnterframeListener._accel = null;
+                        this._changeDirection = null;
+                        this._changeSpeed = null;
+                        this._accel = null;
+                    };
+                    onEnterframeListener.restart();
 
                     return onEnterframeListener;
                 },
@@ -336,7 +340,7 @@
                     b.addEventListener("enterframe", bt);
                     if (config.addTarget) {
                         config.addTarget.addChild(b);
-                    } else {
+                    } else if (this.parentNode) {
                         this.parentNode.addChild(b);
                     }
                 },
@@ -466,7 +470,7 @@
                         finalValV = ticker.speedV;
                     }
 
-                    this._accel = function() {
+                    ticker._accel = function() {
                         ticker.speedH += incrH;
                         ticker.speedV += incrV;
                         if (this.age == endAge) {
