@@ -63,22 +63,6 @@
         xhr.send(null);
     };
 
-    enchant.Node.prototype.setAttackPattern = function(attackPattern) {
-        this.attackPattern = attackPattern;
-        this.attackPattern.attacker = this;
-        this._attackTick = function() {
-            if (this.attackPattern) {
-                this.attackPattern.tick();
-            }
-        };
-        this.addEventListener("enterframe", this._attackTick);
-    };
-    enchant.Node.prototype.removeAttackPattern = function() {
-        this.attackPattern.attacker = null;
-        this.attackPattern = null;
-        this.removeEventListener("enterframe", this._attackTick);
-    };
-
     /**
      * @namespace
      */
@@ -141,9 +125,7 @@
                     if (base !== undefined) {
                         for ( var prop in base) {
                             if (base.hasOwnProperty(prop)) {
-                                if (config[prop] === undefined) {
-                                    config[prop] = base[prop];
-                                }
+                                config[prop] = base[prop];
                             }
                         }
                     }
@@ -172,7 +154,13 @@
                  * <tr>
                  * <td>addTarget</td>
                  * <td>enchant.Group<br>
+                 * <td>攻撃を実行するノードの親ノード</td>
                  * <td></td>
+                 * </tr>
+                 * <tr>
+                 * <td>bulletFactory</td>
+                 * <td>function<br>
+                 * <td>小さな赤い弾を生成する</td>
                  * <td></td>
                  * </tr>
                  * </table>
@@ -309,7 +297,7 @@
                             if (config.target) {
                                 return radiusAtoB(attacker, config.target) + dv;
                             } else {
-                                return dv;
+                                return dv - Math.PI / 2;
                             }
                         case "absolute":
                             return dv - Math.PI / 2; // 真上が0度
