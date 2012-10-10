@@ -5,6 +5,8 @@
  * @description
  * enchant.js extension plugin for use BulletML.
  * 
+ * This project has hosted by github.com (https://github.com/daishihmr/bulletml.js).
+ * 
  * The MIT License (MIT)
  * Copyright (c) 2012 dev7.jp
  * 

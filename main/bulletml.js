@@ -2,7 +2,9 @@
  * bullet.js v0.1.0
  * @author daishi@dev7.jp
  * @description
- * BulletML parser.
+ * General-purpose parser BulletML.
+ * 
+ * This project has hosted by github.com (https://github.com/daishihmr/bulletml.js).
  * 
  * The MIT License (MIT)
  * Copyright (c) 2012 dev7.jp
