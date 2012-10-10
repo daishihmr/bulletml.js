@@ -13,6 +13,7 @@ var xmlFiles = [ "sample-assets/[1943]_rolling_fire.xml",
         "sample-assets/[Progear]_round_5_middle_boss_rockets.xml",
         "sample-assets/[Progear]_round_6_boss_parabola_shot.xml",
         "sample-assets/[Psyvariar]_X-A_boss_opening.xml",
+        "sample-assets/[Psyvariar]_X-A_boss_winder.xml",
         "sample-assets/[Psyvariar]_X-B_colony_shape_satellite.xml",
         "sample-assets/[XEVIOUS]_garu_zakato.xml" ];
 
@@ -81,8 +82,11 @@ window.onload = function() {
         scene.addChild(enemy);
 
         // 攻撃パターン
-        var attackPattern = new AttackPattern(game.assets[xmlFiles[~~(Math
-                .random() * xmlFiles.length)]]);
+        var xml = xmlFiles[~~(Math.random() * xmlFiles.length)];
+        console.log(xml);
+        var attackPattern = new AttackPattern(game.assets[xml]);
+        // var attackPattern = new AttackPattern(
+        // game.assets["sample-assets/[Psyvariar]_X-A_boss_winder.xml"]);
         // 攻撃パターン設定
         var config = {
             target : player, // 攻撃対象
@@ -109,7 +113,6 @@ window.onload = function() {
 
         // enterframeイベントリスナを作成
         var ticker = attackPattern.createTicker(config);
-
         // 作成したenterframeイベントリスナを敵機にセット
         enemy.on("enterframe", ticker);
 

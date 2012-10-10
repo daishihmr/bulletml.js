@@ -191,7 +191,7 @@ var BulletML = {};
         }
         var action = this.findAction(actionLabel);
         if (!action) {
-            throw new Error("action labeld '" + actionLabel + "' is not found.");
+            return;
         }
         var visitor = new BulletML.Visitor(this);
         visitor.visit(action);
