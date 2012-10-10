@@ -71,7 +71,18 @@
     enchant.bulletml = {};
 
     /**
+     * 弾の画像が指定されなかった場合に使用される.
+     * 
+     * 8px x 8px.赤い球状の弾.
+     *
+     * @type string
+     * @memberOf enchant.bulletml
+     */
+    enchant.bulletml.DEFAULT_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAa0lEQVQYV2NkgIL/DAw2QGYolLuakYHhCIgNpBkYgJITGWxs8hj8/CDymzYBpY9MAkrmM4J12tgcZlizhoFBXByi4OVLBoaQEJAiW5CCiQxdXXkMpaUw2yB0dzcDQ1nZJKIU4LeCoCMJeRMAewIxn7cIaLcAAAAASUVORK5CYII=";
+
+    /**
      * @scope enchant.bulletml.AttackPattern.prototype
+     * @memberOf enchant.bulletml
      */
     enchant.bulletml.AttackPattern = enchant.Class
             .create({
@@ -472,7 +483,7 @@
                  * 解析済みのBulletMLオブジェクト.<br>
                  * 読み取り専用.
                  * 
-                 * @type {BulletML.Root}
+                 * @type BulletML.Root
                  */
                 bulletml : {
                     get : function() {
@@ -480,15 +491,6 @@
                     }
                 }
             });
-
-    /**
-     * 弾の画像が指定されなかった場合に使用される.
-     * 
-     * 8px x 8px.赤い球状の弾.
-     * 
-     * @memberOf enchant.bulletml
-     */
-    enchant.bulletml.DEFAULT_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAa0lEQVQYV2NkgIL/DAw2QGYolLuakYHhCIgNpBkYgJITGWxs8hj8/CDymzYBpY9MAkrmM4J12tgcZlizhoFBXByi4OVLBoaQEJAiW5CCiQxdXXkMpaUw2yB0dzcDQ1nZJKIU4LeCoCMJeRMAewIxn7cIaLcAAAAASUVORK5CYII=";
 
     /**
      * ラジアンから度数に変換.
