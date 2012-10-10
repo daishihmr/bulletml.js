@@ -74,11 +74,24 @@
      * 弾の画像が指定されなかった場合に使用される.
      * 
      * 8px x 8px.赤い球状の弾.
-     *
+     * 
      * @type string
      * @memberOf enchant.bulletml
      */
     enchant.bulletml.DEFAULT_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAa0lEQVQYV2NkgIL/DAw2QGYolLuakYHhCIgNpBkYgJITGWxs8hj8/CDymzYBpY9MAkrmM4J12tgcZlizhoFBXByi4OVLBoaQEJAiW5CCiQxdXXkMpaUw2yB0dzcDQ1nZJKIU4LeCoCMJeRMAewIxn7cIaLcAAAAASUVORK5CYII=";
+
+    /**
+     * bulletFactory未指定時に使用される弾スプライトの生成関数.
+     * 
+     * @returns {enchant.Sprite} 8px x 8px の大きさのスプライト
+     * @type function
+     * @memberOf enchant.bulletml
+     */
+    enchant.bulletml.DEFAULT_BULLET_FACTORY = function() {
+        var bullet = new enchant.Sprite(8, 8);
+        bullet.image = enchant.Surface.load(enchant.bulletml.DEFAULT_IMAGE);
+        return bullet;
+    };
 
     /**
      * @scope enchant.bulletml.AttackPattern.prototype
@@ -118,12 +131,7 @@
                     }
 
                     var config = {
-                        bulletFactory : function(spec) {
-                            var bullet = new enchant.Sprite(8, 8);
-                            bullet.image = enchant.Surface
-                                    .load(enchant.bulletml.DEFAULT_IMAGE);
-                            return bullet;
-                        },
+                        bulletFactory : enchant.bulletml.DEFAULT_BULLET_FACTORY,
                         testInWorld : function(bullet) {
                             var scw = enchant.Game.instance.width;
                             var sch = enchant.Game.instance.height;
@@ -195,6 +203,13 @@
                  *            <td>Gameインスタンスの大きさをベースにして判定する</td>
                  *            <td></td>
                  *            </tr>
+                 *            <tr>
+                 *            <td>rank</td>
+                 *            <td>number</td>
+                 *            <td>弾幕ランク.BulletMLの$rankに対応する.0.0～1.0の範囲で指定.</td>
+                 *            <td>0</td>
+                 *            <td></td>
+                 *            </tr>
                  *            </table>
                  *            設定する項目がtargetのみの場合、標的オブジェクトを直接引数として渡すことが可能.
                  * @param {string}
@@ -204,12 +219,36 @@
                  *          攻撃パターンを初めからやりなおすrestartメソッドを持つ.
                  */
                 createTicker : function(config, action) {
+                    if (action === undefined
+                            && !this._bulletml.findAction("top")) {
+                        // topN対応
+                        var tickers = [];
+                        for ( var i = 1; this._bulletml.findAction("top" + i); i++) {
+                            tickers[tickers.length] = this._createTicker(
+                                    config, "top" + i);
+                        }
+                        var ticker = function() {
+                            for ( var i = 0, end = tickers.length; i < end; i++) {
+                                tickers[i].call(this);
+                            }
+                        };
+                        ticker.restart = function() {
+                            for ( var i = 0, end = tickers.length; i < end; i++) {
+                                tickers[i].restart();
+                            }
+                        };
+                        return ticker;
+                    } else {
+                        return this._createTicker(config, action);
+                    }
+                },
+                _createTicker : function(config, action) {
                     config = this._getConf(config);
 
                     var seq;
                     if (action === undefined) {
                         seq = this._bulletml.sequence("top", config.rank);
-                    } else if (typeof (topActionLabel) === "string") {
+                    } else if (typeof (action) === "string") {
                         seq = this._bulletml.sequence(action, config.rank);
                     } else if (action instanceof BulletML.Bullet) {
                         seq = action.sequence();
@@ -265,7 +304,7 @@
                             var cmd = seq[ticker.cursor];
                             switch (cmd.commandName) {
                             case "fire":
-                                pattern._fire.call(this, cmd, config, this,
+                                pattern._fire.call(this, cmd, config, ticker,
                                         pattern);
                                 break;
                             case "wait":
@@ -275,7 +314,7 @@
                             case "loopEnd":
                                 cmd.loopCount = (cmd.loopCount == -1) ? 0
                                         : (cmd.loopCount + 1);
-                                if (cmd.loopCount < cmd.times - 1) {
+                                if (cmd.loopCount < eval(cmd.times) - 1) {
                                     while (0 < ticker.cursor
                                             && seq[ticker.cursor] != cmd.start) {
                                         ticker.cursor -= 1;
@@ -348,6 +387,7 @@
                     var attacker = this;
                     var calcDirection = function(d) {
                         var dv = toRadian(eval(d.value));
+                        // console.log(d.type);
                         switch (d.type) {
                         case "aim":
                             if (config.target) {
@@ -360,12 +400,14 @@
                         case "relative":
                             return ticker.direction + dv;
                         case "sequence":
+                            // console.log(ticker.lastDirection, dv);
                             return ticker.lastDirection + dv;
                         }
                     };
                     bt.direction = calcDirection(cmd.direction
                             || cmd.bullet.direction);
                     ticker.lastDirection = bt.direction;
+                    // console.log(bt.direction);
 
                     var calcSpeed = function(s) {
                         var sv = eval(s.value);
