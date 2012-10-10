@@ -8,4 +8,4 @@ bulletml.enchant.js
 
 enchant.jsでBulletMLを利用するためのプラグイン。
 
-使い方はsample.jsを参照。
+使い方は[wiki](https://github.com/daishihmr/bulletml.js/wiki)を参照。
