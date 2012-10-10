@@ -74,11 +74,24 @@
      * 弾の画像が指定されなかった場合に使用される.
      * 
      * 8px x 8px.赤い球状の弾.
-     *
+     * 
      * @type string
      * @memberOf enchant.bulletml
      */
     enchant.bulletml.DEFAULT_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAa0lEQVQYV2NkgIL/DAw2QGYolLuakYHhCIgNpBkYgJITGWxs8hj8/CDymzYBpY9MAkrmM4J12tgcZlizhoFBXByi4OVLBoaQEJAiW5CCiQxdXXkMpaUw2yB0dzcDQ1nZJKIU4LeCoCMJeRMAewIxn7cIaLcAAAAASUVORK5CYII=";
+
+    /**
+     * bulletFactory未指定時に使用される弾スプライトの生成関数.
+     * 
+     * @returns {enchant.Sprite} 8px x 8px の大きさのスプライト
+     * @type function
+     * @memberOf enchant.bulletml
+     */
+    enchant.bulletml.DEFAULT_BULLET_FACTORY = function() {
+        var bullet = new enchant.Sprite(8, 8);
+        bullet.image = enchant.Surface.load(enchant.bulletml.DEFAULT_IMAGE);
+        return bullet;
+    };
 
     /**
      * @scope enchant.bulletml.AttackPattern.prototype
@@ -118,12 +131,7 @@
                     }
 
                     var config = {
-                        bulletFactory : function(spec) {
-                            var bullet = new enchant.Sprite(8, 8);
-                            bullet.image = enchant.Surface
-                                    .load(enchant.bulletml.DEFAULT_IMAGE);
-                            return bullet;
-                        },
+                        bulletFactory : enchant.bulletml.DEFAULT_BULLET_FACTORY,
                         testInWorld : function(bullet) {
                             var scw = enchant.Game.instance.width;
                             var sch = enchant.Game.instance.height;
@@ -275,7 +283,7 @@
                             case "loopEnd":
                                 cmd.loopCount = (cmd.loopCount == -1) ? 0
                                         : (cmd.loopCount + 1);
-                                if (cmd.loopCount < cmd.times - 1) {
+                                if (cmd.loopCount < eval(cmd.times) - 1) {
                                     while (0 < ticker.cursor
                                             && seq[ticker.cursor] != cmd.start) {
                                         ticker.cursor -= 1;

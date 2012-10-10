@@ -117,10 +117,12 @@ window.onload = function() {
         enemy.on("completeAttack", function() {
             // 攻撃パターンさしかえ
             this.removeEventListener(ticker);
-            attackPattern = new AttackPattern(game.assets[xmlFiles[~~(Math
-                    .random() * xmlFiles.length)]]);
+            var xml = xmlFiles[~~(Math.random() * xmlFiles.length)];
+            console.log(xml);
+            attackPattern = new AttackPattern(game.assets[xml]);
             ticker = attackPattern.createTicker(config);
             this.on("enterframe", ticker);
+            // ticker.restart();
         });
 
         // タッチ操作用パネル
