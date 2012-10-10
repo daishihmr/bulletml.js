@@ -1,7 +1,7 @@
 /*
- * bullet.enchant.js v0.1.0
+ * bullet.enchant.js v0.2.0
  * @author daishi@dev7.jp
- * @require enchant.js v0.5.1 or later, bullet.js v0.1.0.
+ * @require enchant.js v0.5.1 or later, bulletml.js v0.1.0.
  * @description
  * enchant.js extension plugin for use BulletML.
  * 
@@ -69,42 +69,41 @@
     enchant.bulletml = {};
 
     /**
-     * 攻撃パターン.
-     * 
-     * 単一の敵機に対応する.
-     * 
-     * @constructor
      * @scope enchant.bulletml.AttackPattern.prototype
-     * @example
-     * 
-     * <pre>
-     * game.preload(&quot;boss.xml&quot;);
-     * ...
-     * var player = new Sprite(...); // 自機
-     * var boss = new Sprite(...); // 敵機
-     * var bossPattern = new AttackPattern(game.assets[&quot;boss.xml&quot;], {
-     *     target : player,
-     *     onenterframe: function() {
-     *         hitTest(this, player);
-     *     }
-     * });
-     * boss.setAttackPattern(bossPattern); // パターンを敵機に設定する
-     * </pre>
      */
     enchant.bulletml.AttackPattern = enchant.Class
             .create({
                 /**
-                 * 攻撃パターンのコンストラクタ.
+                 * 攻撃パターン.
                  * 
+                 * 単一の敵機に対応する.
                  * 
-                 * @param {BulletML.Root}
-                 *            [bulletml] BulletMLデータ
+                 * @example
+                 * 
+                 * <pre>
+                 * game.preload(&quot;boss.xml&quot;);
+                 * ...
+                 * var player = new Sprite(... // 自機
+                 * var boss = new Sprite(... // 敵機
+                 * var pattern = new AttackPattern(game.assets[&quot;boss.xml&quot;]); // 攻撃パターンを生成
+                 * var ticker = pattern.createTicker(player); // 自機を標的としたenterframeイベントリスナを生成
+                 * boss.addEventListener(&quot;enterframe&quot;, ticker); // パターンを敵機に設定する
+                 * </pre>
+                 * 
                  * @constructs
+                 * @param {BulletML.Root}
+                 *            bulletml BulletMLデータ
                  */
                 initialize : function(bulletml) {
                     this._bulletml = bulletml;
                 },
                 _getConf : function(base) {
+                    if (base instanceof enchant.Node) {
+                        base = {
+                            target : base
+                        };
+                    }
+
                     var config = {
                         bulletFactory : function(spec) {
                             var bullet = new enchant.Sprite(8, 8);
@@ -112,7 +111,7 @@
                                     .load(enchant.bulletml.DEFAULT_IMAGE);
                             return bullet;
                         },
-                        testOnScreen : function(bullet) {
+                        testInWorld : function(bullet) {
                             var scw = enchant.Game.instance.width;
                             var sch = enchant.Game.instance.height;
                             var w = bullet.width || 0;
@@ -120,7 +119,8 @@
                             return (-w <= bullet.x && bullet.x < scw
                                     && -h <= bullet.y && bullet.y < sch);
                         },
-                        rank : 0
+                        rank : 0,
+                        updateProperties : false
                     };
                     if (base !== undefined) {
                         for ( var prop in base) {
@@ -132,43 +132,63 @@
                     return config;
                 },
                 /**
-                 * enterframeイベントのリスナを作成する.
+                 * enterframeイベントのリスナを作成する.<br>
+                 * <br>
+                 * 第1引数configで各種設定を行う. <br>
                  * 
-                 * 第2引数config各種設定を行う. <br>
                  * 
-                 * <table border=1>
-                 * <tr>
-                 * <th>プロパティ名</th>
-                 * <th>型.<br>
-                 * 設定内容</th>
-                 * <th>デフォルト値</th>
-                 * <th>必須</th>
-                 * </tr>
-                 * <tr>
-                 * <td>target</td>
-                 * <td>enchant.Node.<br>
-                 * 攻撃の標的となるオブジェクト.</td>
-                 * <td>null</td>
-                 * <td>○</td>
-                 * </tr>
-                 * <tr>
-                 * <td>addTarget</td>
-                 * <td>enchant.Group<br>
-                 * <td>攻撃を実行するノードの親ノード</td>
-                 * <td></td>
-                 * </tr>
-                 * <tr>
-                 * <td>bulletFactory</td>
-                 * <td>function<br>
-                 * <td>小さな赤い弾を生成する</td>
-                 * <td></td>
-                 * </tr>
-                 * </table>
-                 * 
+                 * @param {Object|enchant.Node}
+                 *            config 発射される弾に関する設定.<br>
+                 *            <table border=1>
+                 *            <tr>
+                 *            <th>プロパティ名</th>
+                 *            <th>型</th>
+                 *            <th>設定内容</th>
+                 *            <th>デフォルト値</th>
+                 *            <th>必須</th>
+                 *            </tr>
+                 *            <tr>
+                 *            <td>target</td>
+                 *            <td>enchant.Node</td>
+                 *            <td>攻撃の標的となるオブジェクト</td>
+                 *            <td>null</td>
+                 *            <td>○</td>
+                 *            </tr>
+                 *            <tr>
+                 *            <td>addTarget</td>
+                 *            <td>enchant.Group</td>
+                 *            <td>生成した弾を追加するノード</td>
+                 *            <td>攻撃を実行するノードのparentNode</td>
+                 *            <td></td>
+                 *            </tr>
+                 *            <tr>
+                 *            <td>bulletFactory</td>
+                 *            <td>function</td>
+                 *            <td>弾ノードを生成する関数</td>
+                 *            <td>小さな赤い弾を生成</td>
+                 *            <td></td>
+                 *            </tr>
+                 *            <tr>
+                 *            <td>updateProperties</td>
+                 *            <td>boolean</td>
+                 *            <td>弾のプロパティ(direction, speed)を更新するかどうか</td>
+                 *            <td>false</td>
+                 *            <td></td>
+                 *            </tr>
+                 *            <tr>
+                 *            <td>testInWorld</td>
+                 *            <td>function</td>
+                 *            <td>弾が画面内に存在することを判定する関数</td>
+                 *            <td>Gameインスタンスの大きさをベースにして判定する</td>
+                 *            <td></td>
+                 *            </tr>
+                 *            </table>
+                 *            設定する項目がtargetのみの場合、標的オブジェクトを直接引数として渡すことが可能.
                  * @param {string}
-                 *            topActionLabel 最初に読み込むactionのラベル.デフォルトは"top"
-                 * @param {Object}
-                 *            [config] 発射される弾に関する設定
+                 *            [action] 最初に読み込むactionのラベル.<br>
+                 *            省略可(デフォルト値は"top").
+                 * @returns {function} enterframeイベントのリスナ.<br>
+                 *          攻撃パターンを初めからやりなおすrestartメソッドを持つ.
                  */
                 createTicker : function(config, action) {
                     config = this._getConf(config);
@@ -185,72 +205,95 @@
                     }
 
                     var pattern = this;
-                    var onEnterframeListener = function() {
-                        var t = onEnterframeListener;
 
-                        t._changeDirection && t._changeDirection.call(this);
-                        t._changeSpeed && t._changeSpeed.call(this);
-                        t._accel && t._accel.call(this);
+                    var ticker = function() {
+                        // change direction
+                        if (this.age < ticker.chDirEnd) {
+                            ticker.direction += ticker.dirIncr;
+                        } else if (this.age == ticker.chDirEnd) {
+                            ticker.direction = ticker.dirFin;
+                        }
 
-                        this.x += Math.cos(t.direction) * t.speed * 2
-                        this.y += Math.sin(t.direction) * t.speed * 2;
-                        this.x += t.speedH * 2;
-                        this.y += t.speedV * 2;
+                        // change speed
+                        if (this.age < ticker.chSpdEnd) {
+                            ticker.speed += ticker.spdIncr;
+                        } else if (this.age == ticker.chSpdEnd) {
+                            ticker.speed = ticker.spdFin;
+                        }
 
-                        if (!config.testOnScreen(this)) {
+                        // accel
+                        if (this.age < ticker.aclEnd) {
+                            ticker.speedH += ticker.aclIncrH;
+                            ticker.speedV += ticker.aclIncrV;
+                        } else if (this.age == ticker.aclEnd) {
+                            ticker.speedH = ticker.aclFinH;
+                            ticker.speedV = ticker.aclFinV;
+                        }
+
+                        // move
+                        this.x += Math.cos(ticker.direction) * ticker.speed * 2;
+                        this.y += Math.sin(ticker.direction) * ticker.speed * 2;
+                        this.x += ticker.speedH * 2;
+                        this.y += ticker.speedV * 2;
+
+                        if (!config.testInWorld(this)) {
                             this.parentNode.removeChild(this);
                         }
 
-                        if (this.age < t.waitTo || t.completed) {
+                        if (config.updateProperties) {
+                            this.direction = ticker.direction;
+                            this.speed = ticker.speed;
+                        }
+
+                        if (this.age < ticker.waitTo || ticker.completed) {
                             return;
                         }
-                        for ( var end = seq.length; t.cursor < end; t.cursor++) {
-                            var cmd = seq[t.cursor];
+                        for ( var end = seq.length; ticker.cursor < end; ticker.cursor++) {
+                            var cmd = seq[ticker.cursor];
                             switch (cmd.commandName) {
                             case "fire":
-                                pattern.fire.call(this, cmd, config, this,
+                                pattern._fire.call(this, cmd, config, this,
                                         pattern);
                                 break;
                             case "wait":
-                                t.waitTo = this.age + eval(cmd.value);
-                                t.cursor += 1;
+                                ticker.waitTo = this.age + eval(cmd.value);
+                                ticker.cursor += 1;
                                 return;
                             case "loopEnd":
                                 cmd.loopCount = (cmd.loopCount == -1) ? 0
                                         : (cmd.loopCount + 1);
                                 if (cmd.loopCount < cmd.times - 1) {
-                                    while (0 < t.cursor
-                                            && seq[t.cursor] != cmd.start) {
-                                        t.cursor -= 1;
+                                    while (0 < ticker.cursor
+                                            && seq[ticker.cursor] != cmd.start) {
+                                        ticker.cursor -= 1;
                                     }
                                 } else {
                                     cmd.loopCount = -1;
                                 }
                                 break;
                             case "changeDirection":
-                                pattern.changeDirection.call(this, cmd, config,
-                                        t);
+                                pattern._changeDirection.call(this, cmd,
+                                        config, ticker);
                                 break;
                             case "changeSpeed":
-                                pattern.changeSpeed.call(this, cmd, t);
+                                pattern._changeSpeed.call(this, cmd, ticker);
                                 break;
                             case "accel":
-                                pattern.accel.call(this, cmd, t);
+                                pattern._accel.call(this, cmd, ticker);
                                 break;
                             case "vanish":
                                 if (this.parentNode) {
                                     this.parentNode.removeChild(this);
                                 }
-                                t.cursor = end;
+                                ticker.cursor = end;
                                 break;
                             }
                         }
 
-                        t.completed = true;
+                        ticker.completed = true;
                         this.dispatchEvent(new Event("completeAttack"));
                     };
-
-                    onEnterframeListener.restart = function() {
+                    ticker.restart = function() {
                         this.cursor = 0;
                         this.waitTo = -1;
                         this.completed = false;
@@ -262,25 +305,25 @@
                         this.speedH = 0;
                         this.speedV = 0;
 
-                        this._changeDirection = null;
-                        this._changeSpeed = null;
-                        this._accel = null;
-                    };
-                    onEnterframeListener.restart();
+                        this.dirIncr = 0;
+                        this.dirFin = 0;
+                        this.chDirEnd = -1;
 
-                    return onEnterframeListener;
+                        this.spdIncr = 0;
+                        this.spdFin = 0;
+                        this.chSpdEnd = -1;
+
+                        this.aclIncrH = 0;
+                        this.aclFinH = 0;
+                        this.aclIncrV = 0;
+                        this.aclFinV = 0;
+                        this.aclEnd = -1;
+                    };
+                    ticker.restart();
+
+                    return ticker;
                 },
-                /**
-                 * 弾を発射する.
-                 * 
-                 * @param {BulletML.Fire}
-                 *            cmd 発射コマンド
-                 * @param {Object}
-                 *            config 設定
-                 * @param {enchant.Node}
-                 *            attacker 弾を発射するオブジェクト
-                 */
-                fire : function(cmd, config, ticker, pattern) {
+                _fire : function(cmd, config, ticker, pattern) {
                     var b = config.bulletFactory({
                         label : cmd.bullet.label
                     });
@@ -332,15 +375,7 @@
                         this.parentNode.addChild(b);
                     }
                 },
-                /**
-                 * @param {BulletML.ChangeDirection}
-                 *            cmd
-                 */
-                changeDirection : function(cmd, config, ticker) {
-                    var incr;
-                    var finalVal;
-                    var endAge;
-
+                _changeDirection : function(cmd, config, ticker) {
                     var d = eval(cmd.direction.value);
                     var t = eval(cmd.term);
                     switch (cmd.direction.type) {
@@ -349,203 +384,100 @@
                         if (!tar) {
                             return;
                         }
-                        finalVal = radiusAtoB(this, tar) + toRadian(d);
-                        incr = rel(finalVal - ticker.direction) / t;
+                        ticker.dirFin = radiusAtoB(this, tar) + toRadian(d);
+                        ticker.dirIncr = rel(ticker.dirFin - ticker.direction)
+                                / t;
                         break;
                     case "absolute":
-                        finalVal = toRadian(d) - Math.PI / 2;
-                        incr = rel(finalVal - ticker.direction) / t;
+                        ticker.dirFin = toRadian(d) - Math.PI / 2;
+                        ticker.dirIncr = rel(ticker.dirFin - ticker.direction)
+                                / t;
                         break;
                     case "relative":
-                        finalVal = ticker.direction + toRadian(d);
-                        incr = rel(finalVal - ticker.direction) / t;
+                        ticker.dirFin = ticker.direction + toRadian(d);
+                        ticker.dirIncr = rel(ticker.dirFin - ticker.direction)
+                                / t;
                         break;
                     case "sequence":
-                        incr = toRadian(d);
-                        finalVal = ticker.direction + incr * t;
+                        ticker.dirIncr = toRadian(d);
+                        ticker.dirFin = ticker.direction + ticker.dirIncr * t;
                         break;
                     }
-                    endAge = this.age + t;
-
-                    ticker._changeDirection = function() {
-                        ticker.direction += incr;
-                        if (this.age == endAge) {
-                            ticker.direction = finalVal;
-                            ticker._changeDirection = null;
-                        }
-                    };
+                    ticker.chDirEnd = this.age + t;
                 },
-                /**
-                 * @param {BulletML.ChangeSpeed}
-                 *            cmd
-                 */
-                changeSpeed : function(cmd, ticker) {
-                    var incr;
-                    var finalVal;
-                    var endAge;
-
+                _changeSpeed : function(cmd, ticker) {
                     var s = eval(cmd.speed.value);
                     var t = eval(cmd.term);
                     switch (cmd.speed.type) {
                     case "absolute":
-                        finalVal = s;
-                        incr = (finalVal - ticker.speed) / t;
+                        ticker.spdFin = s;
+                        ticker.spdIncr = (ticker.spdFin - ticker.speed) / t;
                         break;
                     case "relative":
-                        finalVal = s + ticker.speed;
-                        incr = (finalVal - ticker.speed) / t;
+                        ticker.spdFin = s + ticker.speed;
+                        ticker.spdIncr = (ticker.spdFin - ticker.speed) / t;
                         break;
                     case "sequence":
-                        incr = s;
-                        finalVal = ticker.speed + incr * t;
+                        ticker.spdIncr = s;
+                        ticker.spdFin = ticker.speed + ticker.spdIncr * t;
                         break;
                     }
-                    endAge = this.age + t;
-
-                    ticker._changeSpeed = function() {
-                        ticker.speed += incr;
-                        if (this.age == endAge) {
-                            ticker.speed = finalVal;
-                            ticker._changeSpeed = null;
-                        }
-                    };
+                    ticker.chSpdEnd = this.age + t;
                 },
-                /**
-                 * @param {BulletML.Accel}
-                 *            cmd
-                 */
-                accel : function(cmd, ticker) {
+                _accel : function(cmd, ticker) {
                     var t = eval(cmd.term);
-                    var endAge = this.age + t;
+                    ticker.aclEnd = this.age + t;
 
-                    var incrH;
-                    var finalValH;
                     if (cmd.horizontal) {
                         var h = eval(cmd.horizontal.value);
                         switch (cmd.horizontal.type) {
                         case "absolute":
                         case "sequence":
-                            incrH = (h - ticker.speedH) / t;
-                            finalValH = h;
+                            ticker.aclIncrH = (h - ticker.speedH) / t;
+                            ticker.aclFinH = h;
                             break;
                         case "relative":
-                            incrH = h;
-                            finalValH = (h - ticker.speedH) * t;
+                            ticker.aclIncrH = h;
+                            ticker.aclFinH = (h - ticker.speedH) * t;
                             break;
                         }
                     } else {
-                        incrH = 0;
-                        finalValH = ticker.speedH;
+                        ticker.aclIncrH = 0;
+                        ticker.aclFinH = ticker.speedH;
                     }
 
-                    var incrV;
-                    var finalValV;
                     if (cmd.vertical) {
                         var v = eval(cmd.vertical.value);
                         switch (cmd.vertical.type) {
                         case "absolute":
                         case "sequence":
-                            incrV = (v - ticker.speedV) / t;
-                            finalValV = v;
+                            ticker.aclIncrV = (v - ticker.speedV) / t;
+                            ticker.aclFinV = v;
                             break;
                         case "relative":
-                            incrV = v;
-                            finalValV = (v - ticker.speedV) * t;
+                            ticker.aclIncrV = v;
+                            ticker.aclFinV = (v - ticker.speedV) * t;
                             break;
                         }
                     } else {
-                        incrV = 0;
-                        finalValV = ticker.speedV;
+                        ticker.aclIncrV = 0;
+                        ticker.aclFinV = ticker.speedV;
                     }
-
-                    ticker._accel = function() {
-                        ticker.speedH += incrH;
-                        ticker.speedV += incrV;
-                        if (this.age == endAge) {
-                            ticker.speedH = finalValH;
-                            ticker.speedV = finalValV;
-                            ticker._accel = null;
-                        }
-                    };
                 },
+                /**
+                 * 攻撃パターンの元となるBulletML定義.
+                 * 
+                 * 解析済みのBulletMLオブジェクト.<br>
+                 * 読み取り専用.
+                 * 
+                 * @type {BulletML.Root}
+                 */
                 bulletml : {
                     get : function() {
                         return this._bulletml;
                     }
                 }
             });
-
-    /**
-     * 弾クラス.
-     * 
-     * @constructor
-     * @scope enchant.bulletml.Bullet.prototype
-     * @extends {enchant.Sprite}
-     */
-    enchant.bulletml.Bullet = enchant.Class.create(enchant.Sprite, {
-        /**
-         * @param {number}
-         *            x 初期位置x
-         * @param {number}
-         *            y 初期位置y
-         * @param {number}
-         *            width スプライトの幅
-         * @param {number}
-         *            height スプライトの高さ
-         * @param {enchant.bulletml.AttackPattern}
-         *            attackPattern 攻撃パターン
-         * @param {BulletML.Bullet}
-         *            bulletSpec 弾
-         * @constructs
-         */
-        initialize : function(x, y, width, height, attackPattern, bulletSpec) {
-            enchant.Sprite.call(this, width, height);
-            this.x = x;
-            this.y = y;
-            this.pattern = attackPattern;
-            this.cursor = 0;
-            this.waitTo = -1;
-            this.lastDirection = 0;
-            this.lastSpeed = 1;
-
-            this.direction = 0;
-            if (bulletSpec.direction) {
-                var dv = toRadian(eval(bulletSpec.direction.value));
-                switch (bulletSpec.direction.type) {
-                case "absolute":
-                    this.direction = dv - Math.PI / 2; // 真上が0度
-                    break;
-                case "sequence":
-                    this.direction = attackPattern.lastDirection + dv;
-                    break;
-                case "aim":
-                    if (attackPattern.config.target) {
-                        var a = attackPattern.attacker;
-                        var t = attackPattern.config.target;
-                        this.direction = radiusAtoB(a, t) + dv;
-                    } else {
-                        this.direction = dv;
-                    }
-                    break;
-                }
-            }
-
-            this.speed = 1;
-            if (bulletSpec.speed) {
-                var sv = eval(bulletSpec.speed.value);
-                switch (bulletSpec.speed.type) {
-                case "absolute":
-                case "relative":
-                    this.speed = sv;
-                    break;
-                case "sequence":
-                    this.speed = attackPattern.lastSpeed + sv;
-                    break;
-                }
-            }
-            attackPattern.lastSpeed = this.speed;
-        }
-    });
 
     /**
      * 弾の画像が指定されなかった場合に使用される.
@@ -557,13 +489,13 @@
     enchant.bulletml.DEFAULT_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAa0lEQVQYV2NkgIL/DAw2QGYolLuakYHhCIgNpBkYgJITGWxs8hj8/CDymzYBpY9MAkrmM4J12tgcZlizhoFBXByi4OVLBoaQEJAiW5CCiQxdXXkMpaUw2yB0dzcDQ1nZJKIU4LeCoCMJeRMAewIxn7cIaLcAAAAASUVORK5CYII=";
 
     /**
-     * ラジアン→度
+     * ラジアンから度数に変換.
      */
     function toDegree(radian) {
         return radian * 180 / Math.PI;
     }
     /**
-     * 度→ラジアン
+     * 度数からラジアンに変換.
      */
     function toRadian(degree) {
         return degree * Math.PI / 180;
