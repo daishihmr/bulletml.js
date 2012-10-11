@@ -141,7 +141,8 @@
                                     && -h <= bullet.y && bullet.y < sch);
                         },
                         rank : 0,
-                        updateProperties : false
+                        updateProperties : false,
+                        speedRate : 1
                     };
                     if (base !== undefined) {
                         for ( var prop in base) {
@@ -208,6 +209,13 @@
                  *            <td>number</td>
                  *            <td>弾幕ランク.BulletMLの$rankに対応する.0.0～1.0の範囲で指定.</td>
                  *            <td>0</td>
+                 *            <td></td>
+                 *            </tr>
+                 *            <tr>
+                 *            <td>speedRate</td>
+                 *            <td>number</td>
+                 *            <td>弾速度の補正倍率.</td>
+                 *            <td>1</td>
                  *            <td></td>
                  *            </tr>
                  *            </table>
@@ -283,10 +291,10 @@
                         }
 
                         // move
-                        this.x += Math.cos(ticker.direction) * ticker.speed * 2;
-                        this.y += Math.sin(ticker.direction) * ticker.speed * 2;
-                        this.x += ticker.speedH * 2;
-                        this.y += ticker.speedV * 2;
+                        this.x += Math.cos(ticker.direction) * ticker.speed * config.speedRate;
+                        this.y += Math.sin(ticker.direction) * ticker.speed * config.speedRate;
+                        this.x += ticker.speedH * config.speedRate;
+                        this.y += ticker.speedV * config.speedRate;
 
                         if (!config.testInWorld(this)) {
                             this.parentNode.removeChild(this);
