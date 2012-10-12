@@ -1,7 +1,7 @@
 /*
- * bullet.enchant.js v0.3.0
+ * bullet.enchant.js v0.3.2
  * @author daishi@dev7.jp
- * @require enchant.js v0.5.1 or later, bulletml.js v0.3.0.
+ * @require enchant.js v0.5.1 or later, bulletml.js v0.3.0
  * @description
  * enchant.js extension plugin for use BulletML.
  * 
