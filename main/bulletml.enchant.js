@@ -1,5 +1,5 @@
 /*
- * bullet.enchant.js v0.2.1
+ * bullet.enchant.js v0.2.2
  * @author daishi@dev7.jp
  * @require enchant.js v0.5.1 or later, bulletml.js v0.1.0.
  * @description
@@ -390,8 +390,9 @@
                     var b = config.bulletFactory({
                         label : cmd.bullet.label
                     });
-                    b.x = this.x + ((this.width || 0) - (b.width || 0)) / 2;
-                    b.y = this.y + ((this.height || 0) - (b.height || 0)) / 2;
+                    if (!b) {
+                        return;
+                    }
 
                     var bt = pattern.createTicker(config, cmd.bullet);
 
@@ -434,7 +435,13 @@
                     bt.speed = calcSpeed(cmd.speed || cmd.bullet.speed);
                     ticker.lastSpeed = bt.speed;
 
+                    b.x = this.x + ((this.width || 0) - (b.width || 0)) / 2;
+                    b.y = this.y + ((this.height || 0) - (b.height || 0)) / 2;
+
                     b.addEventListener("enterframe", bt);
+                    b.addEventListener("removed", function() {
+                        this.removeEventListener("enterframe", bt);
+                    });
                     if (config.addTarget) {
                         config.addTarget.addChild(b);
                     } else if (this.parentNode) {
