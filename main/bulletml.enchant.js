@@ -1,5 +1,5 @@
 /*
- * bullet.enchant.js v0.2.0
+ * bullet.enchant.js v0.2.1
  * @author daishi@dev7.jp
  * @require enchant.js v0.5.1 or later, bulletml.js v0.1.0.
  * @description
@@ -142,7 +142,7 @@
                         },
                         rank : 0,
                         updateProperties : false,
-                        speedRate : 1
+                        speedRate : 2
                     };
                     if (base !== undefined) {
                         for ( var prop in base) {
@@ -291,8 +291,10 @@
                         }
 
                         // move
-                        this.x += Math.cos(ticker.direction) * ticker.speed * config.speedRate;
-                        this.y += Math.sin(ticker.direction) * ticker.speed * config.speedRate;
+                        this.x += Math.cos(ticker.direction) * ticker.speed
+                                * config.speedRate;
+                        this.y += Math.sin(ticker.direction) * ticker.speed
+                                * config.speedRate;
                         this.x += ticker.speedH * config.speedRate;
                         this.y += ticker.speedV * config.speedRate;
 
@@ -301,7 +303,8 @@
                         }
 
                         if (config.updateProperties) {
-                            this.direction = ticker.direction;
+                            this.direction = toDegree(ticker.direction
+                                    + Math.PI / 2);
                             this.speed = ticker.speed;
                         }
 
