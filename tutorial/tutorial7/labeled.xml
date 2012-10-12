@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE bulletml SYSTEM "http://www.asahi-net.or.jp/~cs8k-cyu/bulletml/bulletml.dtd">
+<bulletml type="vertical" xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+	<action label='top'>
+		<repeat>
+			<times>8</times>
+			<action>
+				<fire>
+					<direction type="absolute">-60</direction>
+					<speed>2</speed>
+					<bullet label='spade'>
+						<actionRef label="homing" />
+					</bullet>
+				</fire>
+				<fire>
+					<direction type="absolute">-2</direction>
+					<speed>6</speed>
+					<bullet label='heart'>
+						<actionRef label="homing" />
+					</bullet>
+				</fire>
+				<fire>
+					<direction type="absolute">2</direction>
+					<speed>6</speed>
+					<bullet label='clover'>
+						<actionRef label="homing" />
+					</bullet>
+				</fire>
+				<fire>
+					<direction type="absolute">60</direction>
+					<speed>2</speed>
+					<bullet label='diamond'>
+						<actionRef label="homing" />
+					</bullet>
+				</fire>
+				<wait>3</wait>
+			</action>
+		</repeat>
+	</action>
+
+	<action label="homing">
+		<repeat>
+			<times>9999</times>
+			<action>
+				<changeDirection>
+					<direction type="aim">0</direction>
+					<term>20</term>
+				</changeDirection>
+                <changeSpeed>
+                    <speed>3</speed>
+                    <term>10</term>
+                </changeSpeed>
+				<wait>5</wait>
+			</action>
+		</repeat>
+	</action>
+</bulletml>
