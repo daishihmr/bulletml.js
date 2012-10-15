@@ -267,6 +267,43 @@ var BulletML = {};
         return this.paramsStack[this.paramsStack.length - 1];
     };
 
+    // 例
+    var walker = new BulletML.Walker();
+    walker._action = this.findAction("top");
+    walker._cursor = -1;
+    return walker;
+    walker.next = function() {
+        this._cursor += 1;
+        return this._action[this._cursor];
+    };
+    
+    function() {
+        var next = walker.next();
+        if (next.commandName == "action") {
+            walker.pushStack();
+        }
+    }
+    // 例ここまで
+
+    BulletML.Walker = function() {
+        this._action = null;
+        this._cursor = -1;
+        this._callStack = [];
+    };
+    BulletML.Walker.prototype.next = function() {
+    };
+    BulletML.Walker.prototype.pushStack = function() {
+        this._callStack.push({
+            action : this._action,
+            cursor : this._cursor
+        });
+        this._action = this._action.commands[0];
+        this._cursor = -1;w
+    };
+    BulletML.Walker.prototype.stackTop = function() {
+        return this._callStack[this._callStack.length - 1];
+    };
+
     /**
      * bullet要素.
      * 
@@ -392,6 +429,13 @@ var BulletML = {};
     BulletML.Command.prototype.clone = function() {
         return this;
     };
+    /**
+     * @memberOf BulletML.Command.prototype
+     */
+    BulletML.Command.prototype.next = function(walker) {
+        walker._cursor += 1;
+        return walker.stackTop()[walker._cursor];
+    };
 
     /**
      * @constructor
@@ -434,6 +478,14 @@ var BulletML = {};
         }
         return result;
     };
+    /**
+     * @memberOf BulletML.Action.prototype
+     */
+    BulletML.Action.prototype.next = function(walker) {
+        walker.pushStack(this, walker._cursor);
+        walker._cursor = 0;
+        return walker.stackTop()[walker._cursor];
+    };
 
     /**
      * @constructor
@@ -468,6 +520,14 @@ var BulletML = {};
                     this.params[i], params, this.root.rank);
         }
         return result;
+    };
+    /**
+     * @memberOf BulletML.ActionRef.prototype
+     */
+    BulletML.ActionRef.prototype.next = function(walker) {
+        walker.pushStack(this.root.fincAction(this.label), walker._cursor);
+        walker._cursor = 0;
+        return walker.stackTop()[walker._cursor];
     };
 
     /**

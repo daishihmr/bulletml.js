@@ -5,40 +5,40 @@ var WtTest = TestCase("WalkthroughTest");
 WtTest.prototype.testBasic1 = function() {
     var bulletml = BulletML
             .build("<bulletml><action label='top'><fire><bullet/></fire></action></bulletml>");
-    var script = bulletml._scriptalize();
-    assertEquals("this.top=function(){" //
-            + "this.fire(null,null,this.bullet(this.direction(),this.speed(),null));" //
-            + "};");
+    var walker = bulletml.getWalker("top");
+    assertEquals("fire", walker.next().commandName);
+    assertNull(walker.next());
 };
 
 WtTest.prototype.testBasic2 = function() {
     var bulletml = BulletML
             .build("<bulletml>"
-                    + "<action label='top'><repeat><times>2</times><action><fire><bullet/></fire><vanish/></action></repeat></action>"
-                    + "</bulletml>");
-    var script = bulletml._scriptalize();
-    assertEquals("this.top=function(){" //
-            + "this.repeat(2,function(){" //
-            + "this.fire(null,null,this.bullet(this.direction(),this.speed(), null));" //
-            + "this.vanish();" //
-            + "});" //
-            + "};");
+                    + "<action label='top'>"
+                    + "<repeat><times>2</times><action><fire><bullet/></fire><vanish/></action></repeat>"
+                    + "</action></bulletml>");
+    var walker = bulletml.getWalker("top");
+    assertEquals("fire", walker.next().commandName);
+    assertEquals("vanish", walker.next().commandName);
+    assertEquals("fire", walker.next().commandName);
+    assertEquals("vanish", walker.next().commandName);
+    assertNull(walker.next());
 };
 
 WtTest.prototype.testBulletRef = function() {
     var bulletml = BulletML
             .build("<bulletml><action label='top'><fire><bulletRef label='b1'/></fire></action>"
                     + "<bullet label='b1'><action><wait>10</wait><vanish/></action></bullet></bulletml>");
-    var script = bulletml._scriptalize();
-    assertEquals("this.top=function(){" //
-            + "this.fire(null,null,this.b1());" //
-            + "};" //
-            + "this.b1=function($1,$2,$3,$4,$5){" //
-            + "return this.bullet(this.direction(),this.speed(),function(){" //
-            + "this.wait(10);" //
-            + "this.vanish();" //
-            + "});" //
-            + "};");
+    var walker = bulletml.getWalker("top");
+    var fire = walker.next();
+    assertEquals("fire", fire.commandName);
+    assertNull(walker.next());
+    var bullet = fire.getBullet();
+
+    assertEquals("b1", bullet.label);
+    var bwalker = bullet.getWalker();
+    assertEquals("wait", bwalker.next().commandName);
+    assertEquals("vanish", bwalker.next().commandName);
+    assertNull(bwalker.next());
 };
 
 WtTest.prototype.testParameter = function() {
@@ -47,16 +47,7 @@ WtTest.prototype.testParameter = function() {
                     + "<action label='top'><fire><bulletRef label='b1'><param>$rand</param><param>4</param></bulletRef></fire></action>"
                     + "<bullet label='b1'><speed>$1</speed><action><wait>$2</wait><vanish/></action></bullet>"
                     + "</bulletml>");
-    var script = bulletml._scriptalize();
-    assertEquals("this.top=function(){" //
-            + "this.fire(null,null,this.b1(Math.random(),4));" //
-            + "};" //
-            + "this.b1=function($1,$2,$3,$4,$5){" //
-            + "return this.bullet(this.direction(),this.speed($1),function(){" //
-            + "this.wait($2);" //
-            + "this.vanish();" //
-            + "});" //
-            + "};");
+    var walker = bulletml.getWalker("top");
 };
 
 // ActionRef, FireRefはcall. BulletRefはget.
