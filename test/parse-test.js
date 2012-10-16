@@ -44,9 +44,9 @@ ParseTest.prototype.testBuildTopAction = function() {
 ParseTest.prototype.testRepeat2ActionRef = function() {
     var result = BulletML
             .build("<bulletml>"
-                    + "<action label='top'><repeat><times>5</times>"
-                    + "<action><actionRef label='sub'/><actionRef label='sub'/></action></action>"
-                    + "<action label='sub'></actoin></bulletml>");
+                    + "<action label='top'>"
+                    + "<repeat><times>5</times><action><actionRef label='sub'/><actionRef label='sub'/></action></repeat>"
+                    + "</action><action label='sub'></action></bulletml>");
     var repeat = result.topAction.commands[0];
     assertEquals("repeat", repeat.commandName);
     assertEquals(2, repeat.action.commands.length);
