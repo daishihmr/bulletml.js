@@ -1,0 +1,93 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml 
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="8way2">
+ <fire>
+  <direction type="absolute">180-75</direction>
+  <speed>4</speed>
+  <bullet/>
+ </fire>
+ <repeat> <times>7</times>
+  <action>
+   <fire>
+    <direction type="sequence">9</direction>
+    <speed type="sequence">-0.25</speed>
+	<bullet/>
+   </fire>
+  </action>
+ </repeat>
+
+ <fire>
+  <direction type="absolute">180+75</direction>
+  <speed>4</speed>
+  <bullet/>
+ </fire>
+ <repeat> <times>7</times>
+  <action>
+   <fire>
+    <direction type="sequence">-9</direction>
+    <speed type="sequence">-0.25</speed>
+	<bullet/>
+   </fire>
+  </action>
+ </repeat>
+</action>
+
+<action label="downShot">
+ <fire>
+  <direction type="aim">-60+$rand*120</direction>
+  <speed>4*$rand</speed>
+  <bullet>
+   <action>
+    <wait>20</wait>
+    <fire>
+	 <direction type="absolute">180</direction>
+	 <speed>1.2</speed>
+     <bullet/>
+    </fire>
+    <vanish/>
+   </action>
+  </bullet>
+ </fire>
+</action>
+  
+<action label="gara">
+ <changeDirection>
+  <direction type="aim">10+$rand*340</direction>
+  <term>1</term>
+ </changeDirection>
+ <changeSpeed>
+  <speed type="absolute">0.3</speed>
+  <term>1</term>
+ </changeSpeed>
+
+ <repeat> <times>3+$rank*4</times>
+  <action>
+   <repeat> <times>8</times>
+    <action>
+	 <actionRef label="downShot"/>
+	 <wait>3*(3-$rank*2)*$rand</wait>
+    </action>
+   </repeat>
+   <actionRef label="8way2"/>
+  </action>
+ </repeat>
+
+</action>
+
+<action label="top">
+ <repeat> <times>5</times>
+  <actionRef label="gara"/>
+ </repeat>
+
+ <changeSpeed>
+  <speed>0</speed>
+  <term>1</term>
+ </changeSpeed>
+ <wait>30</wait>
+</action>
+
+</bulletml>

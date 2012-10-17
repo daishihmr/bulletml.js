@@ -1,0 +1,186 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml type="vertical" xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+	<bullet  label="aimSrc">
+		<speed>
+			 3
+		</speed>
+		<action>
+			<wait>
+				 10
+			</wait>
+			<changeSpeed>
+				<speed>
+					 0
+				</speed>
+				<term>
+					 1
+				</term>
+			</changeSpeed>
+			<repeat>
+				<times>
+					 5+$rank*10
+				</times>
+				<action>
+					<wait>
+						 340/(5+$rank*10)
+					</wait>
+					<repeat>
+						<times>
+							 3
+						</times>
+						<action>
+							<wait>
+								 2
+							</wait>
+							<fire>
+								<direction  type="aim">
+									0
+								</direction>
+								<speed>
+									 2
+								</speed>
+								<bullet/>
+							</fire>
+						</action>
+					</repeat>
+				</action>
+			</repeat>
+			<vanish/>
+		</action>
+	</bullet>
+	<bullet  label="circleSrc">
+		<speed>
+			 4
+		</speed>
+		<action>
+			<wait>
+				 10
+			</wait>
+			<changeSpeed>
+				<speed>
+					 0.5+$rank
+				</speed>
+				<term>
+					 1
+				</term>
+			</changeSpeed>
+			<changeDirection>
+				<direction  type="sequence">
+					5
+				</direction>
+				<term>
+					 9999
+				</term>
+			</changeDirection>
+			<repeat>
+				<times>
+					 200
+				</times>
+				<action>
+					<wait>
+						 2
+					</wait>
+					<fire>
+						<direction  type="absolute">
+							180
+						</direction>
+						<speed>
+							 3+$rand*0.02
+						</speed>
+						<bullet/>
+					</fire>
+				</action>
+			</repeat>
+			<vanish/>
+		</action>
+	</bullet>
+	<action  label="top">
+		<fire>
+			<direction  type="absolute">
+				90
+			</direction>
+			<bulletRef  label="circleSrc"/>
+		</fire>
+		<fire>
+			<direction  type="absolute">
+				-90
+			</direction>
+			<bulletRef  label="circleSrc"/>
+		</fire>
+		<fire>
+			<direction  type="absolute">
+				135
+			</direction>
+			<bulletRef  label="aimSrc"/>
+		</fire>
+		<fire>
+			<direction  type="absolute">
+				-135
+			</direction>
+			<bulletRef  label="aimSrc"/>
+		</fire>
+		<repeat>
+			<times>
+				 20
+			</times>
+			<action>
+				<wait>
+					 12-$rank*8
+				</wait>
+				<repeat>
+					<times>
+						 4+$rank*4
+					</times>
+					<action>
+						<wait>
+							 2
+						</wait>
+						<fire>
+							<direction  type="absolute">
+								180
+							</direction>
+							<speed>
+								 4
+							</speed>
+							<bullet>
+								<action>
+									<wait>
+										 6
+									</wait>
+									<changeSpeed>
+										<speed>
+											 1
+										</speed>
+										<term>
+											 5
+										</term>
+									</changeSpeed>
+									<wait>
+										 20
+									</wait>
+									<changeDirection>
+										<direction  type="aim">
+											0
+										</direction>
+										<term>
+											 1
+										</term>
+									</changeDirection>
+									<changeSpeed>
+										<speed>
+											 2.2
+										</speed>
+										<term>
+											 1
+										</term>
+									</changeSpeed>
+								</action>
+							</bullet>
+						</fire>
+					</action>
+				</repeat>
+			</action>
+		</repeat>
+	</action>
+</bulletml>

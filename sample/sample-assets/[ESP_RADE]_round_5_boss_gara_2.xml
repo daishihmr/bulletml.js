@@ -1,0 +1,76 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml 
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<bullet label="featherShot">
+ <speed>6</speed>
+ <action>
+  <changeSpeed>
+   <speed>0</speed>
+   <term>20</term>
+  </changeSpeed>
+  <wait>20</wait>
+
+  <fire>
+   <bulletRef label="featherAim"/>
+  </fire>
+
+  <repeat> <times>150+$rank*100</times>
+   <action>
+    <fire>
+     <direction>90*$rand-45</direction>
+     <bullet/>
+    </fire>
+    <wait>3-$rank*2</wait>
+   </action>
+  </repeat>
+  <vanish/>
+ </action>
+</bullet>
+
+<bullet label="featherAim">
+ <speed>0</speed>
+ <action>
+  <repeat> <times>7</times>
+   <action>
+    <fire>
+     <speed>3</speed>
+     <bullet/>
+    </fire>
+
+    <repeat> <times>20</times>
+     <action>
+      <wait>2</wait>
+      <fire>
+       <direction type="sequence">0</direction>
+       <speed>3</speed>
+       <bullet/>
+      </fire>
+     </action>
+    </repeat>
+
+    <wait>30</wait>
+   </action>
+  </repeat>
+
+  <vanish/>
+ </action>
+</bullet>
+
+<action label="top">
+ <fire>
+  <direction type="absolute">90</direction>
+  <bulletRef label="featherShot"/>
+ </fire>
+ <fire>
+  <direction type="absolute">-90</direction>
+  <bulletRef label="featherShot"/>
+ </fire>
+
+ <wait>550</wait>
+
+</action>
+
+</bulletml>

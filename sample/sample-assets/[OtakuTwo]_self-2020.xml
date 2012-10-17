@@ -1,0 +1,70 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml type="vertical" xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+ <changeDirection>
+  <direction type="absolute">0</direction>
+  <term>1</term>
+ </changeDirection>
+ <wait>1</wait>
+ <changeSpeed>
+  <speed>5</speed>
+  <term>1</term>
+ </changeSpeed>
+ <wait>15</wait>
+ <changeSpeed>
+  <speed>0</speed>
+  <term>1</term>
+ </changeSpeed>
+ <repeat><times>45</times>
+  <action>
+   <fireRef label="seed"><param> 1</param></fireRef>
+   <fireRef label="seed"><param>-1</param></fireRef>
+   <wait>30</wait>
+  </action>
+ </repeat>
+ <wait>450</wait>
+</action>
+
+<fire label="seed">
+ <direction type="absolute">90*$1</direction>
+ <speed>(1.5-$rank*0.5)</speed>
+ <bullet>
+  <action>
+   <wait>$rand*(30-$rank*15)</wait>
+   <repeat><times>9999</times>
+    <action>
+     <fire>
+      <direction type="absolute">180</direction>
+      <speed>1</speed>
+      <bulletRef label="bomb"/>
+     </fire>
+     <wait>30-$rank*15</wait>
+    </action>
+   </repeat>
+  </action>
+ </bullet>
+</fire>
+
+<bullet label="bomb">
+ <action>
+  <wait>225</wait>
+  <fire>
+   <direction type="aim">-20+($rand-0.5)*$rank*$rank*$rank*$rank*$rank*$rank*$rank*$rank*20</direction>
+   <speed>1.5+$rank*$rank</speed>
+   <bullet/>
+  </fire>
+  <repeat><times>2</times>
+   <action>
+    <fire>
+     <direction type="sequence">20</direction>
+     <speed>1.5+$rank*$rank</speed>
+     <bullet/>
+    </fire>
+   </action>
+  </repeat>
+ </action>
+</bullet>
+
+</bulletml>

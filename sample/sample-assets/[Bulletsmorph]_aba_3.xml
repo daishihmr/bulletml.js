@@ -1,0 +1,85 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="vertical"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+
+  <repeat><times>4 + 16 * $rank</times><action>
+    <fire>
+      <direction type="absolute">120 + 120 * $rand</direction>
+      <bulletRef label="bomb">
+      </bulletRef>
+    </fire>
+  <wait>60 - 30 * $rank</wait>
+  </action></repeat>
+
+  <wait>180</wait>
+
+</action>
+
+<bullet label="bomb">
+<speed>0.5 + 1.9 * $rand</speed>
+<action>
+  <wait>50</wait>
+
+  <fire>
+    <direction type="absolute">360 * $rand</direction>
+    <bulletRef label="bombbit">
+    </bulletRef>
+  </fire>
+  <repeat><times>(4 + 8 * $rank) - 1</times><action>
+    <fire>
+      <direction type="sequence">360 / (4 + 8 * $rank)</direction>
+      <bulletRef label="bombbit">
+      </bulletRef>
+    </fire>
+  </action></repeat>
+  <vanish/>
+
+</action>
+</bullet>
+
+<bullet label="bombbit">
+<speed>0.8</speed>
+<action>
+
+  <wait>120</wait>
+
+  <fire>
+    <direction type="relative">120</direction>
+    <speed>1.3</speed>
+    <bullet/>
+  </fire>
+  <fire>
+    <direction type="relative">240</direction>
+    <speed>1.3</speed>
+    <bullet/>
+  </fire>
+  <fire>
+    <direction type="aim">0</direction>
+    <speed>1.3</speed>
+    <bulletRef label="changecolor"/>
+  </fire>
+
+  <vanish/>
+
+</action>
+</bullet>
+
+<bullet label="changecolor">
+<action>
+
+  <fire>
+    <direction type="relative">0</direction>
+    <speed type="relative">0</speed>
+    <bullet/>
+  </fire>
+
+  <vanish/>
+
+</action>
+</bullet>
+
+</bulletml>

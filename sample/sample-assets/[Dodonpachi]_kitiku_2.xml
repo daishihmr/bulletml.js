@@ -1,0 +1,62 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<bullet label="feather">
+ <speed>4</speed>
+
+ <action>
+  <wait>6</wait>
+  <fire>
+   <direction type="relative">0</direction>
+   <bullet>
+    <action> <vanish/> </action>
+   </bullet>
+  </fire>
+
+  <changeSpeed>
+   <speed>0</speed>
+   <term>1</term>
+  </changeSpeed>
+
+  <wait>1</wait>
+
+  <repeat> <times>100</times> <action>
+   <fire>
+    <direction type="sequence">10-(3+$rank*6)*3</direction>
+    <speed>1</speed>
+    <bullet/>
+   </fire>
+
+   <repeat> <times>3+$rank*6</times> <action>
+    <fire>
+     <direction type="sequence">3</direction>
+     <speed type="sequence">0.15</speed>
+     <bullet/>
+    </fire>
+   </action> </repeat>
+
+   <wait>4</wait>
+  </action> </repeat>
+
+  <vanish/>
+ </action>
+</bullet>
+
+<action label="top">
+ <fire>
+  <direction type="absolute">-90</direction>
+  <bulletRef label="feather"/>
+ </fire>
+ <wait>1</wait>
+ <fire>
+  <direction type="absolute">90</direction>
+  <bulletRef label="feather"/>
+ </fire>
+
+ <wait>430</wait>
+</action>
+
+</bulletml>

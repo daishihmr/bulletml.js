@@ -1,0 +1,98 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml 
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="1way">
+ <fire>
+  <direction type="aim">$2+$1*$rand*2-$1</direction>
+  <speed>1</speed>
+  <bullet/>
+ </fire>
+
+ <repeat> <times>20</times>
+ <action>
+
+  <fire>
+   <direction type="aim">$2+$1*$rand*2-$1</direction>
+   <speed type="sequence">0.1</speed>
+   <bullet/>
+  </fire>
+
+ </action>
+ </repeat>
+</action>
+
+<action label="5way">
+ <actionRef label="1way">
+  <param>$1</param>
+  <param>-30</param>
+ </actionRef>
+ <actionRef label="1way">
+  <param>$1</param>
+  <param>-15</param>
+ </actionRef>
+ <actionRef label="1way">
+  <param>$1</param>
+  <param>0</param>
+ </actionRef>
+ <actionRef label="1way">
+  <param>$1</param>
+  <param>15</param>
+ </actionRef>
+ <actionRef label="1way">
+  <param>$1</param>
+  <param>30</param>
+ </actionRef>
+</action>
+
+<action label="idousite5way">
+ <changeDirection>
+  <direction>$rand*360</direction>
+  <term>1</term>
+ </changeDirection>
+ <changeSpeed>
+  <speed>2</speed>
+  <term>1</term>
+ </changeSpeed>
+
+ <wait>30</wait>
+
+ <actionRef label="5way">
+  <param>$1</param>
+ </actionRef>
+
+ <changeSpeed>
+  <speed>0</speed>
+  <term>1</term>
+ </changeSpeed>
+
+ <wait>90-$rank*60</wait>
+
+</action>
+
+<action label="satoru">
+ <actionRef label="idousite5way">
+  <param>1</param>
+ </actionRef>
+ <actionRef label="idousite5way">
+  <param>2</param>
+ </actionRef>
+ <actionRef label="idousite5way">
+  <param>3</param>
+ </actionRef>
+ <actionRef label="idousite5way">
+  <param>4</param>
+ </actionRef>
+ <actionRef label="idousite5way">
+  <param>5</param>
+ </actionRef>
+</action>
+
+<action label="top">
+ <actionRef label="satoru"/>
+ <wait>30</wait>
+</action>
+
+</bulletml>

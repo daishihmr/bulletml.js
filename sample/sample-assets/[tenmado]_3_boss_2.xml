@@ -1,0 +1,251 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="vertical"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+
+ <fire>
+  <direction type="absolute">240</direction>
+  <speed>0.6</speed>
+  <bulletRef label="bitlaser">
+   <param>60</param>
+   <param>10</param>
+  </bulletRef>
+ </fire>
+
+ <fire>
+  <direction type="absolute">-240</direction>
+  <speed>0.6</speed>
+  <bulletRef label="bitlaser">
+   <param>-60</param>
+   <param>-10</param>
+  </bulletRef>
+ </fire>
+
+ <fire>
+  <direction type="absolute">240</direction>
+  <speed>0.6</speed>
+  <bulletRef label="bitaim">
+   <param>60</param>
+   <param>10</param>
+   <param>35</param>
+  </bulletRef>
+ </fire>
+
+ <fire>
+  <direction type="absolute">-240</direction>
+  <speed>0.6</speed>
+  <bulletRef label="bitaim">
+   <param>-60</param>
+   <param>-10</param>
+   <param>5</param>
+  </bulletRef>
+ </fire>
+
+ <wait>60</wait>
+
+ <repeat> <times>600 / (6.0 - 4.0 * $rank)</times> <action>
+  <fire>
+   <direction type="aim">-30 + 60 * $rand</direction>
+   <speed>1.3+$rank*0.7</speed>
+   <bullet/>
+  </fire>
+  <wait>6.0 - 4.0 * $rank</wait>
+ </action> </repeat>
+
+ <wait>90</wait>
+
+</action>
+
+<bullet label="bitlaser">
+
+<action>
+ <wait>120</wait>
+
+ <changeSpeed>
+  <speed>0</speed>
+  <term>1</term>
+ </changeSpeed>
+
+ <wait>30</wait>
+
+ <changeDirection>
+  <direction type="absolute">180</direction>
+  <term>1</term>
+ </changeDirection>
+ <changeSpeed>
+  <speed>0.6</speed>
+  <term>1</term>
+ </changeSpeed>
+
+ <wait>90</wait>
+
+ <fire>
+  <direction type="absolute">$1</direction>
+  <speed>0.1</speed>
+  <bulletRef label="laser">
+   <param>0.3</param>
+  </bulletRef>
+ </fire>
+
+ <repeat> <times>6</times> <action>
+  <wait>20</wait>
+  <fire>
+   <direction type="sequence">$2</direction>
+   <speed>0.1</speed>
+   <bulletRef label="laser">
+    <param>0.3</param>
+   </bulletRef>
+  </fire>
+ </action> </repeat>
+
+ <changeSpeed>
+  <speed>0</speed>
+  <term>1</term>
+ </changeSpeed>
+
+ <wait>30</wait>
+
+ <changeDirection>
+  <direction type="absolute">0</direction>
+  <term>1</term>
+ </changeDirection>
+ <changeSpeed>
+  <speed>0.8</speed>
+  <term>1</term>
+ </changeSpeed>
+
+ <wait>10</wait>
+
+ <fire>
+  <direction type="absolute">$1 + 3.5 * $2</direction>
+  <speed>0.1</speed>
+  <bulletRef label="laser">
+   <param>1.5</param>
+  </bulletRef>
+ </fire>
+
+ <repeat> <times>4</times> <action>
+  <wait>20</wait>
+  <fire>
+   <direction type="sequence">-$2</direction>
+   <speed>0.1</speed>
+   <bulletRef label="laser">
+    <param>1.5</param>
+   </bulletRef>
+  </fire>
+ </action> </repeat>
+
+ <vanish/>
+
+</action> </bullet>
+
+<bullet label="bitaim">
+
+<action>
+ <wait>120</wait>
+
+ <changeSpeed>
+  <speed>0</speed>
+  <term>1</term>
+ </changeSpeed>
+
+ <wait>30</wait>
+
+ <changeDirection>
+  <direction type="absolute">180</direction>
+  <term>1</term>
+ </changeDirection>
+ <changeSpeed>
+  <speed>0.6</speed>
+  <term>1</term>
+ </changeSpeed>
+
+ <wait>40 - $3</wait>
+
+ <repeat> <times>2</times> <action>
+  <wait>70</wait>
+  <fire>
+   <direction type="aim">-10 + 20 * $rand</direction>
+   <speed>0.6</speed>
+   <bullet/>
+  </fire>
+ </action> </repeat>
+
+ <wait>30 + $3</wait>
+
+ <changeSpeed>
+  <speed>0</speed>
+  <term>1</term>
+ </changeSpeed>
+
+ <wait>30</wait>
+
+ <changeDirection>
+  <direction type="absolute">0</direction>
+  <term>1</term>
+ </changeDirection>
+ <changeSpeed>
+  <speed>0.8</speed>
+  <term>1</term>
+ </changeSpeed>
+
+ <wait>40 - $3</wait>
+
+ <fire>
+  <direction type="aim">-10 + 20 * $rand</direction>
+  <speed>0.6</speed>
+  <bullet/>
+ </fire>
+
+ <wait>50 + $3</wait>
+ <vanish/>
+
+</action> </bullet>
+
+<bullet label="laser"><action>
+
+ <fire>
+  <direction type="relative">0</direction>
+  <speed>$1</speed>
+  <bullet/>
+ </fire>
+
+ <fire>
+  <direction type="relative">0</direction>
+  <speed>$1 + 0.01</speed>
+  <bullet/>
+ </fire>
+
+ <fire>
+  <direction type="relative">0</direction>
+  <speed>$1 + 0.02</speed>
+  <bullet/>
+ </fire>
+
+ <fire>
+  <direction type="relative">0</direction>
+  <speed>$1 + 0.03</speed>
+  <bullet/>
+ </fire>
+
+ <fire>
+  <direction type="relative">0</direction>
+  <speed>$1 + 0.04</speed>
+  <bullet/>
+ </fire>
+
+ <fire>
+  <direction type="relative">0</direction>
+  <speed>$1 + 0.05</speed>
+  <bullet/>
+ </fire>
+
+ <vanish/>
+
+</action></bullet>
+
+
+</bulletml>

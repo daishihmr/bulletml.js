@@ -1,0 +1,92 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml type="vertical" xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+ <fireRef label="lr"><param> 90</param><param>1.5</param></fireRef>
+ <fireRef label="lr"><param>-90</param><param>1.5</param></fireRef>
+ <actionRef label="move"><param>  0</param><param>0.9</param></actionRef>
+ <wait>950</wait>
+ <actionRef label="move"><param>180</param><param>0.9</param></actionRef>
+</action>
+
+<fire label="lr">
+ <direction type="absolute">0</direction>
+ <speed>0</speed>
+ <bullet>
+  <action>
+   <actionRef label="move"><param>$1</param><param>$2</param></actionRef>
+   <fireRef label="tb"><param>  0</param><param>0.9</param></fireRef>
+   <fireRef label="tb"><param>180</param><param>3.0</param></fireRef>
+   <vanish/>
+  </action>
+ </bullet>
+</fire>
+
+<fire label="tb">
+ <speed>0</speed>
+ <bullet>
+  <action>
+   <actionRef label="move"><param>$1</param><param>$2</param></actionRef>
+   <wait>20</wait>
+   <actionRef label="wall"><param> 30-$rank*20</param></actionRef>
+   <actionRef label="wall"><param>-30+$rank*20</param></actionRef>
+   <wait>200</wait>
+    <repeat><times>7+$rank*8</times>
+     <action>
+      <fire>
+       <direction type="aim">15-$rand*30</direction>
+       <speed>1+$rand*0.5</speed>
+       <bullet/>
+      </fire>
+      <wait>40-$rank*20</wait>
+     </action>
+    </repeat>
+   <vanish/>
+  </action>
+ </bullet>
+</fire>
+
+<action label="move">
+ <changeDirection><direction type="absolute">$1</direction><term>10</term></changeDirection>
+ <wait>12</wait>
+ <changeSpeed><speed>$2</speed><term>50</term></changeSpeed>
+ <wait>55</wait>
+ <changeSpeed><speed> 0</speed><term>50</term></changeSpeed>
+ <wait>55</wait>
+</action>
+
+<action label="wall">
+ <fire>
+  <direction type="aim">$1</direction>
+  <speed>0.35</speed>
+  <bulletRef label="stop"/>
+ </fire>
+ <repeat><times>110</times>
+  <action>
+   <fire>
+    <direction type="aim">$1</direction>
+    <speed type="sequence">0.4</speed>
+    <bulletRef label="stop"/>
+   </fire>
+  </action>
+ </repeat>
+</action>
+
+<bullet label="stop">
+ <action>
+  <wait>5</wait>
+  <changeSpeed><speed>0</speed><term>1</term></changeSpeed>
+  <wait>750</wait>
+  <changeDirection><direction type="aim">2+$rank*2</direction><term>10</term></changeDirection>
+  <wait>10</wait>
+  <repeat><times>50</times>
+   <action>
+    <changeSpeed><speed type="relative">0.1</speed><term>8</term></changeSpeed>
+    <wait>8</wait>
+   </action>
+  </repeat>
+ </action>
+</bullet>
+
+</bulletml>

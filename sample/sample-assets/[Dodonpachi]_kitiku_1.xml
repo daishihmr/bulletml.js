@@ -1,0 +1,111 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<bullet label="fast">
+ <speed>10</speed>
+
+ <action>
+  <wait>6</wait>
+  <changeSpeed>
+   <speed>0</speed>
+   <term>1</term>
+  </changeSpeed>
+
+  <wait>20</wait>
+
+  <repeat> <times>10+$rank*18</times> <action>
+   <fire>
+    <direction type="sequence">-11-$rand*2</direction>
+    <speed>1.5</speed>
+    <bullet/>
+   </fire>
+   <actionRef label="add3"/>
+
+   <repeat> <times>4</times> <action>
+    <fire>
+     <direction type="sequence">0</direction>
+     <speed type="sequence">0.1+$rank*0.2</speed>
+     <bullet/>
+    </fire>
+    <actionRef label="add3"/>
+   </action> </repeat>
+
+   <wait>336/(10+$rank*18)</wait>
+  </action> </repeat>
+
+  <vanish/>
+ </action>
+</bullet>
+
+<action label="add3">
+ <repeat> <times>3</times> <action>
+  <fire>
+   <direction type="sequence">90</direction>
+   <speed type="sequence">0</speed>
+   <bullet/>
+  </fire>
+ </action> </repeat>
+</action>
+
+<fire label="slowColorChange">
+ <direction type="absolute">180+45*$1</direction>
+ <speed>7</speed>
+
+ <bullet> <action>
+  <wait>6</wait>
+  <changeSpeed>
+   <speed>0</speed>
+   <term>1</term>
+  </changeSpeed>
+
+  <repeat> <times>50+$rank*50</times> <action>
+   <fire>
+    <direction type="sequence">(8-$rank*4)*$1</direction>
+    <speed>1.2</speed>
+    <bullet/>
+   </fire>
+
+   <actionRef label="add3"/>
+
+   <wait>8-$rank*4+$rand</wait>
+  </action> </repeat>
+
+  <vanish/>
+ </action> </bullet>
+</fire>
+
+<fire label="slow">
+ <bullet> <action>
+  <fireRef label="slowColorChange">
+   <param>$1</param>
+  </fireRef>
+  <vanish/>
+ </action> </bullet>
+</fire>
+
+<action label="top">
+ <fire>
+  <direction type="absolute">-85</direction>
+  <bulletRef label="fast"/>
+ </fire>
+ <wait>1</wait>
+ <fire>
+  <direction type="absolute">85</direction>
+  <bulletRef label="fast"/>
+ </fire>
+ <wait>1</wait>
+ <fireRef label="slow">
+  <param>1</param>
+ </fireRef>
+ <wait>1</wait>
+ <fireRef label="slow">
+  <param>-1</param>
+ </fireRef>
+
+ <wait>430</wait>
+</action>
+
+</bulletml>

@@ -1,0 +1,119 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="vertical"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+<repeat> <times>3</times>
+<action>
+
+<fire>
+ <direction type="absolute">180</direction>
+ <speed>3</speed>
+ <bulletRef label="fastHanabi"/>
+</fire>
+
+<wait>110-$rank*60</wait>
+
+</action>
+</repeat>
+
+</action>
+
+<action label="fastFour">
+ <fire>
+  <direction type="sequence">5</direction>
+  <speed>2+$rank</speed>
+  <bullet/>
+ </fire>
+ <fire>
+  <direction type="sequence">-10</direction>
+  <speed>2+$rank</speed>
+  <bullet/>
+ </fire>
+ <fire>
+  <direction type="sequence">15</direction>
+  <speed>1.5+$rank</speed>
+  <bullet/>
+ </fire>
+ <fire>
+  <direction type="sequence">-20</direction>
+  <speed>1.5+$rank</speed>
+  <bullet/>
+ </fire>
+</action>
+
+<action label="slowFour">
+ <fire>
+  <direction type="sequence">5</direction>
+  <speed>1+$rank*0.8</speed>
+  <bullet/>
+ </fire>
+ <fire>
+  <direction type="sequence">-10</direction>
+  <speed>1+$rank*0.8</speed>
+  <bullet/>
+ </fire>
+ <fire>
+  <direction type="sequence">15</direction>
+  <speed>0.7+$rank*0.8</speed>
+  <bullet/>
+ </fire>
+ <fire>
+  <direction type="sequence">-20</direction>
+  <speed>0.7+$rank*0.8</speed>
+  <bullet/>
+ </fire>
+</action>
+
+<bullet label="fastHanabi">
+<action>
+ <wait>15</wait>
+
+ <fire>
+  <direction type="aim">0</direction>
+  <speed>2.5+$rank</speed>
+  <bullet/>
+ </fire>
+ <actionRef label="fastFour"/>
+
+ <repeat> <times>16</times> <action>
+  <fire>
+   <direction type="sequence">32.5</direction>
+   <speed>2.5+$rank</speed>
+   <bullet/>
+  </fire>
+  <actionRef label="fastFour"/>
+ </action> </repeat>
+
+ <fireRef label="slowHanabi"/>
+
+ <vanish/>
+
+</action>
+</bullet>
+
+<fire label="slowHanabi">
+ <bullet> <action>
+  <fire>
+   <direction type="absolute">0</direction>
+   <speed>1.3+$rank*0.8</speed>
+   <bullet/>
+  </fire>
+  <actionRef label="slowFour"/>
+
+  <repeat> <times>16</times> <action>
+   <fire>
+    <direction type="sequence">32.5</direction>
+    <speed>1.3+$rank*0.8</speed>
+    <bullet/>
+   </fire>
+   <actionRef label="slowFour"/>
+  </action> </repeat>
+
+  <vanish/>
+ </action> </bullet>
+</fire>
+
+</bulletml>

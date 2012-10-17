@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml>
+<action label="top"><repeat><times>4</times><action><actionRef label="impl:259"></actionRef><wait>50</wait></action></repeat><wait>60</wait></action>
+<action label="impl:259"><fire><direction type="aim">15+30*$rand</direction><speed type="absolute">1.8-$rank+$rand</speed><bullet><action><actionRef label="impl:30"></actionRef></action></bullet></fire></action>
+<action label="impl:30"><fire><direction type="absolute">$2</direction><speed type="absolute">$1</speed><bullet><action><actionRef label="impl:156"></actionRef><vanish/></action></bullet></fire><repeat><times>10+$rank*10</times><action><actionRef label="impl:12"></actionRef></action></repeat><vanish></vanish></action>
+<action label="impl:156"><wait>1</wait><fire><direction type="sequence">0</direction><bulletRef label="bulletmls/[G_DARIUS]_homing_laser.xml:_:hmgLsr"></bulletRef></fire></action>
+<bullet label="bulletmls/[G_DARIUS]_homing_laser.xml:_:hmgLsr"><speed type="absolute">2</speed><action><changeSpeed><speed type="absolute">0.3</speed><term>30</term></changeSpeed><wait>100</wait><changeSpeed><speed type="absolute">5</speed><term>100</term></changeSpeed></action><action><repeat><times>12</times><action><changeDirection><direction type="aim">0</direction><term>45-$rank*30</term></changeDirection><wait>5</wait></action></repeat></action></bullet>
+<action label="impl:12"><repeat><times>9999</times><action><wait>2</wait><fire><direction type="sequence">15</direction><bullet></bullet></fire></action></repeat></action>
+</bulletml>

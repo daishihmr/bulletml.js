@@ -1,0 +1,68 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml 
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+ <repeat> <times>10</times>
+ <action>
+
+  <fire>
+   <direction>$rand*360</direction>
+   <speed>2</speed>
+   <bullet>
+    <action>
+
+     <changeDirection>
+      <direction>0</direction>
+      <term>60</term>
+     </changeDirection>
+
+     <wait>60</wait>
+
+     <repeat> <times>15+$rank*20</times>
+     <action>
+
+     <repeat> <times>2</times>
+     <action>
+
+      <fire>
+       <direction>360*$rand</direction>
+       <speed>5</speed>
+       <bullet>
+        <action>
+	 <wait>$rand*5</wait>
+	 <fire>
+	  <speed>$rand*4+0.5</speed>
+	  <bullet/>
+	 </fire>
+	 <vanish/>
+	</action>
+       </bullet>
+      </fire>
+
+     </action>
+     </repeat>
+
+     <wait>1</wait>
+
+     </action>
+     </repeat>
+
+     <vanish/>
+
+    </action>
+   </bullet>
+  </fire>
+
+ <wait>60</wait>
+
+ </action>
+ </repeat>
+
+ <wait>100</wait>
+
+</action>
+
+</bulletml>

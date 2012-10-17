@@ -1,0 +1,112 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="vertical"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+ <repeat> <times>2</times> <action>
+ <fire>
+  <direction type="absolute">180</direction>
+  <speed>4</speed>
+  <bulletRef label="seed"/>
+ </fire>
+ <wait>500</wait>
+ </action> </repeat>
+ <wait>200</wait>
+</action>
+
+<bullet label="seed">
+<action>
+ <wait>9</wait>
+ <fire>
+  <direction type="relative">0</direction>
+  <bulletRef label="seed2"/>
+ </fire>
+ <fire>
+  <direction type="relative">180</direction>
+  <bulletRef label="seed2"/>
+ </fire>
+ <vanish/>
+</action>
+</bullet>
+
+<bullet label="seed2">
+<speed>18</speed>
+<action>
+ <wait>1</wait>
+ <fire>
+  <direction type="relative">90</direction>
+  <bulletRef label="seed3"/>
+ </fire>
+ <vanish/>
+</action>
+</bullet>
+
+<bullet label="seed3">
+<speed>0.8</speed>
+<action>
+ <changeDirection>
+  <direction type="sequence">1.2</direction>
+  <term>9999</term>
+ </changeDirection>
+</action>
+<action>
+ <repeat> <times>62+$rank*100</times>
+ <action>
+  <fire>
+   <direction type="sequence">40-10</direction>
+   <bullet/>
+  </fire>
+  <fire>
+   <direction type="sequence">140</direction>
+   <bullet/>
+  </fire>
+  <fire>
+   <direction type="sequence">40</direction>
+   <bullet/>
+  </fire>
+  <fire>
+   <direction type="sequence">140</direction>
+   <bullet/>
+  </fire>
+  <wait>8-$rank*6</wait>
+ </action>
+ </repeat>
+</action>
+<action>
+ <repeat> <times>5</times>
+ <action>
+  <fire>
+   <bulletRef label="tw"/>
+  </fire>
+  <wait>138</wait>
+ </action>
+ </repeat>
+ <vanish/>
+</action>
+</bullet>
+
+<bullet label="tw">
+ <action>
+  <fire>
+   <bullet>
+    <direction>-12</direction>
+    <action/>
+   </bullet>
+  </fire>
+  <repeat> <times>3.5+$rank*5+$rand</times>
+  <action>
+   <fire>
+    <bullet>
+     <direction type="sequence">4</direction>
+	 <action/>
+    </bullet>
+   </fire>
+  </action>
+  </repeat>
+ <vanish/>
+ </action>
+</bullet>
+
+</bulletml>

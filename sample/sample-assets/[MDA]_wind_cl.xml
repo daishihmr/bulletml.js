@@ -1,0 +1,105 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="vertical"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+ <fireRef label="side">
+  <param>120</param>
+ </fireRef>
+ <fireRef label="side">
+  <param>240</param>
+ </fireRef>
+ <wait>31</wait>
+ <repeat>
+  <times>5+$rank*20</times>
+  <action>
+   <fire>
+    <bulletRef label="center"/>
+   </fire>
+   <wait>30</wait>
+  </action>
+ </repeat>
+ <wait>100</wait>
+</action>
+
+<fire label="side">
+ <direction type="absolute">$1</direction>
+ <speed>18.6</speed>
+ <bullet>
+  <action>
+   <wait>1</wait>
+   <changeSpeed>
+    <speed>0.02</speed>
+    <term>2</term>
+   </changeSpeed>
+  <wait>30</wait>
+  <changeDirection> 
+   <direction>0</direction>
+   <term>1</term>
+  </changeDirection> 
+   <repeat>
+    <times>77+$rank*306</times>
+    <action>
+     <wait>2</wait>
+     <changeDirection> 
+      <direction>0</direction>
+      <term>30</term>
+     </changeDirection> 
+     <fireRef label="3way">
+      <param>0</param>
+     </fireRef>
+     <fireRef label="3way">
+      <param>20</param>
+     </fireRef>
+     <fireRef label="3way">
+      <param>-20</param>
+     </fireRef>
+    </action>
+   </repeat>
+  <vanish/>
+  </action>
+ </bullet>
+</fire>
+
+<fire label="3way">
+ <direction type="relative">$1</direction>
+ <speed>4.9</speed>
+ <bullet/>
+</fire>
+
+<action label="2way">
+ <fire>
+  <direction type="relative">$1</direction>
+  <speed>2.3</speed>
+  <bulletRef label="dummy"/>
+ </fire>
+ <fire>
+  <direction type="relative">-$1</direction>
+  <speed>2.3</speed>
+  <bulletRef label="dummy"/>
+ </fire>
+ <wait>5</wait>
+</action>
+
+<bullet label="dummy">
+ <action/>
+</bullet>
+
+<bullet label="center">
+ <action>
+  <changeSpeed>
+   <speed>0.01</speed>
+   <term>1</term>
+  </changeSpeed>
+  <actionRef label="2way"><param>0</param></actionRef>
+  <actionRef label="2way"><param>8-$rank*4</param></actionRef>
+  <actionRef label="2way"><param>16-$rank*8</param></actionRef>
+  <vanish/>
+ </action>
+</bullet>
+
+
+
+</bulletml>

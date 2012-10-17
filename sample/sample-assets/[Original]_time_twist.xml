@@ -1,0 +1,306 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="vertical"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+
+  <actionRef label="ancient"/>
+  <wait>60 - 40 * $rank</wait>
+  <actionRef label="future"/>
+  <wait>60 - 40 * $rank</wait>
+  <actionRef label="modern"/>
+  <wait>60 - 40 * $rank</wait>
+  <actionRef label="medieval"/>
+  <wait>60 - 40 * $rank</wait>
+  <actionRef label="primal"/>
+
+  <wait>450</wait>
+
+</action>
+
+<action label="ancient">
+  <fire>
+    <direction type="absolute">90</direction>
+    <speed>1.5</speed>
+    <bulletRef label="ancientBit"/>
+  </fire>
+  <fire>
+    <direction type="absolute">-90</direction>
+    <speed>1.5</speed>
+    <bulletRef label="ancientBit"/>
+  </fire>
+  <fire>
+    <direction type="absolute">0</direction>
+    <speed>0.0</speed>
+    <bulletRef label="ancientBit"/>
+  </fire>
+
+</action>
+
+<bullet label="ancientBit">
+<action>
+  <wait>30</wait>
+  <changeSpeed>
+    <speed>0</speed>
+    <term>1</term>
+  </changeSpeed>
+  <wait>5</wait>
+
+  <repeat><times>40</times><action>
+    <fire>
+      <direction type="absolute">180</direction>
+      <speed>2.0</speed>
+      <bullet/>
+    </fire>
+    <wait>5</wait>
+  </action></repeat>
+
+  <vanish/>
+
+</action>
+</bullet>
+
+<action label="modern">
+  <repeat><times>20</times><action>
+    <fire>
+      <direction type="absolute">-45 + 90 * $rand</direction>
+      <bulletRef label="modernBit"/>
+    </fire>
+    <wait>6</wait>
+  </action></repeat>
+</action>
+
+<bullet label="modernBit">
+<speed>0.5</speed>
+<action>
+  <changeDirection>
+    <direction type="absolute">160 + 40 * $rand</direction>
+    <term>90</term>
+  </changeDirection>
+
+  <wait>30</wait>
+
+  <repeat><times>5 + 5 * $rank</times><action>
+    <fire>
+      <direction type="absolute">-45 + 90 * $rand</direction>
+      <bulletRef label="modernScore"/>
+    </fire>
+    <wait>3</wait>
+  </action></repeat>
+
+  <vanish/>
+
+</action>
+</bullet>
+
+<bullet label="modernScore">
+<speed>0.5</speed>
+<action>
+  <changeDirection>
+    <direction type="absolute">160 + 40 * $rand</direction>
+    <term>90</term>
+  </changeDirection>
+
+  <changeSpeed>
+    <speed>1.0 + 2.0 * $rank</speed>
+    <term>300</term>
+  </changeSpeed>
+
+</action>
+</bullet>
+
+<action label="future">
+  <fire>
+    <bulletRef label="futureBit"/>
+  </fire>
+</action>
+
+<bullet label="futureBit">
+<direction type="absolute">180</direction>
+<speed>1.5</speed>
+<action>
+
+  <wait>30</wait>
+  <fire>
+    <direction type="absolute">360 * $rand</direction>
+    <bulletRef label="futureTriangle"/>
+  </fire>
+  <repeat><times>10</times><action>
+    <fire>
+      <direction type="sequence">120</direction>
+      <bulletRef label="futureTriangle"/>
+    </fire>
+  </action></repeat>
+
+  <vanish/>
+
+</action>
+</bullet>
+
+<bullet label="futureTriangle">
+<speed>1.1</speed>
+<action>
+
+  <wait>30</wait>
+
+  <changeDirection>
+    <direction type="relative">120</direction>
+    <term>1</term>
+  </changeDirection>
+
+  <wait>5</wait>
+
+  <changeDirection>
+    <direction type="relative">150</direction>
+    <term>60</term>
+  </changeDirection>
+
+  <repeat><times>20</times><action>
+    <fire>
+      <direction type="relative">45</direction>
+      <speed>0.8</speed>
+      <bullet/>
+    </fire>
+    <wait>1</wait>
+    <fire>
+      <direction type="relative">-45</direction>
+      <speed>1.0</speed>
+      <bullet/>
+    </fire>
+    <wait>1</wait>
+    <fire>
+      <direction type="relative">-60</direction>
+      <speed>1.2</speed>
+      <bullet/>
+    </fire>
+    <wait>1</wait>
+  </action></repeat>
+
+</action>
+</bullet>
+
+<action label="medieval">
+  <fire>
+    <bulletRef label="medievalBit"/>
+  </fire>
+</action>
+
+<bullet label="medievalBit">
+<direction type="absolute">180</direction>
+<speed>1.5</speed>
+<action>
+  <wait>60</wait>
+
+  <changeSpeed>
+    <speed>0.0</speed>
+    <term>1</term>
+  </changeSpeed>
+
+  <wait>5</wait>
+
+  <repeat><times>50</times><action>
+    <fire>
+      <direction type="absolute">360 * $rand</direction>
+      <bulletRef label="medievalStar">
+        <param>90</param>
+      </bulletRef>
+    </fire>
+    <fire>
+      <direction type="absolute">360 * $rand</direction>
+      <bulletRef label="medievalStar">
+        <param>-90</param>
+      </bulletRef>
+    </fire>
+    <wait>2</wait>
+  </action></repeat>
+
+  <vanish/>
+
+</action>
+</bullet>
+
+<bullet label="medievalStar">
+<speed>1.1</speed>
+<action>
+  <wait>60</wait>
+
+  <fire>
+    <direction type="absolute">$1</direction>
+    <speed>1.1</speed>
+    <bullet/>
+  </fire>
+
+  <vanish/>
+
+</action>
+</bullet>
+
+<action label="primal">
+  <fire>
+    <bulletRef label="primalBit"/>
+  </fire>
+</action>
+
+<bullet label="primalBit">
+<direction type="aim">0</direction>
+<speed>0.5</speed>
+<action>
+
+  <changeSpeed>
+    <speed>1.1</speed>
+    <term>120</term>
+  </changeSpeed>
+
+  <repeat><times>24</times><action>
+    <changeDirection>
+      <direction type="aim">0</direction>
+      <term>5</term>
+    </changeDirection>
+    <wait>5</wait>
+  </action></repeat>
+
+  <changeSpeed>
+    <speed>0.0</speed>
+    <term>120</term>
+  </changeSpeed>
+
+  <repeat><times>24</times><action>
+    <changeDirection>
+      <direction type="aim">0</direction>
+      <term>5</term>
+    </changeDirection>
+    <wait>5</wait>
+  </action></repeat>
+
+  <wait>60</wait>
+
+  <repeat><times>80 + 220 * $rank</times><action>
+    <actionRef label="primalRock">
+      <param>180 * $rand</param>
+      <param>1</param>
+    </actionRef>
+    <actionRef label="primalRock">
+      <param>180 * $rand</param>
+      <param>-1</param>
+    </actionRef>
+  </action></repeat>
+
+  <vanish/>
+
+</action>
+</bullet>
+
+<action label="primalRock">
+  <fire>
+    <direction type="absolute">$1 * $2</direction>
+    <speed>
+      (0.8 + 1.1*$1*(180-$1)/(90*90)) * (0.5+0.5*$rand) * (0.5+0.5*$rank)
+    </speed>
+    <bullet/>
+  </fire>
+
+</action>
+
+</bulletml>

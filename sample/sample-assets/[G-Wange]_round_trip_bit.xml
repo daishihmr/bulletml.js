@@ -1,0 +1,143 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml>
+	<action label="top">
+		<fire>
+			<bulletRef label="src">
+				<param>
+					5
+				</param>
+				<param>
+					91
+				</param>
+			</bulletRef>
+		</fire>
+		<fire>
+			<bulletRef label="src">
+				<param>
+					4
+				</param>
+				<param>
+					-91
+				</param>
+			</bulletRef>
+		</fire>
+		<wait>
+			600
+		</wait>
+	</action>
+	<action label="Xway">
+		<fire>
+			<direction type="aim">
+				-(5+$rank*5)*($1-1)-4+$rand*8
+			</direction>
+			<speed>
+				1.6
+			</speed>
+			<bullet/>
+		</fire>
+		<repeat>
+			<times>
+				$1-1
+			</times>
+			<action>
+				<fire>
+					<direction type="sequence">
+						5+$rank*5
+					</direction>
+					<speed>
+						1.6
+					</speed>
+					<bullet/>
+				</fire>
+			</action>
+		</repeat>
+	</action>
+	<action label="fire">
+		<actionRef label="Xway">
+			<param>
+				3
+			</param>
+		</actionRef>
+		<wait>
+			15
+		</wait>
+		<actionRef label="Xway">
+			<param>
+				5
+			</param>
+		</actionRef>
+		<wait>
+			15
+		</wait>
+	</action>
+	<bullet label="src">
+		<direction type="absolute">
+			$2
+		</direction>
+		<speed>
+			$1
+		</speed>
+		<action>
+			<repeat>
+				<times>
+					5
+				</times>
+				<action>
+					<changeSpeed>
+						<speed>
+							0.01
+						</speed>
+						<term>
+							30
+						</term>
+					</changeSpeed>
+					<actionRef label="fire"/>
+					<changeDirection>
+						<direction type="absolute">
+							-$2
+						</direction>
+						<term>
+							1
+						</term>
+					</changeDirection>
+					<changeSpeed>
+						<speed>
+							$1
+						</speed>
+						<term>
+							30
+						</term>
+					</changeSpeed>
+					<actionRef label="fire"/>
+					<changeSpeed>
+						<speed>
+							0.01
+						</speed>
+						<term>
+							30
+						</term>
+					</changeSpeed>
+					<actionRef label="fire"/>
+					<changeDirection>
+						<direction type="absolute">
+							$2
+						</direction>
+						<term>
+							1
+						</term>
+					</changeDirection>
+					<changeSpeed>
+						<speed>
+							$1
+						</speed>
+						<term>
+							30
+						</term>
+					</changeSpeed>
+					<actionRef label="fire"/>
+				</action>
+			</repeat>
+		</action>
+	</bullet>
+</bulletml>

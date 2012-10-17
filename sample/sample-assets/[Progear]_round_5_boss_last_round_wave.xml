@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="horizontal"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+<repeat> <times>4</times>
+<action>
+
+<repeat><times>2+$rank*1.5</times>
+<action>
+ <fire>
+  <bulletRef label="rfRkt"/>
+ </fire>
+ <wait>45</wait>
+</action>
+</repeat>
+<wait>100</wait>
+
+</action>
+</repeat>
+
+</action>
+
+<bullet label="rfRkt">
+<action>
+<repeat><times>9999</times>
+<action>
+ <wait>2</wait>
+ <fire>
+  <direction type="sequence">15</direction>
+  <bullet/>
+ </fire>
+</action>
+</repeat>
+</action>
+</bullet>
+
+</bulletml>

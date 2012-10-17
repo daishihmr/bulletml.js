@@ -1,0 +1,283 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml type="vertical" xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+	<bullet  label="Red">
+		<action/>
+	</bullet>
+	<action  label="Stop">
+		<changeSpeed>
+			<speed>
+				 0
+			</speed>
+			<term>
+				 1
+			</term>
+		</changeSpeed>
+	</action>
+	<bullet  label="Dummy">
+		<action>
+			<vanish/>
+		</action>
+	</bullet>
+	<bullet  label="seven">
+		<direction  type="absolute">
+			180
+		</direction>
+		<speed>
+			 4
+		</speed>
+		<action>
+			<wait>
+				 10
+			</wait>
+			<actionRef  label="Stop"/>
+			<repeat>
+				<times>
+					 5+$rank*4
+				</times>
+				<action>
+					<fire>
+						<direction  type="aim">
+							-10
+						</direction>
+						<speed>
+							 1.5
+						</speed>
+						<bulletRef  label="Red"/>
+					</fire>
+					<fire>
+						<direction  type="aim">
+							10
+						</direction>
+						<speed>
+							 1.5
+						</speed>
+						<bulletRef  label="Red"/>
+					</fire>
+					<fire>
+						<direction  type="aim">
+							-5
+						</direction>
+						<speed>
+							 1.3
+						</speed>
+						<bulletRef  label="Red"/>
+					</fire>
+					<fire>
+						<direction  type="aim">
+							5
+						</direction>
+						<speed>
+							 1.3
+						</speed>
+						<bulletRef  label="Red"/>
+					</fire>
+					<fire>
+						<direction  type="aim">
+							-5
+						</direction>
+						<speed>
+							 1.7
+						</speed>
+						<bulletRef  label="Red"/>
+					</fire>
+					<fire>
+						<direction  type="aim">
+							5
+						</direction>
+						<speed>
+							 1.7
+						</speed>
+						<bulletRef  label="Red"/>
+					</fire>
+					<fire>
+						<direction  type="aim">
+							0
+						</direction>
+						<speed>
+							 1.5
+						</speed>
+						<bulletRef  label="Red"/>
+					</fire>
+					<wait>
+						 360/(5+$rank*4)
+					</wait>
+				</action>
+			</repeat>
+			<vanish/>
+		</action>
+	</bullet>
+	<bullet  label="fan">
+		<speed>
+			 4
+		</speed>
+		<action>
+			<wait>
+				 10
+			</wait>
+			<actionRef  label="Stop"/>
+			<fire>
+				<direction>
+					 $1
+				</direction>
+				<bulletRef  label="Dummy"/>
+			</fire>
+			<repeat>
+				<times>
+					 35+$rank*35
+				</times>
+				<action>
+					<fire>
+						<direction  type="sequence">
+							$2
+						</direction>
+						<speed>
+							 $3
+						</speed>
+						<bullet/>
+					</fire>
+					<wait>
+						 10/(1+$rank)+$rand
+					</wait>
+				</action>
+			</repeat>
+			<vanish/>
+		</action>
+	</bullet>
+	<action  label="top">
+		<fire>
+			<bulletRef  label="seven"/>
+		</fire>
+		<fire>
+			<direction  type="absolute">
+				170
+			</direction>
+			<bulletRef  label="fan">
+				<param>
+					 55
+				</param>
+				<param>
+					 10
+				</param>
+				<param>
+					 1.8+$rank*0.4
+				</param>
+			</bulletRef>
+		</fire>
+		<fire>
+			<direction  type="absolute">
+				170
+			</direction>
+			<bulletRef  label="fan">
+				<param>
+					 60
+				</param>
+				<param>
+					 10
+				</param>
+				<param>
+					 1+$rank*0.2
+				</param>
+			</bulletRef>
+		</fire>
+		<fire>
+			<direction  type="absolute">
+				170
+			</direction>
+			<bulletRef  label="fan">
+				<param>
+					 225
+				</param>
+				<param>
+					 10
+				</param>
+				<param>
+					 1.4+$rank*0.2
+				</param>
+			</bulletRef>
+		</fire>
+		<fire>
+			<direction  type="absolute">
+				170
+			</direction>
+			<bulletRef  label="fan">
+				<param>
+					 250
+				</param>
+				<param>
+					 10
+				</param>
+				<param>
+					 1.3+$rank*0.2
+				</param>
+			</bulletRef>
+		</fire>
+		<fire>
+			<direction  type="absolute">
+				-170
+			</direction>
+			<bulletRef  label="fan">
+				<param>
+					 55
+				</param>
+				<param>
+					 -10
+				</param>
+				<param>
+					 1.8+$rank*0.4
+				</param>
+			</bulletRef>
+		</fire>
+		<fire>
+			<direction  type="absolute">
+				-170
+			</direction>
+			<bulletRef  label="fan">
+				<param>
+					 60
+				</param>
+				<param>
+					 -10
+				</param>
+				<param>
+					 1+$rank*0.2
+				</param>
+			</bulletRef>
+		</fire>
+		<fire>
+			<direction  type="absolute">
+				-170
+			</direction>
+			<bulletRef  label="fan">
+				<param>
+					 225
+				</param>
+				<param>
+					 -10
+				</param>
+				<param>
+					 1.4+$rank*0.2
+				</param>
+			</bulletRef>
+		</fire>
+		<fire>
+			<direction  type="absolute">
+				-170
+			</direction>
+			<bulletRef  label="fan">
+				<param>
+					 250
+				</param>
+				<param>
+					 -10
+				</param>
+				<param>
+					 1.3+$rank*0.2
+				</param>
+			</bulletRef>
+		</fire>
+		<wait>
+			 360
+		</wait>
+	</action>
+</bulletml>

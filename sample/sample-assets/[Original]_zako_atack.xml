@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml>
+	<action label="top">
+		<repeat>
+			<times>
+				40+$rank*20
+			</times>
+			<action>
+				<wait>
+					4
+				</wait>
+				<fire>
+					<direction type="aim">
+						$rand*180-90
+					</direction>
+					<speed>
+						1.5
+					</speed>
+					<bullet>
+						<action>
+							<repeat>
+								<times>
+									3
+								</times>
+								<action>
+									<fire>
+										<direction type="aim">
+											(0.5-$rand)*$rank*10
+										</direction>
+										<speed>
+											1.5
+										</speed>
+										<bullet/>
+									</fire>
+									<wait>
+										20+$rand*$rank*40
+									</wait>
+								</action>
+							</repeat>
+						</action>
+					</bullet>
+				</fire>
+			</action>
+		</repeat>
+	</action>
+</bulletml>

@@ -1,0 +1,168 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+ <actionRef label="move"><param>180</param></actionRef>
+ <fire>
+  <direction type="absolute">$rand*360</direction>
+  <speed>0</speed>
+  <bullet>
+   <action>
+    <vanish/>
+   </action>
+  </bullet>
+ </fire>
+ <wait>1</wait>
+ <repeat><times>5</times>
+  <action>
+   <fire><direction type="sequence">62</direction><speed>2.4</speed><bulletRef label="speed1"/></fire>
+   <repeat><times>5</times>
+    <action>
+     <fire><direction type="sequence">60</direction><speed>2.4</speed><bulletRef label="speed1"/></fire>
+    </action>
+   </repeat>
+   <wait>2</wait>
+   <actionRef label="wall"/>
+   <fire><direction type="sequence">62</direction><speed>2.4</speed><bulletRef label="speed2"/></fire>
+   <repeat><times>5</times>
+    <action>
+     <fire><direction type="sequence">60</direction><speed>2.4</speed><bulletRef label="speed2"/></fire>
+    </action>
+   </repeat>
+   <wait>2</wait>
+   <actionRef label="wall"/>
+  </action>
+ </repeat>
+ <wait>150</wait>
+ <repeat><times>16+$rank*16</times>
+  <action>
+   <fire><direction type="absolute">360*$rand</direction><speed>0.6+$rank*0.6</speed><bulletRef label="curvel"/></fire>
+   <fire><direction type="sequence"> 0</direction><speed>0.6+$rank*0.6</speed><bulletRef label="curver"/></fire>
+   <fire><direction type="sequence">20</direction><speed>0.6+$rank*0.6</speed><bulletRef label="curvel"/></fire>
+   <fire><direction type="sequence"> 0</direction><speed>0.6+$rank*0.6</speed><bulletRef label="curver"/></fire>
+   <repeat><times>6</times>
+    <action>
+     <fire><direction type="sequence">40</direction><speed>0.6+$rank*0.6</speed><bulletRef label="curvel"/></fire>
+     <fire><direction type="sequence"> 0</direction><speed>0.6+$rank*0.6</speed><bulletRef label="curver"/></fire>
+     <fire><direction type="sequence">20</direction><speed>0.6+$rank*0.6</speed><bulletRef label="curvel"/></fire>
+     <fire><direction type="sequence"> 0</direction><speed>0.6+$rank*0.6</speed><bulletRef label="curver"/></fire>
+    </action>
+   </repeat>
+   <wait>40-$rank*20</wait>
+  </action>
+ </repeat>
+ <wait>200</wait>
+ <actionRef label="move"><param>  0</param></actionRef>
+</action>
+
+<action label="move">
+ <changeDirection><direction type="absolute">$1</direction><term>5</term></changeDirection>
+ <wait>6</wait>
+ <changeSpeed><speed>1</speed><term>50</term></changeSpeed>
+ <wait>55</wait>
+ <changeSpeed><speed>0</speed><term>50</term></changeSpeed>
+ <wait>55</wait>
+</action>
+
+<action label="wall">
+ <repeat><times>2</times>
+  <action>
+   <fire><direction type="sequence">62</direction><speed>2.4</speed><bulletRef label="speed0"/></fire>
+   <repeat><times>5</times>
+    <action>
+     <fire><direction type="sequence">60</direction><speed>2.4</speed><bulletRef label="speed0"/></fire>
+    </action>
+   </repeat>
+   <wait>2</wait>
+  </action>
+ </repeat>
+</action>
+
+<bullet label="speed0">
+ <action>
+  <actionRef label="stop"/>
+  <wait>960</wait>
+  <vanish/>
+ </action>
+</bullet>
+
+<bullet label="speed1">
+ <action>
+  <actionRef label="stop"/>
+  <repeat><times>4</times>
+   <action>
+    <actionRef label="huri"><param>60</param><param>1</param></actionRef>
+    <actionRef label="huri"><param>-120</param><param>2</param></actionRef>
+    <actionRef label="huri"><param>60</param><param>1</param></actionRef>
+   </action>
+  </repeat>
+  <vanish/>
+ </action>
+</bullet>
+
+<bullet label="speed2">
+ <action>
+  <actionRef label="stop"/>
+  <repeat><times>4</times>
+   <action>
+    <actionRef label="huri"><param>-60</param><param>1</param></actionRef>
+    <actionRef label="huri"><param>120</param><param>2</param></actionRef>
+    <actionRef label="huri"><param>-60</param><param>1</param></actionRef>
+   </action>
+  </repeat>
+  <vanish/>
+ </action>
+</bullet>
+
+<action label="stop">
+ <changeSpeed>
+  <speed>0</speed>
+  <term>70</term>
+ </changeSpeed>
+ <wait>65</wait>
+</action>
+
+<action label="huri">
+ <changeDirection><direction type="relative">$1</direction><term>48*$2</term></changeDirection>
+ <repeat><times>(3+$rank*3)*$2</times>
+  <action>
+   <fire>
+    <direction type="relative">-30+$rand*30</direction>
+    <speed>2+$rank</speed>
+    <bullet/>
+   </fire>
+   <wait>20-$rank*10</wait>
+  </action>
+ </repeat>
+</action>
+
+<bullet label="curvel">
+ <action>
+  <repeat><times>9999</times>
+   <action>
+    <changeDirection>
+     <direction type="relative">2+$rank*6</direction>
+     <term>10</term>
+    </changeDirection>
+    <wait>10</wait>
+   </action>
+  </repeat>
+ </action>
+</bullet>
+
+<bullet label="curver">
+ <action>
+  <repeat><times>9999</times>
+   <action>
+    <changeDirection>
+     <direction type="relative">-2-$rank*6</direction>
+     <term>10</term>
+    </changeDirection>
+    <wait>10</wait>
+   </action>
+  </repeat>
+ </action>
+</bullet>
+
+</bulletml>

@@ -1,0 +1,72 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml type="vertical" xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+ <actionRef label="position"><param>$rand</param><param>$rand</param><param>10</param><param>6-$rank*4</param></actionRef>
+ <actionRef label="position"><param>$rand</param><param>$rand</param><param>15</param><param>6-$rank*4</param></actionRef>
+ <actionRef label="position"><param>$rand</param><param>$rand</param><param>20</param><param>6-$rank*4</param></actionRef>
+ <actionRef label="position"><param>$rand</param><param>$rand</param><param>25</param><param>6-$rank*4</param></actionRef>
+ <actionRef label="position"><param>$rand</param><param>$rand</param><param>30</param><param>6-$rank*4</param></actionRef>
+</action>
+
+<action label="position">
+ <actionRef label="move"><param>100+$1*160</param><param>$2</param></actionRef>
+ <changeDirection>
+  <direction type="absolute">$rand*360</direction>
+  <term>1</term>
+ </changeDirection>
+ <wait>1</wait>
+ <actionRef label="wave"><param>$3</param><param>$4</param></actionRef>
+ <actionRef label="move"><param>(100+$1*160)+180</param><param>$2</param></actionRef>
+</action>
+
+<action label="move">
+ <changeDirection><direction type="absolute">$1</direction><term>1</term></changeDirection>
+ <changeSpeed><speed>$2*6+$rank*6</speed><term>1</term></changeSpeed>
+ <wait>10-$rank*5</wait>
+ <changeSpeed><speed>0</speed><term>1</term></changeSpeed>
+ <wait>1</wait>
+</action>
+
+<action label="wave">
+ <repeat><times>3</times>
+  <action>
+   <actionRef label="allrange"><param> 0.0</param><param>$1</param></actionRef><wait>$2</wait>
+   <actionRef label="allrange"><param> 3.0</param><param>$1</param></actionRef><wait>$2</wait>
+   <actionRef label="allrange"><param> 5.0</param><param>$1</param></actionRef><wait>$2</wait>
+   <actionRef label="allrange"><param> 6.0</param><param>$1</param></actionRef><wait>$2</wait>
+   <actionRef label="allrange"><param> 6.5</param><param>$1</param></actionRef><wait>$2</wait>
+   <actionRef label="allrange"><param> 6.0</param><param>$1</param></actionRef><wait>$2</wait>
+   <actionRef label="allrange"><param> 5.0</param><param>$1</param></actionRef><wait>$2</wait>
+   <actionRef label="allrange"><param> 3.0</param><param>$1</param></actionRef><wait>$2</wait>
+   <actionRef label="allrange"><param> 0.0</param><param>$1</param></actionRef><wait>$2</wait>
+   <actionRef label="allrange"><param>-3.0</param><param>$1</param></actionRef><wait>$2</wait>
+   <actionRef label="allrange"><param>-5.0</param><param>$1</param></actionRef><wait>$2</wait>
+   <actionRef label="allrange"><param>-6.0</param><param>$1</param></actionRef><wait>$2</wait>
+   <actionRef label="allrange"><param>-6.5</param><param>$1</param></actionRef><wait>$2</wait>
+   <actionRef label="allrange"><param>-6.0</param><param>$1</param></actionRef><wait>$2</wait>
+   <actionRef label="allrange"><param>-5.0</param><param>$1</param></actionRef><wait>$2</wait>
+   <actionRef label="allrange"><param>-3.0</param><param>$1</param></actionRef><wait>$2</wait>
+  </action>
+ </repeat>
+</action>
+
+<action label="allrange">
+ <fire>
+  <direction type="relative">$1</direction>
+  <speed>0.8+$rank*1.6</speed>
+  <bullet/>
+ </fire>
+ <repeat><times>$2-1</times>
+  <action>
+   <fire>
+    <direction type="sequence">360/$2</direction>
+    <speed>0.8+$rank*1.6</speed>
+    <bullet/>
+   </fire>
+  </action>
+ </repeat>
+</action>
+
+</bulletml>

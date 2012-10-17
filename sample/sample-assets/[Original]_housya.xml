@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml 
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+
+ <fire>
+  <direction>-80</direction>
+  <bullet/>
+ </fire>
+
+ <repeat> <times>70</times>
+ <action>
+
+  <repeat> <times>3*($rank+0.5)</times>
+  <action>
+
+  <fire>
+   <direction type="sequence">($rand*20-9)/($rank+0.5)</direction>
+   <speed type="sequence">0.01/($rank+0.5)</speed>
+   <bullet/>
+  </fire>
+
+  </action>
+  </repeat>
+
+  <wait>1</wait>
+
+ </action>
+ </repeat>
+
+</action>
+
+</bulletml>

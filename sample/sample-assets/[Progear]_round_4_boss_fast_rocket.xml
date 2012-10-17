@@ -1,0 +1,75 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="horizontal"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="fireRoot">
+<fire>
+ <direction type="absolute">$1</direction>
+ <speed>0.2</speed>
+ <bulletRef label="rootBl"/>
+</fire>
+<repeat> <times>3</times>
+<action>
+<fire>
+ <direction type="absolute">$1</direction>
+ <speed type="sequence">0.5</speed>
+ <bulletRef label="rootBl"/>
+</fire>
+</action>
+</repeat>
+</action>
+
+<action label="top">
+<actionRef label="fireRoot">
+ <param>$rand*16</param>
+</actionRef>
+<actionRef label="fireRoot">
+ <param>180+$rand*16</param>
+</actionRef>
+<wait>120</wait>
+</action>
+
+<bullet label="rootBl">
+<action>
+<wait>40</wait>
+<fire>
+ <direction type="absolute">274+$rand*4</direction>
+ <bulletRef label="rocket"/>
+</fire>
+<vanish/>
+</action>
+</bullet>
+
+<bullet label="rocket">
+<speed>5+$rand</speed>
+<action>
+<repeat> <times>9999</times>
+ <action>
+ <fire>
+  <direction type="absolute">0</direction>
+  <speed>1</speed>
+  <bulletRef label="downAccel"/>
+ </fire>
+ <fire>
+  <direction type="absolute">60</direction>
+  <speed>1.8</speed>
+  <bulletRef label="downAccel"/>
+ </fire>
+ <wait>5-$rank*4</wait>
+</action>
+</repeat>
+</action>
+</bullet>
+
+<bullet label="downAccel">
+<action>
+<accel>
+<vertical>2.7</vertical>
+<term>120</term>
+</accel>
+</action>
+</bullet>
+
+</bulletml>

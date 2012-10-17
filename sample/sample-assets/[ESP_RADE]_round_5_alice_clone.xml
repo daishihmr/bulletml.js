@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml 
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<fire label="alice">
+<direction>$rand*360</direction>
+<speed>8</speed>
+<bullet>
+ <action>
+  <wait>10*$rand</wait>
+  <fire>
+   <direction type="aim">$rand*30-15</direction>
+   <bullet/>
+  </fire>
+  <vanish/>
+ </action>
+</bullet>
+</fire>
+
+<action label="top">
+ <repeat> <times>600</times>
+  <action>
+   <fireRef label="alice"/>
+   <wait>$rank+1+$rand</wait>
+  </action>
+ </repeat>
+ <wait>100</wait>
+</action>
+
+</bulletml>

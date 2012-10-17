@@ -1,5 +1,5 @@
 /*
- * bullet.js v0.1.0
+ * bullet.js v0.3.0
  * @author daishi@dev7.jp
  * @description
  * General-purpose parser BulletML.
@@ -28,37 +28,12 @@
  * IN THE SOFTWARE.
  */
 
-"use strict";
-
 /**
  * @namespace
  */
 var BulletML = {};
 
 (function() {
-    // for IE
-    if (typeof DOMParser == "undefined") {
-        DOMParser = function() {
-        };
-        DOMParser.prototype.parseFromString = function(string, contentType) {
-            if (typeof ActiveXObject != "undefined") {
-                var domDoc = new ActiveXObject("MSXML.DomDocument");
-                domDoc.loadXML(string);
-                return domDoc;
-            } else if (typeof XMLHttpRequest != "undefined") {
-                var xhr = new XMLHttpRequest();
-                xhr.open("GET", "data:" + (contenttype || "application/xml")
-                        + ";charset=utf-8," + encodingURIComponent(string),
-                        false);
-                if (xhr.overrideMimeType) {
-                    xhr.overrideMimeType(contentType);
-                }
-                xhr.send(null);
-                return xhr.responseXML;
-            }
-        };
-    }
-
     /**
      * BulletMLを解析し、JavaScriptオブジェクトツリーを生成する.
      * 
@@ -74,11 +49,8 @@ var BulletML = {};
         } else if (xml.getElementsByTagName("bulletml")) {
             result = parse(xml);
         } else {
-            throw new Exception("cannot build " + xml);
+            throw new Error("cannot build " + xml);
         }
-
-        // find topAction
-        result.topAction = search(result.actions, "top");
         return result;
     };
 
@@ -98,13 +70,6 @@ var BulletML = {};
          * @field
          */
         this.root = this;
-        /**
-         * action element labeled 'top'.
-         * 
-         * @type {BulletML.Action}
-         * @field
-         */
-        this.topAction = null;
         /**
          * top level action elements.
          * 
@@ -126,15 +91,6 @@ var BulletML = {};
          * @field
          */
         this.fires = [];
-        /**
-         * rank.
-         * 
-         * variable $rank.
-         * 
-         * @type {number}
-         * @field
-         */
-        this.rank = 0;
     };
     /**
      * find top level action element by label.
@@ -169,102 +125,221 @@ var BulletML = {};
     BulletML.Root.prototype.findFire = function(label) {
         return search(this.fires, label);
     };
-    /**
-     * コマンドツリーをシーケンシャルにアクセス可能な配列に変換する.
-     * 
-     * 変換に際し、各種パラメータ内の変数はサブノード呼び出しパラメータ（param要素）が展開される.<br>
-     * ランク（$rank）、乱数（$rand）もこの時点で確定される.
-     * 
-     * @param {string}
-     *            actionLabel 初めに実行するactionのラベル
-     * @param {number}
-     *            rank ランク
-     * @return {Array.<BulletML.Command>}
-     * @memberOf BulletML.Root.prototype
-     */
-    BulletML.Root.prototype.sequence = function(actionLabel, rank) {
-        if (!actionLabel) {
-            actionLabel = "top";
-        }
-        if (rank != undefined) {
-            this.rank = rank;
-        }
+    BulletML.Root.prototype.getWalker = function(actionLabel, rank) {
+        var w = new BulletML.Walker(this, rank);
         var action = this.findAction(actionLabel);
-        if (!action) {
-            return;
-        }
-        var visitor = new BulletML.Visitor(this);
-        visitor.visit(action);
-        return visitor.result;
-    };
-
-    /**
-     * @constructor
-     */
-    BulletML.Visitor = function(root) {
-        /**
-         * @type {BulletML.Root}
-         * @field
-         */
-        this.root = root;
-        /**
-         * @type {Array.<BulletML.Command>}
-         * @field
-         */
-        this.result = [];
-        this.paramsStack = [];
-    };
-    /**
-     * @memberOf BulletML.Visitor.prototype
-     */
-    BulletML.Visitor.prototype.visit = function(command) {
-        switch (command.commandName) {
-        case "action":
-            for ( var i = 0, end = command.commands.length; i < end; i++) {
-                this.visit(command.commands[i]);
-            }
-            break;
-        case "actionRef":
-            this.pushParams(command.params);
-            var action = this.root.findAction(command.label);
-            for ( var i = 0, end = action.commands.length; i < end; i++) {
-                this.visit(action.commands[i]);
-            }
-            this.paramsStack.pop();
-            break;
-        case "repeat":
-            var start = new BulletML.LoopStart();
-            var times = evalNumber(command.times, this.params(), this.root.rank);
-            var end = new BulletML.LoopEnd(start, times);
-
-            this.result[this.result.length] = start;
-            this.visit(command.action);
-            this.result[this.result.length] = end;
-            break;
-        default:
-            this.result[this.result.length] = command.clone(this.params());
+        if (action) {
+            w._action = action;
+            return w;
         }
     };
-    /**
-     * @memberOf BulletML.Visitor.prototype
-     */
-    BulletML.Visitor.prototype.pushParams = function(params) {
-        var cp = this.params();
-        var result = [];
+
+    BulletML.Walker = function(root, rank) {
+        this._root = root;
+        this._stack = [];
+        this._localScopeStack = [];
+        this._cursor = -1;
+        this._action = null;
+        this._localScope = {};
+        this._globalScope = {
+            $rank : rank || 0
+        };
+        this._loopCounter = 0;
+    };
+    BulletML.Walker.prototype.next = function() {
+        this._cursor += 1;
+        if (this._action) {
+            var n = this._action.commands[this._cursor];
+
+            if (n) {
+                var result = {
+                    commandName : n.commandName
+                };
+                switch (n.commandName) {
+                case "action":
+                    this.pushStack();
+                    this._action = n;
+                    return this.next();
+                case "actionRef":
+                    this._localScopeStack.push(this._localScope);
+                    this._localScope = this.newScope(n.params);
+                    this.pushStack();
+                    this._action = this._root.findAction(n.label);
+                    return this.next();
+                case "repeat":
+                    this._loopCounter = 0;
+                    n.end = this.eval(n.times, this._localScope,
+                            this._globalScope);
+                    this.pushStack();
+                    if (n.action.commandName === "action") {
+                        this._action = n.action;
+                    } else {
+                        this._action = {
+                            commandName : "action",
+                            commands : [ n.action ]
+                        };
+                    }
+                    return this.next();
+                case "fire":
+                    result.bullet = n.bullet.clone(this);
+                    if (n.direction) {
+                        result.direction = {
+                            type : n.direction.type,
+                            value : this.eval(n.direction.value)
+                        };
+                    }
+                    if (n.speed) {
+                        result.speed = {
+                            type : n.speed.type,
+                            value : this.eval(n.speed.value)
+                        }
+                    }
+                    break;
+                case "fireRef":
+                    this._localScopeStack.push(this._localScope);
+                    this._localScope = this.newScope(n.params);
+                    this.pushStack();
+                    this._action = {
+                        commandName : "action",
+                        commands : [ this._root.findFire(n.label) ],
+                        createdBy : "fireRef"
+                    };
+                    return this.next();
+                case "changeDirection":
+                    if (n.direction) {
+                        result.direction = {
+                            type : n.direction.type,
+                            value : this.eval(n.direction.value)
+                        };
+                    }
+                    if (n.term) {
+                        result.term = this.eval(n.term);
+                    }
+                    break;
+                case "changeSpeed":
+                    if (n.speed) {
+                        result.speed = {
+                            type : n.speed.type,
+                            value : this.eval(n.speed.value)
+                        }
+                    }
+                    if (n.term) {
+                        result.term = this.eval(n.term);
+                    }
+                    break;
+                case "accel":
+                    if (n.horizontal) {
+                        result.horizontal = {
+                            type : n.horizontal.type,
+                            value : this.eval(n.horizontal.value)
+                        };
+                    }
+                    if (n.vertical) {
+                        result.vertical = {
+                            type : n.vertical.type,
+                            value : this.eval(n.vertical.value)
+                        };
+                    }
+                    if (n.term) {
+                        result.term = this.eval(n.term);
+                    }
+                    break;
+                case "wait":
+                    result.value = this.eval(n.value);
+                    break;
+                }
+                return result;
+            } else {
+                this.popStack();
+                if (!this._action) {
+                    return;
+                }
+                var current = this._action.commands[this._cursor];
+                if (current
+                        && (current.commandName == "actionRef" || current.commandName == "fireRef")) {
+                    this._localScope = this._localScopeStack.pop();
+                    return this.next();
+                } else if (current && current.commandName == "repeat") {
+                    this._loopCounter++;
+                    if (this._loopCounter < current.end) {
+                        // もう１回行ってこい
+                        this.pushStack();
+                        if (current.action.commandName === "action") {
+                            this._action = current.action;
+                        } else {
+                            this._action = {
+                                commandName : "action",
+                                commands : [ current.action ]
+                            };
+                        }
+                        return this.next();
+                    } else {
+                        return this.next();
+                    }
+                } else {
+                    return this.next();
+                }
+            }
+        }
+    };
+    BulletML.Walker.prototype.pushStack = function() {
+        this._stack.push({
+            action : this._action,
+            cursor : this._cursor,
+            loopCounter : this._loopCounter
+        });
+        this._cursor = -1;
+        this._loopCounter = 0;
+    };
+    BulletML.Walker.prototype.popStack = function() {
+        var p = this._stack.pop();
+        if (p) {
+            this._cursor = p.cursor;
+            this._action = p.action;
+            this._loopCounter = p.loopCounter;
+        } else {
+            this._cursor = -1;
+            this._action = null;
+            this._loopCounter = 0;
+        }
+    };
+    BulletML.Walker.prototype.eval = function(exp) {
+        // evalを使わずに済む場合
+        var n;
+        if (typeof exp == "number") {
+            return exp;
+        } else if (!isNaN(n = Number(exp))) {
+            return n;
+        } else if (n = this._localScope[exp]) {
+            return n;
+        } else if (n = this._globalScope[exp]) {
+            return n;
+        } else if (exp == "$rand") {
+            return Math.random();
+        }
+
+        var scope = {};
+        for ( var prop in this._globalScope) {
+            if (this._globalScope.hasOwnProperty(prop)) {
+                scope[prop] = this._globalScope[prop];
+            }
+        }
+        for ( var prop in this._localScope) {
+            if (this._localScope.hasOwnProperty(prop)) {
+                scope[prop] = this._localScope[prop];
+            }
+        }
+        scope.$rand = Math.random();
+        return eval(
+                "BulletML._temp = function() { return "
+                        + exp.split("$").join("this.$") + "}").bind(scope)();
+    };
+    BulletML.Walker.prototype.newScope = function(params) {
+        var result = {};
         for ( var i = 0, end = params.length; i < end; i++) {
-            result[result.length] = evalNumberFixRand(params[i], cp,
-                    this.root.rank);
+            result["$" + (i + 1)] = this.eval(params[i]);
         }
-        this.paramsStack[this.paramsStack.length] = result;
-    };
-    /**
-     * @memberOf BulletML.Visitor.prototype
-     */
-    BulletML.Visitor.prototype.params = function() {
-        if (this.paramsStack.length == 0) {
-            return [];
-        }
-        return this.paramsStack[this.paramsStack.length - 1];
+        return result;
     };
 
     /**
@@ -298,39 +373,32 @@ var BulletML = {};
          * @field
          */
         this.actions = [];
+        this._localScope = {};
     };
-    /**
-     * @memberOf BulletML.Bullet.prototype
-     */
-    BulletML.Bullet.prototype.sequence = function() {
-        var visitor = new BulletML.Visitor(this.root);
-        for ( var i = 0, end = this.actions.length; i < end; i++) {
-            visitor.visit(this.actions[i]);
-        }
-        return visitor.result;
+    BulletML.Bullet.prototype.getWalker = function(rank) {
+        var w = new BulletML.Walker(this.root, rank);
+        var action = new BulletML.Action();
+        action.root = this.root;
+        action.commands = this.actions;
+        w._action = action;
+        w._localScope = this._localScope;
+        return w;
     };
-    /**
-     * @memberOf BulletML.Bullet.prototype
-     */
-    BulletML.Bullet.prototype.clone = function(params) {
-        var result = new BulletML.Bullet();
-        result.label = this.label;
-        result.root = this.root;
-        if (this.direction) {
-            result.direction = new BulletML.Direction(evalNumber(
-                    this.direction.value, params, this.root.rank));
-            result.direction.type = this.direction.type;
-        }
-        if (this.speed) {
-            result.speed = new BulletML.Speed(evalNumber(this.speed.value,
-                    params, this.root.rank));
-            result.speed.type = this.speed.type;
-        }
-        for ( var i = 0, end = this.actions.length; i < end; i++) {
-            result.actions[result.actions.length] = this.actions[i]
-                    .clone(params);
-        }
-        return result;
+    BulletML.Bullet.prototype.clone = function(walker) {
+        var c = new BulletML.Bullet();
+        c.label = this.label;
+        c.root = this.root;
+        c.actions = this.actions;
+        c.direction = {
+            type : this.direction.type,
+            value : walker.eval(this.direction.value)
+        };
+        c.speed = {
+            type : this.speed.type,
+            value : walker.eval(this.speed.value)
+        };
+        c._localScope = walker._localScope;
+        return c;
     };
 
     /**
@@ -348,22 +416,12 @@ var BulletML = {};
          */
         this.params = [];
     };
-    BulletML.BulletRef.prototype.clone = function(params) {
-        // console.log("BulletRef#clone");
-        // console.log("params", params);
-        // console.log("this.params", this.params);
-        var origBullet = this.root.findBullet(this.label);
-        if (!origBullet) {
-            throw new Error("bulletRef reference not found.(label = "
-                    + this.label + ")");
-        }
-        var newParam = [];
-        for ( var i = 0, end = this.params.length; i < end; i++) {
-            newParam[newParam.length] = evalNumberFixRand(this.params[i],
-                    params, this.root.rank);
-        }
-        // console.log("newParam", newParam);
-        return origBullet.clone(newParam);
+    BulletML.BulletRef.prototype.clone = function(walker) {
+        var bkup = walker._localScope;
+        walker._localScope = walker.newScope(this.params);
+        var b = this.root.findBullet(this.label).clone(walker);
+        walker._localScope = bkup;
+        return b;
     };
 
     // commandクラス --------------------------------------------
@@ -377,20 +435,10 @@ var BulletML = {};
      */
     BulletML.Command = function() {
         /**
-         * @field
-         */
-        this.root = null;
-        /**
          * @type {string}
          * @field
          */
         this.commandName = null;
-    };
-    /**
-     * @memberOf BulletML.Command.prototype
-     */
-    BulletML.Command.prototype.clone = function() {
-        return this;
     };
 
     /**
@@ -419,21 +467,6 @@ var BulletML = {};
         this.commands = [];
     };
     BulletML.Action.prototype = new BulletML.Command();
-    /**
-     * @memberOf BulletML.Action.prototype
-     */
-    BulletML.Action.prototype.clone = function(params) {
-        // console.log("Action#clone");
-        // console.log("params", params);
-        var result = new BulletML.Action();
-        result.label = this.label;
-        result.root = this.root;
-        for ( var i = 0, end = this.commands.length; i < end; i++) {
-            result.commands[result.commands.length] = this.commands[i]
-                    .clone(params);
-        }
-        return result;
-    };
 
     /**
      * @constructor
@@ -451,24 +484,16 @@ var BulletML = {};
          */
         this.label = null;
         /**
+         * @type {BulletML.Root}
+         * @field
+         */
+        this.root = null;
+        /**
          * @field
          */
         this.params = [];
     };
     BulletML.ActionRef.prototype = new BulletML.Command();
-    /**
-     * @memberOf BulletML.ActionRef.prototype
-     */
-    BulletML.ActionRef.prototype.clone = function(params) {
-        var result = new BulletML.ActionRef();
-        result.label = this.label;
-        result.root = this.root;
-        for ( var i = 0, end = this.params.length; i < end; i++) {
-            result.params[result.params.length] = evalNumberFixRand(
-                    this.params[i], params, this.root.rank);
-        }
-        return result;
-    };
 
     /**
      * @constructor
@@ -504,31 +529,6 @@ var BulletML = {};
         this.bullet = null;
     };
     BulletML.Fire.prototype = new BulletML.Command();
-    /**
-     * @memberOf BulletML.Fire.prototype
-     */
-    BulletML.Fire.prototype.clone = function(params) {
-        var result = new BulletML.Fire();
-        result.label = this.label;
-        result.root = this.root;
-        if (this.direction) {
-            result.direction = new BulletML.Direction(evalNumber(
-                    this.direction.value, params, this.root.rank));
-            result.direction.type = this.direction.type;
-        }
-        if (this.speed) {
-            result.speed = new BulletML.Speed(evalNumber(this.speed.value,
-                    params, this.root.rank));
-            result.speed.type = this.speed.type;
-        }
-
-        if (this.bullet) {
-            result.bullet = this.bullet.clone(params);
-        } else {
-            throw new Error("fire has no bullet (or bulletRef).");
-        }
-        return result;
-    }
 
     /**
      * @constructor
@@ -551,20 +551,6 @@ var BulletML = {};
         this.params = [];
     };
     BulletML.FireRef.prototype = new BulletML.Command();
-    /**
-     * @memberOf BulletML.FireRef.prototype
-     */
-    BulletML.FireRef.prototype.clone = function(params) {
-        var orig = this.root.findFire(this.label);
-        if (orig) {
-            var newParams = [];
-            for ( var i = 0, end = this.params.length; i < end; i++) {
-                newParams[newParams.length] = evalNumberFixRand(this.params[i],
-                        params, this.root.rank);
-            }
-            return orig.clone(newParams);
-        }
-    };
 
     /**
      * @constructor
@@ -586,20 +572,6 @@ var BulletML = {};
         this.term = 0;
     };
     BulletML.ChangeDirection.prototype = new BulletML.Command();
-    /**
-     * @memberOf BulletML.ChangeDirection
-     */
-    BulletML.ChangeDirection.prototype.clone = function(params) {
-        var result = new BulletML.ChangeDirection();
-        result.root = this.root;
-        if (this.direction) {
-            result.direction = new BulletML.Direction(evalNumber(
-                    this.direction.value, params, this.root.rank));
-            result.direction.type = this.direction.type;
-        }
-        result.term = evalNumber(this.term, params, this.root.rank);
-        return result;
-    };
 
     /**
      * @constructor
@@ -621,20 +593,6 @@ var BulletML = {};
         this.term = 0;
     };
     BulletML.ChangeSpeed.prototype = new BulletML.Command();
-    /**
-     * @memberOf BulletML.ChangeSpeed.prototype
-     */
-    BulletML.ChangeSpeed.prototype.clone = function(params) {
-        var result = new BulletML.ChangeSpeed();
-        result.root = this.root;
-        if (this.speed) {
-            result.speed = new BulletML.Speed(evalNumber(this.speed.value,
-                    params, this.root.rank));
-            result.speed.type = this.speed.type;
-        }
-        result.term = evalNumber(this.term, params, this.root.rank);
-        return result;
-    };
 
     /**
      * @constructor
@@ -660,25 +618,6 @@ var BulletML = {};
         this.term = 0;
     };
     BulletML.Accel.prototype = new BulletML.Command();
-    /**
-     * @memberOf BulletML.Accel.prototype
-     */
-    BulletML.Accel.prototype.clone = function(params) {
-        var result = new BulletML.Accel();
-        result.root = this.root;
-        if (this.horizontal) {
-            result.horizontal = new BulletML.Horizontal(evalNumber(
-                    this.horizontal.value, params, this.root.rank));
-            result.horizontal.type = this.horizontal.type;
-        }
-        if (this.vertical) {
-            result.vertical = new BulletML.Vertical(evalNumber(
-                    this.vertical.value, params, this.root.rank));
-            result.vertical.type = this.vertical.type;
-        }
-        result.term = evalNumber(this.term, params, this.root.rank);
-        return result;
-    };
 
     /**
      * @constructor
@@ -697,19 +636,10 @@ var BulletML = {};
              */
             this.value = value;
         } else {
-            this.value = "0";
+            this.value = 0;
         }
     };
     BulletML.Wait.prototype = new BulletML.Command();
-    /**
-     * @memberOf BulletML.Wait.prototype
-     */
-    BulletML.Wait.prototype.clone = function(params) {
-        var result = new BulletML.Wait(evalNumber(this.value, params,
-                this.root.rank));
-        result.root = this.root;
-        return result;
-    };
 
     /**
      * @constructor
@@ -738,58 +668,13 @@ var BulletML = {};
          * @type {string}
          * @field
          */
-        this.times = "0";
+        this.times = 0;
         /**
          * @field
          */
         this.action = null;
     };
     BulletML.Repeat.prototype = new BulletML.Command();
-    BulletML.Repeat.prototype.clone = function(params) {
-        // console.log("Repeat#clone");
-        // console.log("params", params);
-        var result = new BulletML.Repeat();
-        result.root = this.root;
-        result.times = evalNumber(this.times, params, this.root.rank);
-        result.action = this.action.clone(params);
-        return result;
-    };
-
-    /**
-     * @constructor
-     * @extends {BulletML.Command}
-     */
-    BulletML.LoopStart = function() {
-        /**
-         * @type {string}
-         * @field
-         */
-        this.commandName = "loopStart";
-    };
-    BulletML.LoopStart.prototype = new BulletML.Command();
-
-    /**
-     * @constructor
-     * @extends {BulletML.Command}
-     */
-    BulletML.LoopEnd = function(start, times) {
-        /**
-         * @type {string}
-         * @field
-         */
-        this.commandName = "loopEnd";
-        /**
-         * @field
-         */
-        this.start = start;
-        /**
-         * @type {string}
-         * @field
-         */
-        this.times = times;
-        this.loopCount = -1;
-    };
-    BulletML.LoopEnd.prototype = new BulletML.Command();
 
     // valueクラス -----------------------------------------------
 
@@ -809,7 +694,7 @@ var BulletML = {};
              */
             this.value = value;
         } else {
-            this.value = "0";
+            this.value = 0;
         }
     };
 
@@ -829,7 +714,7 @@ var BulletML = {};
              */
             this.value = value;
         } else {
-            this.value = "1";
+            this.value = 1;
         }
     };
 
@@ -849,7 +734,7 @@ var BulletML = {};
              */
             this.value = value;
         } else {
-            this.value = "0";
+            this.value = 0;
         }
     };
 
@@ -869,7 +754,7 @@ var BulletML = {};
              */
             this.value = value;
         } else {
-            this.value = "0";
+            this.value = 0;
         }
     };
 
@@ -1046,8 +931,8 @@ var BulletML = {};
             result.bullet = parseBulletRef(root, bulletRef);
         });
 
-        if (!result.bullet && !result.bulletRef) {
-            throw new Exception("fire has no bullet or bulletRef.");
+        if (!result.bullet) {
+            throw new Error("fire has no bullet or bulletRef.");
         }
 
         result.root = root;
@@ -1173,36 +1058,6 @@ var BulletML = {};
 
     // utility ---------------------------------------------------
 
-    function evalNumberFixRand(value, params, rank) {
-        if (typeof (value) == "number") {
-            return value;
-        }
-        value = value.replace(/\$rand/g, "(" + Math.random() + ")");
-        value = value.replace(/\$rank/g, "(" + rank + ")");
-        if (params) {
-            for ( var i = 0, end = params.length; i < end; i++) {
-                var pat = new RegExp("\\$" + (i + 1), "g");
-                value = value.replace(pat, "(" + params[i] + ")");
-            }
-        }
-        return value;
-    }
-
-    function evalNumber(value, params, rank) {
-        if (typeof (value) == "number") {
-            return value;
-        }
-        value = value.replace(/\$rand/g, "Math.random()");
-        value = value.replace(/\$rank/g, "(" + rank + ")");
-        if (params) {
-            for ( var i = 0, end = params.length; i < end; i++) {
-                var pat = new RegExp("\\$" + (i + 1), "g");
-                value = value.replace(pat, "(" + params[i] + ")");
-            }
-        }
-        return value;
-    }
-
     function search(array, label) {
         for ( var i = 0, end = array.length; i < end; i++) {
             if (array[i].label == label) {
@@ -1234,24 +1089,7 @@ var BulletML = {};
         }
     }
     function attr(element, attrName, callback, ifNotFound) {
-        // for IE
-        var attrs;
-        if (element.attributes.item(0)) {
-            attrs = {};
-            var i = 0;
-            while (element.attributes.item(i)) {
-                var item = element.attributes.item(i);
-                if (item.value != "" && item.value != "null") {
-                    attrs[item.name] = {
-                        value : item.value
-                    };
-                }
-                i++;
-            }
-        } else {
-            attrs = element.attributes;
-        }
-
+        var attrs = element.attributes;
         var attr = attrs[attrName];
         if (attr) {
             if (callback) {

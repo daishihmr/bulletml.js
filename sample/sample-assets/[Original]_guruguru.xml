@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml 
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="issyuu">
+ <repeat> <times>360/(20-$rank*10)+1</times>
+ <action>
+
+  <fire>
+   <direction type="sequence">18-$rank*6</direction>
+   <speed type="sequence">0</speed>
+   <bullet/>
+  </fire>
+
+ </action>
+ </repeat>
+</action>
+
+<fire label="guruguru">
+ <speed>0.3</speed>
+ <bullet>
+
+  <action>
+
+  <fire>
+   <speed>0.7</speed>
+   <bullet/>
+  </fire>
+
+  <actionRef label="issyuu"/>
+
+   <repeat> <times>30</times>
+   <action>
+
+    <wait>12</wait>
+
+    <fire>
+     <direction type="sequence">-356</direction>
+     <speed type="sequence">0</speed>
+     <bullet/>
+    </fire>
+
+    <actionRef label="issyuu"/>
+
+   </action>
+   </repeat>
+
+   <vanish/>
+
+  </action>
+ </bullet>
+</fire>
+
+<action label="top">
+ <fireRef label="guruguru"/>
+ <wait>500</wait>
+</action>
+
+</bulletml>

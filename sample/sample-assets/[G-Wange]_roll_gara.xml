@@ -1,0 +1,72 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml>
+	<action label="top1">
+		<repeat>
+			<times>
+				600/(3-$rank*2)
+			</times>
+			<action>
+				<actionRef label="line"/>
+				<wait>
+					3-$rank*2+$rand
+				</wait>
+			</action>
+		</repeat>
+	</action>
+	<action label="line">
+		<fire>
+			<direction type="sequence">
+				-7
+			</direction>
+			<speed>
+				0.6
+			</speed>
+			<bullet/>
+		</fire>
+		<repeat>
+			<times>
+				5+$rank*5
+			</times>
+			<action>
+				<fire>
+					<direction type="sequence">
+						0
+					</direction>
+					<speed type="sequence">
+						0.3
+					</speed>
+					<bullet/>
+				</fire>
+			</action>
+		</repeat>
+	</action>
+	<action label="top2">
+		<repeat>
+			<times>
+				20
+			</times>
+			<action>
+				<changeDirection>
+					<direction type="sequence">
+						-1+$rand*2
+					</direction>
+					<term>
+						30
+					</term>
+				</changeDirection>
+				<changeSpeed>
+					<speed type="absolute">
+						(-1+$rand*2)*($rank*2+1)
+					</speed>
+					<term>
+						30
+					</term>
+				</changeSpeed>
+				<wait>
+					30
+				</wait>
+			</action>
+		</repeat>
+	</action>
+</bulletml>

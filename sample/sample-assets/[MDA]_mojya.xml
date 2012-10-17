@@ -1,0 +1,64 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="vertical"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+ <repeat>
+  <times>15+25*$rank</times>
+  <action>
+   <fireRef label="first">
+    <param>15</param>
+   </fireRef>
+   <fireRef label="first">
+    <param>153</param>
+   </fireRef>
+   <wait>3</wait>
+  </action>
+ </repeat>
+ <wait>240</wait>
+</action>
+
+<fire label="first">
+ <direction type="sequence">$1</direction>
+ <speed>0.54</speed>
+ <bulletRef label="second"/>
+</fire>
+
+<bullet label="second">
+ <action>
+  <wait>60</wait>
+   <fireRef label="third">
+    <param>21+$rand*84</param>
+   </fireRef>
+   <fireRef label="third">
+    <param>-21-$rand*84</param>
+   </fireRef>
+   <fireRef label="third">
+    <param>7+$rand*28</param>
+   </fireRef>
+   <fireRef label="third">
+    <param>-7-$rand*28</param>
+   </fireRef>
+   <fireRef label="third">
+    <param>$rand*14</param>
+   </fireRef>
+   <fireRef label="third">
+    <param>$rand*(-14)</param>
+   </fireRef>
+   <fireRef label="third">
+    <param>0</param>
+   </fireRef>
+  <vanish/>
+ </action>
+</bullet>
+
+<fire label="third">
+ <direction type="aim">$1</direction>
+ <speed>0.4+$rand*1.4</speed>
+ <bullet/>
+</fire>
+
+
+</bulletml>

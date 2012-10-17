@@ -1,0 +1,300 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="vertical"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+ <repeat> <times>280 / ((50 - 43 * $rank) * 4)</times><action>
+
+ <fire>
+  <bulletRef label="vaim">
+   <param>0</param>
+   <param>0.7 + 0.9 * $rank</param>
+  </bulletRef>
+ </fire>
+ <fire>
+  <bulletRef label="vaim">
+   <param>18</param>
+   <param>0.7 + 0.9 * $rank</param>
+  </bulletRef>
+ </fire>
+ <fire>
+  <bulletRef label="vaim">
+   <param>-18</param>
+   <param>0.7 + 0.9 * $rank</param>
+  </bulletRef>
+ </fire>
+
+ <wait>(50 - 43 * $rank)</wait>
+
+ <fire>
+  <bulletRef label="vabsolute">
+   <param>0</param>
+   <param>0.7 + 0.9 * $rank</param>
+  </bulletRef>
+ </fire>
+ <fire>
+  <bulletRef label="vabsolute">
+   <param>60</param>
+   <param>0.7 + 0.9 * $rank</param>
+  </bulletRef>
+ </fire>
+ <fire>
+  <bulletRef label="vabsolute">
+   <param>120</param>
+   <param>0.7 + 0.9 * $rank</param>
+  </bulletRef>
+ </fire>
+ <fire>
+  <bulletRef label="vabsolute">
+   <param>180</param>
+   <param>0.7 + 0.9 * $rank</param>
+  </bulletRef>
+ </fire>
+ <fire>
+  <bulletRef label="vabsolute">
+   <param>240</param>
+   <param>0.7 + 0.9 * $rank</param>
+  </bulletRef>
+ </fire>
+ <fire>
+  <bulletRef label="vabsolute">
+   <param>300</param>
+   <param>0.7 + 0.9 * $rank</param>
+  </bulletRef>
+ </fire>
+
+ <wait>(50 - 43 * $rank)</wait>
+
+ <fire>
+  <bulletRef label="vaimrev">
+   <param>0</param>
+   <param>0.7 + 0.9 * $rank</param>
+  </bulletRef>
+ </fire>
+ <fire>
+  <bulletRef label="vaimrev">
+   <param>18</param>
+   <param>0.7 + 0.9 * $rank</param>
+  </bulletRef>
+ </fire>
+ <fire>
+  <bulletRef label="vaimrev">
+   <param>-18</param>
+   <param>0.7 + 0.9 * $rank</param>
+  </bulletRef>
+ </fire>
+
+ <wait>(50 - 43 * $rank)</wait>
+
+ <fire>
+  <bulletRef label="vabsolute">
+   <param>30</param>
+   <param>0.7 + 0.9 * $rank</param>
+  </bulletRef>
+ </fire>
+ <fire>
+  <bulletRef label="vabsolute">
+   <param>90</param>
+   <param>0.7 + 0.9 * $rank</param>
+  </bulletRef>
+ </fire>
+ <fire>
+  <bulletRef label="vabsolute">
+   <param>150</param>
+   <param>0.7 + 0.9 * $rank</param>
+  </bulletRef>
+ </fire>
+ <fire>
+  <bulletRef label="vabsolute">
+   <param>210</param>
+   <param>0.7 + 0.9 * $rank</param>
+  </bulletRef>
+ </fire>
+ <fire>
+  <bulletRef label="vabsolute">
+   <param>270</param>
+   <param>0.7 + 0.9 * $rank</param>
+  </bulletRef>
+ </fire>
+ <fire>
+  <bulletRef label="vabsolute">
+   <param>330</param>
+   <param>0.7 + 0.9 * $rank</param>
+  </bulletRef>
+ </fire>
+
+ <wait>(50 - 43 * $rank)</wait>
+
+ </action></repeat>
+
+ <wait>60</wait>
+
+</action>
+
+<bullet label="vaim">
+<direction type="absolute">0</direction>
+<speed>0</speed>
+<action>
+
+ <fire>
+  <direction type="aim">$1</direction>
+  <speed>$2</speed>
+  <bullet/>
+ </fire>
+ <wait>7 - 4 * $rank</wait>
+
+ <fire>
+  <direction type="sequence">3</direction>
+  <speed>$2</speed>
+  <bullet/>
+ </fire>
+ <fire>
+  <direction type="sequence">-6</direction>
+  <speed>$2</speed>
+  <bullet/>
+ </fire>
+ <wait>7 - 4 * $rank</wait>
+
+ <fire>
+  <direction type="sequence">9</direction>
+  <speed>$2</speed>
+  <bullet/>
+ </fire>
+ <fire>
+  <direction type="sequence">-12</direction>
+  <speed>$2</speed>
+  <bullet/>
+ </fire>
+ <wait>7 - 4 * $rank</wait>
+
+ <fire>
+  <direction type="sequence">15</direction>
+  <speed>$2</speed>
+  <bullet/>
+ </fire>
+ <fire>
+  <direction type="sequence">-18</direction>
+  <speed>$2</speed>
+  <bullet/>
+ </fire>
+ <wait>7 - 4 * $rank</wait>
+
+ <vanish/>
+
+</action></bullet>
+
+<bullet label="vaimrev">
+<direction type="absolute">0</direction>
+<speed>0</speed>
+<action>
+
+ <fire>
+  <direction type="aim">$1</direction>
+  <speed>$2</speed>
+  <bulletRef label="red"/>
+ </fire>
+ <wait>7 - 4 * $rank</wait>
+
+ <fire>
+  <direction type="sequence">3</direction>
+  <speed>$2 * 1.1</speed>
+  <bulletRef label="red"/>
+ </fire>
+ <fire>
+  <direction type="sequence">-6</direction>
+  <speed>$2 * 1.1</speed>
+  <bulletRef label="red"/>
+ </fire>
+ <wait>7 - 4 * $rank</wait>
+
+ <fire>
+  <direction type="sequence">9</direction>
+  <speed>$2 * 1.21</speed>
+  <bulletRef label="red"/>
+ </fire>
+ <fire>
+  <direction type="sequence">-12</direction>
+  <speed>$2 * 1.21</speed>
+  <bulletRef label="red"/>
+ </fire>
+ <wait>7 - 4 * $rank</wait>
+
+ <fire>
+  <direction type="sequence">15</direction>
+  <speed>$2 * 1.331</speed>
+  <bulletRef label="red"/>
+ </fire>
+ <fire>
+  <direction type="sequence">-18</direction>
+  <speed>$2 * 1.331</speed>
+  <bulletRef label="red"/>
+ </fire>
+ <wait>7 - 4 * $rank</wait>
+
+ <vanish/>
+
+</action></bullet>
+
+<bullet label="vabsolute">
+<direction type="absolute">0</direction>
+<speed>0</speed>
+<action>
+
+ <fire>
+  <direction type="absolute">$1</direction>
+  <speed>$2</speed>
+  <bullet/>
+ </fire>
+ <wait>7 - 4 * $rank</wait>
+
+ <fire>
+  <direction type="sequence">3</direction>
+  <speed>$2</speed>
+  <bullet/>
+ </fire>
+ <fire>
+  <direction type="sequence">-6</direction>
+  <speed>$2</speed>
+  <bullet/>
+ </fire>
+ <wait>7 - 4 * $rank</wait>
+
+ <fire>
+  <direction type="sequence">9</direction>
+  <speed>$2</speed>
+  <bullet/>
+ </fire>
+ <fire>
+  <direction type="sequence">-12</direction>
+  <speed>$2</speed>
+  <bullet/>
+ </fire>
+ <wait>7 - 4 * $rank</wait>
+
+ <fire>
+  <direction type="sequence">15</direction>
+  <speed>$2</speed>
+  <bullet/>
+ </fire>
+ <fire>
+  <direction type="sequence">-18</direction>
+  <speed>$2</speed>
+  <bullet/>
+ </fire>
+ <wait>7 - 4 * $rank</wait>
+
+ <vanish/>
+
+</action></bullet>
+
+<bullet label="red">
+<action>
+
+ <wait>1000</wait>
+ <vanish/>
+
+</action></bullet>
+
+</bulletml>

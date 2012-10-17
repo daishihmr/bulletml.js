@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml 
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="oogiSeq">
+ <repeat> <times>20</times>
+ <action>
+
+ <fire>
+  <direction type="sequence">8</direction>
+  <speed type="sequence">0</speed>
+  <bullet/>
+ </fire>
+
+ </action>
+ </repeat>
+</action>
+
+<action label="oogi">
+ <fire>
+  <direction>-80</direction>
+  <speed>$2</speed>
+  <bullet/>
+ </fire>
+
+ <actionRef label="oogiSeq"/>
+
+ <repeat> <times>10+$rank*10</times>
+ <action>
+
+  <wait>2</wait>
+
+  <fire>
+   <direction type="sequence">-$1</direction>
+   <speed type="sequence">-0.04</speed>
+   <bullet/>
+  </fire>
+
+  <actionRef label="oogiSeq"/>
+
+ </action>
+ </repeat>
+
+</action>
+
+<action label="top">
+ <actionRef label="oogi">
+  <param>161</param>
+  <param>0.8+$rank*0.4</param>
+ </actionRef>
+ <wait>30</wait>
+ <actionRef label="oogi">
+  <param>159</param>
+  <param>1+$rank*0.6</param>
+ </actionRef>
+ <wait>150</wait>
+</action>
+
+</bulletml>

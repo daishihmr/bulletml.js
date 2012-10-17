@@ -1,0 +1,208 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml type="vertical" xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+	<bullet  label="Red">
+		<action/>
+	</bullet>
+	<bullet  label="Dummy">
+		<action>
+			<vanish/>
+		</action>
+	</bullet>
+	<action  label="Stop">
+		<changeSpeed>
+			<speed>
+				 0
+			</speed>
+			<term>
+				 1
+			</term>
+		</changeSpeed>
+	</action>
+	<action  label="XWay">
+		<actionRef  label="XWayFan">
+			<param>
+				 $1
+			</param>
+			<param>
+				 $2
+			</param>
+			<param>
+				 0
+			</param>
+		</actionRef>
+	</action>
+	<action  label="XWayFan">
+		<repeat>
+			<times>
+				 $1-1
+			</times>
+			<action>
+				<fire>
+					<direction  type="sequence">
+						$2
+					</direction>
+					<speed  type="sequence">
+						$3
+					</speed>
+					<bullet/>
+				</fire>
+			</action>
+		</repeat>
+	</action>
+	<action  label="fan">
+		<wait>
+			 2
+		</wait>
+		<changeSpeed>
+			<speed>
+				 100000
+			</speed>
+			<term>
+				 1
+			</term>
+		</changeSpeed>
+		<wait>
+			 1-$1
+		</wait>
+		<actionRef  label="Stop"/>
+		<fire>
+			<direction  type="absolute">
+				180-$3-$1*$5
+			</direction>
+			<speed>
+				 $2
+			</speed>
+			<bullet/>
+		</fire>
+		<actionRef  label="XWay">
+			<param>
+				 $1
+			</param>
+			<param>
+				 $4
+			</param>
+		</actionRef>
+		<actionRef  label="fan">
+			<param>
+				 $1-1
+			</param>
+			<param>
+				 $2+0.1
+			</param>
+			<param>
+				 $3
+			</param>
+			<param>
+				 $4
+			</param>
+			<param>
+				 $5
+			</param>
+		</actionRef>
+	</action>
+	<action  label="top">
+		<actionRef  label="fanMain">
+			<param>
+				 11+$rank*6
+			</param>
+			<param>
+				 1
+			</param>
+			<param>
+				 30
+			</param>
+			<param>
+				 12-$rank*4
+			</param>
+			<param>
+				 2.5-$rank
+			</param>
+		</actionRef>
+		<actionRef  label="fanMain">
+			<param>
+				 11+$rank*6
+			</param>
+			<param>
+				 1
+			</param>
+			<param>
+				 -20
+			</param>
+			<param>
+				 -12+$rank*4
+			</param>
+			<param>
+				 -2.5+$rank
+			</param>
+		</actionRef>
+		<actionRef  label="fanMain">
+			<param>
+				 13+$rank*8
+			</param>
+			<param>
+				 1
+			</param>
+			<param>
+				 30
+			</param>
+			<param>
+				 12-$rank*4
+			</param>
+			<param>
+				 2.3-$rank
+			</param>
+		</actionRef>
+		<actionRef  label="fanMain">
+			<param>
+				 13+$rank*8
+			</param>
+			<param>
+				 1
+			</param>
+			<param>
+				 -20
+			</param>
+			<param>
+				 -12+$rank*4
+			</param>
+			<param>
+				 -2.3+$rank
+			</param>
+		</actionRef>
+	</action>
+	<action  label="fanMain">
+		<fire>
+			<direction  type="aim">
+				180
+			</direction>
+			<speed>
+				 0
+			</speed>
+			<bullet>
+				<action>
+					<actionRef  label="fan">
+						<param>
+							 $1
+						</param>
+						<param>
+							 $2
+						</param>
+						<param>
+							 $3
+						</param>
+						<param>
+							 $4
+						</param>
+						<param>
+							 $5
+						</param>
+					</actionRef>
+				</action>
+			</bullet>
+		</fire>
+		<wait>
+			 90
+		</wait>
+	</action>
+</bulletml>

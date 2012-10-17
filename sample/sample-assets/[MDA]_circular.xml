@@ -1,0 +1,76 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="vertical"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+ <repeat>
+  <times>$rank*10</times>
+  <action>
+   <fireRef label="seed">
+    <param>90</param>
+    <param>2</param>
+    <param>355</param>
+   </fireRef>
+   <fireRef label="seed">
+    <param>270</param>
+    <param>358</param>
+    <param>5</param>
+   </fireRef>
+   <fireRef label="aimbl"/>
+   <wait>20</wait>
+  </action>
+ </repeat>
+ <repeat>
+  <times>9</times>
+  <action>
+   <fireRef label="aimbl"/>
+   <wait>20</wait>
+  </action>
+ </repeat>
+</action>
+
+<fire label="seed">
+ <direction type="absolute">$1</direction>
+ <speed>2.8</speed>
+ <bulletRef label="roll">
+  <param>$2</param>
+  <param>$3</param>
+ </bulletRef>
+</fire>
+
+<bullet label="roll">
+ <action>
+  <changeDirection>
+   <direction type="sequence">$1</direction>
+   <term>9999</term>
+  </changeDirection>
+  <actionRef label="shoot"><param>$2</param></actionRef>
+  <vanish/>
+ </action>
+</bullet>
+
+<action label="shoot">
+<repeat>
+ <times>22</times>
+ <action>
+  <fire>
+   <direction type="sequence">$1</direction>
+   <speed>1.4</speed>
+   <bullet/>
+  </fire>
+  <wait>4+$rand*8</wait>
+ </action>
+ </repeat>
+</action>
+
+<fire label="aimbl">
+ <direction type="aim">0</direction>
+ <speed>2.8</speed>
+ <bullet/>
+</fire>
+
+
+
+</bulletml>
