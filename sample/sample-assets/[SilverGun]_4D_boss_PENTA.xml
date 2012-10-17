@@ -1,0 +1,78 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="vertical"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+ <fire>
+  <direction type="absolute">100</direction>
+  <speed>4</speed>
+  <bulletRef label="arm"/>
+ </fire>
+ <fire>
+  <direction type="absolute">-100</direction>
+  <speed>4</speed>
+  <bulletRef label="arm"/>
+ </fire>
+
+ <repeat> <times>400</times> <action>
+  <fire>
+   <direction type="sequence">7</direction>
+   <speed>1.5</speed>
+   <bullet/>
+  </fire>
+  <wait>1</wait>
+ </action> </repeat>
+
+ <wait>60</wait>
+</action>
+
+<bullet label="arm">
+
+<action>
+ <wait>12</wait>
+ <changeSpeed>
+  <speed>0</speed>
+  <term>1</term>
+ </changeSpeed>
+
+ <repeat> <times>7</times> <action>
+  <wait>60</wait>
+  <fire>
+   <direction type="aim">-15</direction>
+   <speed>1.8</speed>
+   <bulletRef label="homing"/>
+  </fire>
+  <fire>
+   <direction type="sequence">30</direction>
+   <speed>1.8</speed>
+   <bulletRef label="homing"/>
+  </fire>
+  <wait>2</wait>
+ </action> </repeat>
+
+ <vanish/>
+
+
+</action> </bullet>
+
+<bullet label="homing">
+ <action>
+
+ <wait>60</wait>
+
+ <changeDirection>
+  <direction type="aim">0</direction>
+  <term>15-$rank*10</term>
+ </changeDirection>
+ <wait>15-$rank*10</wait>
+ <changeDirection>
+  <direction type="aim">0</direction>
+  <term>15-$rank*10</term>
+ </changeDirection>
+
+ </action>
+</bullet>
+
+</bulletml>

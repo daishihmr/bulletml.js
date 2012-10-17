@@ -1,11 +1,11 @@
 <?xml version="1.0" ?>
-<!DOCTYPE bulletml SYSTEM "http://www.asahi-net.or.jp/~cs8k-cyu/bulletml/bulletml.dtd">
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
 
 <bulletml type="vertical"
           xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
 
 <action label="top">
-<repeat> <times>6+$rank*8</times>
+<repeat> <times>10+$rank*50</times>
 <action>
 <fire>
  <direction>$rand*360</direction>
@@ -14,7 +14,7 @@
   <param>5+$rand*10</param>
  </bulletRef>
 </fire>
-<wait>20</wait>
+<wait>20-$rank*10</wait>
 </action>
 </repeat>
 </action>
@@ -38,7 +38,7 @@
  </fire>
 </action>
 </repeat>
-<wait>1</wait>
+<wait>6</wait>
 <repeat> <times>2</times>
 <action>
  <fire>
@@ -55,7 +55,7 @@
   </fire>
  </action>
  </repeat>
- <wait>1</wait>
+ <wait>6</wait>
  <fire>
   <direction type="sequence">0</direction>
   <speed type="sequence">-0.1</speed>
@@ -70,14 +70,15 @@
   </fire>
  </action>
  </repeat>
- <wait>1</wait>
+ <wait>6</wait>
 </action>
 </repeat>
+<vanish/>
 </action>
 </bullet>
 
 <bullet label="3way">
-<speed>1.8</speed>
+<speed>3</speed>
 </bullet>
 
 </bulletml>

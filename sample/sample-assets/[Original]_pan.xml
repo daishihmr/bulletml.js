@@ -1,0 +1,92 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml>
+	<bullet label="pan">
+		<action>
+			<wait>
+				10
+			</wait>
+			<fire>
+				<direction type="relative">
+					95*$1
+				</direction>
+				<speed>
+					1.8+$rank
+				</speed>
+				<bullet/>
+			</fire>
+			<vanish/>
+		</action>
+	</bullet>
+	<action label="top">
+		<fire>
+			<direction type="aim">
+				-90
+			</direction>
+			<speed>
+				0.001
+			</speed>
+			<bulletRef label="pan">
+				<param>
+					1
+				</param>
+			</bulletRef>
+		</fire>
+		<repeat>
+			<times>
+				20
+			</times>
+			<action>
+				<fire>
+					<direction type="sequence">
+						3
+					</direction>
+					<speed type="sequence">
+						0.2+$rank*0.4
+					</speed>
+					<bulletRef label="pan">
+						<param>
+							1
+						</param>
+					</bulletRef>
+				</fire>
+			</action>
+		</repeat>
+		<fire>
+			<direction type="aim">
+				90
+			</direction>
+			<speed>
+				0.001
+			</speed>
+			<bulletRef label="pan">
+				<param>
+					-1
+				</param>
+			</bulletRef>
+		</fire>
+		<repeat>
+			<times>
+				20
+			</times>
+			<action>
+				<fire>
+					<direction type="sequence">
+						-3
+					</direction>
+					<speed type="sequence">
+						0.2+$rank*0.4
+					</speed>
+					<bulletRef label="pan">
+						<param>
+							-1
+						</param>
+					</bulletRef>
+				</fire>
+			</action>
+		</repeat>
+		<wait>
+			40
+		</wait>
+	</action>
+</bulletml>

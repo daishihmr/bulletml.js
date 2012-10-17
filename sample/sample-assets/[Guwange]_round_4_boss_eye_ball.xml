@@ -1,11 +1,11 @@
 <?xml version="1.0" ?>
-<!DOCTYPE bulletml SYSTEM "http://www.asahi-net.or.jp/~cs8k-cyu/bulletml/bulletml.dtd">
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
 
 <bulletml type="vertical"
           xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
 
 <action label="top">
-<repeat> <times>4+$rank*4</times>
+<repeat> <times>10+$rank*10</times>
 <action>
  <fire>
   <direction>$rand*360</direction>
@@ -14,6 +14,7 @@
  <wait>30</wait>
 </action>
 </repeat>
+<wait>120</wait>
 </action>
 
 <bullet label="eye">
@@ -40,7 +41,7 @@
 </bullet>
 
 <bullet label="shadow">
-<speed>0</speed>
+<speed>0.1</speed>
 <action>
 <wait>20</wait>
 <fire>

@@ -1,0 +1,58 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml 
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="5way">
+ <repeat> <times>4</times>
+ <action>
+  <fire>
+   <direction type="sequence">20</direction>
+   <bullet/>
+  </fire>
+ </action>
+ </repeat>
+</action>
+
+<action label="hira">
+ <fire>
+  <direction type="aim">-40+$1*60</direction>
+  <bullet/>
+ </fire>
+
+ <actionRef label="5way"/>
+
+ <repeat> <times>60</times>
+ <action>
+
+
+   <wait>8-$rank*2</wait>
+
+   <fire>
+    <direction type="sequence">-80-$1*2+$rand-0.5</direction>
+    <bullet/>
+   </fire>
+
+   <actionRef label="5way"/>
+
+ </action>
+ </repeat>
+
+</action>
+
+<action label="top1">
+ <actionRef label="hira">
+  <param>-1</param>
+ </actionRef>
+ <wait>60</wait>
+</action>
+
+<action label="top2">
+ <actionRef label="hira">
+  <param>1</param>
+ </actionRef>
+ <wait>60</wait>
+</action>
+
+</bulletml>

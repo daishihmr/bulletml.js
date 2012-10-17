@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!DOCTYPE bulletml SYSTEM "http://www.asahi-net.or.jp/~cs8k-cyu/bulletml/bulletml.dtd">
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
 
 <bulletml type="vertical"
           xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
@@ -51,7 +51,7 @@
  <bulletRef label="winderBullet"/>
 </fire>
 <actionRef label="winderSequence">
- <param>31</param>
+ <param>30.9+0.1*$rank</param>
 </actionRef>
 </action>
 
@@ -62,7 +62,7 @@
  <bulletRef label="winderBullet"/>
 </fire>
 <actionRef label="winderSequence">
- <param>29</param>
+ <param>29.1-0.1*$rank</param>
 </actionRef>
 </action>
 

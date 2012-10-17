@@ -1,0 +1,133 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="vertical"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+
+ <fire>
+  <direction type="absolute">0</direction>
+  <speed>0</speed>
+  <bulletRef label="dummy">
+   <param>90</param>
+  </bulletRef>
+ </fire>
+
+ <fire>
+  <direction type="absolute">0</direction>
+  <speed>0</speed>
+  <bulletRef label="dummy">
+   <param>270</param>
+  </bulletRef>
+ </fire>
+
+ <wait>100 - $rank * 90</wait>
+
+ <fire>
+  <direction type="absolute">0</direction>
+  <speed>0</speed>
+  <bulletRef label="allway">
+   <param>0</param>
+   <param>1.5</param>
+  </bulletRef>
+ </fire>
+
+ <wait>5</wait>
+
+ <fire>
+  <direction type="absolute">0</direction>
+  <speed>0</speed>
+  <bulletRef label="allway">
+   <param>2.5</param>
+   <param>1.8</param>
+  </bulletRef>
+ </fire>
+
+ <wait>20</wait>
+</action>
+
+<bullet label="dummy"><action>
+
+ <fire>
+  <direction type="absolute">$1</direction>
+  <speed>0</speed>
+  <bulletRef label="bit"/>
+ </fire>
+
+ <fire>
+  <direction type="absolute">$1</direction>
+  <speed>0.5</speed>
+  <bulletRef label="bit"/>
+ </fire>
+
+ <fire>
+  <direction type="absolute">$1</direction>
+  <speed>1.0</speed>
+  <bulletRef label="bit"/>
+ </fire>
+
+ <fire>
+  <direction type="absolute">$1</direction>
+  <speed>1.5</speed>
+  <bulletRef label="bit"/>
+ </fire>
+
+ <vanish/>
+
+</action></bullet>
+
+<bullet label="allway"><action>
+ <fire>
+  <direction type="absolute">$1</direction>
+  <speed>$2</speed>
+  <bullet/>
+ </fire>
+
+ <repeat> <times>71</times> <action>
+  <fire>
+   <direction type="sequence">5</direction>
+   <speed>$2</speed>
+   <bullet/>
+  </fire>
+ </action> </repeat>
+
+ <vanish/>
+
+</action></bullet>
+
+<bullet label="bit"><action>
+
+ <wait>20</wait>
+
+ <changeSpeed>
+  <speed>0</speed>
+  <term>1</term>
+ </changeSpeed>
+
+ <wait>105 - $rank * 90</wait>
+
+ <repeat> <times>20</times> <action>
+  <fire>
+   <direction type="absolute">180</direction>
+   <speed>3</speed>
+   <bullet/>
+  </fire>
+  <fire>
+   <direction type="absolute">180</direction>
+   <speed>3.5</speed>
+   <bullet/>
+  </fire>
+  <fire>
+   <direction type="absolute">180</direction>
+   <speed>4</speed>
+   <bullet/>
+  </fire>
+  <wait>1</wait>
+ </action> </repeat>
+
+ <vanish/>
+
+</action></bullet>
+
+</bulletml>

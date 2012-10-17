@@ -1,0 +1,216 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="vertical"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+
+  <fire>
+    <bulletRef label="bit">
+      <param>2</param>
+      <param>1.0</param>
+    </bulletRef>
+  </fire>
+  <fire>
+    <bulletRef label="bit">
+      <param>-2</param>
+      <param>1.0</param>
+    </bulletRef>
+  </fire>
+
+  <wait>10</wait>
+
+  <fire>
+    <bulletRef label="bit">
+      <param>2.5</param>
+      <param>1.05</param>
+    </bulletRef>
+  </fire>
+  <fire>
+    <bulletRef label="bit">
+      <param>-2.5</param>
+      <param>1.05</param>
+    </bulletRef>
+  </fire>
+
+  <wait>10</wait>
+
+  <fire>
+    <bulletRef label="bit">
+      <param>3</param>
+      <param>1.1</param>
+    </bulletRef>
+  </fire>
+  <fire>
+    <bulletRef label="bit">
+      <param>-3</param>
+      <param>1.1</param>
+    </bulletRef>
+  </fire>
+
+  <wait>10</wait>
+
+  <fire>
+    <bulletRef label="bit">
+      <param>3.5</param>
+      <param>1.15</param>
+    </bulletRef>
+  </fire>
+  <fire>
+    <bulletRef label="bit">
+      <param>-3.5</param>
+      <param>1.15</param>
+    </bulletRef>
+  </fire>
+
+  <wait>160</wait>
+
+  <repeat><times>5</times><action>
+    <fire>
+      <direction type="absolute">30</direction>
+      <speed>1.55</speed>
+      <bulletRef label="kujira">
+        <param>179</param>
+      </bulletRef>
+    </fire>
+    <fire>
+      <direction type="absolute">40</direction>
+      <speed>1.4</speed>
+      <bulletRef label="kujira">
+        <param>170</param>
+      </bulletRef>
+    </fire>
+    <fire>
+      <direction type="absolute">50</direction>
+      <speed>1.25</speed>
+      <bulletRef label="kujira">
+        <param>160</param>
+      </bulletRef>
+    </fire>
+    <fire>
+      <direction type="absolute">60</direction>
+      <speed>1.1</speed>
+      <bulletRef label="kujira">
+        <param>150</param>
+      </bulletRef>
+    </fire>
+    <fire>
+      <direction type="absolute">70</direction>
+      <speed>0.95</speed>
+      <bulletRef label="kujira">
+        <param>140</param>
+      </bulletRef>
+    </fire>
+    <fire>
+      <direction type="absolute">80</direction>
+      <speed>0.8</speed>
+      <bulletRef label="kujira">
+        <param>130</param>
+      </bulletRef>
+    </fire>
+
+    <fire>
+      <direction type="absolute">-30</direction>
+      <speed>1.55</speed>
+      <bulletRef label="kujira">
+        <param>-179</param>
+      </bulletRef>
+    </fire>
+    <fire>
+      <direction type="absolute">-40</direction>
+      <speed>1.4</speed>
+      <bulletRef label="kujira">
+        <param>-170</param>
+      </bulletRef>
+    </fire>
+    <fire>
+      <direction type="absolute">-50</direction>
+      <speed>1.25</speed>
+      <bulletRef label="kujira">
+        <param>-160</param>
+      </bulletRef>
+    </fire>
+    <fire>
+      <direction type="absolute">-60</direction>
+      <speed>1.1</speed>
+      <bulletRef label="kujira">
+        <param>-150</param>
+      </bulletRef>
+    </fire>
+    <fire>
+      <direction type="absolute">-70</direction>
+      <speed>0.95</speed>
+      <bulletRef label="kujira">
+        <param>-140</param>
+      </bulletRef>
+    </fire>
+    <fire>
+      <direction type="absolute">-80</direction>
+      <speed>0.8</speed>
+      <bulletRef label="kujira">
+        <param>-130</param>
+      </bulletRef>
+    </fire>
+    <wait>2</wait>
+  </action></repeat>
+
+  <wait>250 - 100 * $rank</wait>
+
+</action>
+
+<bullet label="kujira">
+<action>
+
+  <wait>5</wait>
+
+  <changeDirection>
+    <direction type="relative">$1</direction>
+    <term>60</term>
+  </changeDirection>
+
+  <wait>60 + 5</wait>
+
+  <changeSpeed>
+    <speed>3.5 * (0.75 + 0.25 * $rank)</speed>
+    <term>30</term>
+  </changeSpeed>
+
+  <repeat><times>10 / (2.0 - 1.0 * $rank)</times><action>
+    <changeDirection>
+      <direction type="aim">0</direction>
+      <term>8 * (2.0 - 1.0 * $rank)</term>
+    </changeDirection>
+    <wait>8 * (2.0 - 1.0 * $rank)</wait>
+  </action></repeat>
+
+</action>
+</bullet>
+
+<bullet label="bit">
+<direction type="absolute">0</direction>
+<speed>0.0</speed>
+<action>
+
+  <fire>
+    <direction type="absolute">0</direction>
+    <speed>$2 * (0.5 + 0.5 * $rank)</speed>
+    <bullet/>
+  </fire>
+  <wait>2 * (3.5 - 2.5 * $rank)</wait>
+
+  <repeat><times>100 / (3.5 - 2.5 * $rank)</times><action>
+    <fire>
+      <direction type="sequence">$1 * (3.5 - 2.5 * $rank)</direction>
+      <speed>$2 * (0.5 + 0.5 * $rank)</speed>
+      <bullet/>
+    </fire>
+    <wait>2 * (3.5 - 2.5 * $rank)</wait>
+  </action></repeat>
+
+  <vanish/>
+
+</action>
+</bullet>
+
+</bulletml>

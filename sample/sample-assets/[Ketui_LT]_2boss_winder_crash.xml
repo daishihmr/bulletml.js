@@ -1,0 +1,152 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml>
+	<action  label="pre">
+		<fire>
+			<direction  type="aim">
+				-20
+			</direction>
+			<speed>
+				2
+			</speed>
+			<bullet/>
+		</fire>
+		<repeat>
+			<times>
+				 20
+			</times>
+			<action>
+				<fire>
+					<direction  type="sequence">
+						40
+					</direction>
+					<speed>
+						4
+					</speed>
+					<bullet/>
+				</fire>
+				<fire>
+					<direction  type="sequence">
+						-40
+					</direction>
+					<speed>
+						4
+					</speed>
+					<bullet/>
+				</fire>
+				<wait>
+					 2
+				</wait>
+			</action>
+		</repeat>
+	</action>
+	<bullet  label="missile">
+		<action>
+			<repeat>
+				<times>
+					 9999
+				</times>
+				<action>
+					<wait>
+						 5-$rank*2+$rand
+					</wait>
+					<fire>
+						<direction  type="aim">
+							0
+						</direction>
+						<speed>
+							0.0000001
+						</speed>
+						<bullet>
+							<action>
+								<wait>
+									 60
+								</wait>
+								<changeSpeed>
+									<speed>
+										 3
+									</speed>
+									<term>
+										 30
+									</term>
+								</changeSpeed>
+							</action>
+						</bullet>
+					</fire>
+				</action>
+			</repeat>
+		</action>
+	</bullet>
+	<action  label="missiles">
+		<fire>
+			<direction  type="sequence">
+				-($1-1)*1.5
+			</direction>
+			<speed>
+				4
+			</speed>
+			<bulletRef  label="missile"/>
+		</fire>
+		<repeat>
+			<times>
+				 $1-1
+			</times>
+			<action>
+				<fire>
+					<direction  type="sequence">
+						3
+					</direction>
+					<speed>
+						4
+					</speed>
+					<bulletRef  label="missile"/>
+				</fire>
+			</action>
+		</repeat>
+		<fire>
+			<direction  type="sequence">
+				40-($1-1)*3
+			</direction>
+			<speed>
+				4
+			</speed>
+			<bulletRef  label="missile"/>
+		</fire>
+		<repeat>
+			<times>
+				 $1-1
+			</times>
+			<action>
+				<fire>
+					<direction  type="sequence">
+						3
+					</direction>
+					<speed>
+						4
+					</speed>
+					<bulletRef  label="missile"/>
+				</fire>
+			</action>
+		</repeat>
+	</action>
+	<action  label="top">
+		<actionRef  label="pre"/>
+		<actionRef  label="missiles">
+			<param>
+				 3+$rank*4
+			</param>
+		</actionRef>
+		<wait>
+			 160
+		</wait>
+		<actionRef  label="pre"/>
+		<actionRef  label="missiles">
+			<param>
+				 4+$rank*6
+			</param>
+		</actionRef>
+		<wait>
+			 160
+		</wait>
+	</action>
+</bulletml>

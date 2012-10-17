@@ -1,0 +1,90 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml type="vertical" xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top1">
+ <wait>10</wait>
+ <actionRef label="cyclone"><param>0.1+$rand</param><param> 1</param></actionRef>
+</action>
+
+<action label="top2">
+ <actionRef label="cyclone"><param>0.1+$rand</param><param>-1</param></actionRef>
+ <wait>10</wait>
+</action>
+
+<action label="cyclone">
+ <fire>
+  <direction type="absolute">($rand*360)*$2</direction>
+  <bulletRef label="speed"/>
+ </fire>
+ <repeat><times>11</times>
+  <action>
+   <fire>
+    <direction type="sequence">(30)*$2</direction>
+    <bulletRef label="speed"/>
+   </fire>
+  </action>
+ </repeat>
+ <wait>1</wait>
+ <repeat><times>9</times>
+  <action>
+   <fire>
+    <direction type="sequence">(30+$1)*$2</direction>
+    <bulletRef label="speed"/>
+   </fire>
+   <repeat><times>11</times>
+    <action>
+     <fire>
+      <direction type="sequence">(30)*$2</direction>
+      <bulletRef label="speed"/>
+     </fire>
+    </action>
+   </repeat>
+   <wait>1</wait>
+  </action>
+ </repeat>
+ <wait>10</wait>
+ <repeat><times>39</times>
+  <action>
+
+     <fire>
+      <direction type="sequence">(30+$1*10)*$2</direction>
+      <bulletRef label="speed"/>
+     </fire>
+     <repeat><times>11</times>
+      <action>
+       <fire>
+        <direction type="sequence">(30)*$2</direction>
+        <bulletRef label="speed"/>
+       </fire>
+      </action>
+     </repeat>
+     <wait>1</wait>
+
+   <repeat><times>9</times>
+    <action>
+     <fire>
+      <direction type="sequence">(30+$1)*$2</direction>
+      <bulletRef label="speed"/>
+     </fire>
+     <repeat><times>11</times>
+      <action>
+       <fire>
+        <direction type="sequence">(30)*$2</direction>
+        <bulletRef label="speed"/>
+       </fire>
+      </action>
+     </repeat>
+     <wait>1</wait>
+    </action>
+   </repeat>
+   <wait>10</wait>
+  </action>
+ </repeat>
+</action>
+
+<bullet label="speed">
+ <speed>1+$rank*2</speed>
+</bullet>
+
+</bulletml>

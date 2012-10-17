@@ -1,0 +1,176 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml type="vertical" xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+	<action  label="Stop">
+		<changeSpeed>
+			<speed>
+				 0
+			</speed>
+			<term>
+				 1
+			</term>
+		</changeSpeed>
+	</action>
+	<bullet  label="Dummy">
+		<action>
+			<vanish/>
+		</action>
+	</bullet>
+	<bullet  label="blue">
+		<speed>
+			 3
+		</speed>
+		<action>
+			<wait>
+				 10
+			</wait>
+			<actionRef  label="Stop"/>
+			<repeat>
+				<times>
+					 16+$rank*16
+				</times>
+				<action>
+					<wait>
+						 10-$rank*4+$rand
+					</wait>
+					<repeat>
+						<times>
+							 3
+						</times>
+						<action>
+							<fire>
+								<direction  type="sequence">
+									95
+								</direction>
+								<speed>
+									 1.4
+								</speed>
+								<bullet/>
+							</fire>
+							<repeat>
+								<times>
+									 3
+								</times>
+								<action>
+									<fire>
+										<direction  type="sequence">
+											10
+										</direction>
+										<speed>
+											 1.4
+										</speed>
+										<bullet/>
+									</fire>
+								</action>
+							</repeat>
+						</action>
+					</repeat>
+				</action>
+			</repeat>
+			<vanish/>
+		</action>
+	</bullet>
+	<action  label="xway">
+		<fire>
+			<direction  type="aim">
+				-7*$1-7
+			</direction>
+			<bulletRef  label="Dummy"/>
+		</fire>
+		<repeat>
+			<times>
+				 $1
+			</times>
+			<action>
+				<fire>
+					<direction  type="sequence">
+						15
+					</direction>
+					<speed>
+						 1.3
+					</speed>
+					<bullet>
+						<action/>
+					</bullet>
+				</fire>
+				<repeat>
+					<times>
+						 4
+					</times>
+					<action>
+						<fire>
+							<direction  type="sequence">
+								0
+							</direction>
+							<speed  type="sequence">
+								0.08+$rank*0.08
+							</speed>
+							<bullet>
+								<action/>
+							</bullet>
+						</fire>
+					</action>
+				</repeat>
+			</action>
+		</repeat>
+	</action>
+	<bullet  label="red">
+		<speed>
+			 3
+		</speed>
+		<action>
+			<wait>
+				 10
+			</wait>
+			<actionRef  label="Stop"/>
+			<repeat>
+				<times>
+					 5
+				</times>
+				<action>
+					<actionRef  label="xway">
+						<param>
+							 $rand*3+$rank*2
+						</param>
+					</actionRef>
+					<wait>
+						 40
+					</wait>
+				</action>
+			</repeat>
+			<vanish/>
+		</action>
+	</bullet>
+	<action  label="top">
+		<fire>
+			<direction  type="absolute">
+				120
+			</direction>
+			<bulletRef  label="blue"/>
+		</fire>
+		<fire>
+			<direction  type="absolute">
+				-120
+			</direction>
+			<bulletRef  label="red"/>
+		</fire>
+		<wait>
+			 200
+		</wait>
+		<fire>
+			<direction  type="absolute">
+				-120
+			</direction>
+			<bulletRef  label="blue"/>
+		</fire>
+		<fire>
+			<direction  type="absolute">
+				120
+			</direction>
+			<bulletRef  label="red"/>
+		</fire>
+		<wait>
+			 200
+		</wait>
+	</action>
+</bulletml>

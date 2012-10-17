@@ -1,0 +1,56 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml>
+<action label="top">
+<changeSpeed>
+  <speed type="absolute">2</speed> 
+  <term>1</term> 
+  </changeSpeed>
+<changeDirection>
+<direction type="absolute">180</direction> 
+<term>1</term> 
+</changeDirection>
+<wait>10</wait>
+<changeSpeed>
+<speed type="absolute">0</speed> 
+<term>1</term> 
+</changeSpeed>
+
+
+<fire><direction type="absolute">0</direction><speed>1.5</speed><bulletRef label="blue"/></fire>
+<repeat>
+<times>60+$rank*60</times>
+<action>
+<fireRef label="red"/>
+<fireRef label="red"/>
+<fireRef label="red"/>
+<fireRef label="red"/>
+<fireRef label="red"/>
+<fireRef label="red"/>
+<fireRef label="red"/>
+<fireRef label="red"/>
+<fireRef label="red"/>
+<fireRef label="red"/>
+<fireRef label="red"/>
+
+<wait>20-$rank*14</wait>
+
+<fire><direction type="sequence">-31.5</direction><speed>1.5</speed><bulletRef label="blue"/></fire>
+</action>
+</repeat>
+</action>
+
+<fire label="red">
+<direction type="sequence">30</direction>
+<speed>1.5</speed>
+<bulletRef label="blue"/>
+</fire>
+
+<bullet label="blue">
+<action>
+<wait>30</wait>
+<fire><direction type="relative">-110</direction><speed>1.5</speed><bullet/></fire>
+</action>
+</bullet>
+
+</bulletml>

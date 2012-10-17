@@ -1,0 +1,63 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+ <actionRef label="move"><param>180</param></actionRef>
+ <repeat><times>10+$rank*20</times>
+  <actionRef label="fireball"><param> 1</param></actionRef>
+  <actionRef label="fireball"><param>-1</param></actionRef>
+ </repeat>
+ <actionRef label="move"><param>  0</param></actionRef>
+</action>
+
+<action label="move">
+ <changeDirection><direction type="absolute">$1</direction><term>2</term></changeDirection>
+ <wait>3</wait>
+ <changeSpeed><speed>2</speed><term>25</term></changeSpeed>
+ <wait>27</wait>
+ <changeSpeed><speed>0</speed><term>25</term></changeSpeed>
+ <wait>27</wait>
+</action>
+
+<action label="fireball">
+ <fire><direction type="absolute">$rand*360</direction><bulletRef label="turn"><param>$1</param></bulletRef></fire>
+ <repeat><times>5</times>
+  <action>
+   <fire><direction type="sequence">2</direction><bulletRef label="turn"><param>$1</param></bulletRef></fire>
+  </action>
+ </repeat>
+ <repeat><times>11</times>
+  <action>
+   <fire><direction type="sequence">20</direction><bulletRef label="turn"><param>$1</param></bulletRef></fire>
+   <repeat><times>5</times>
+    <action>
+     <fire><direction type="sequence">2</direction><bulletRef label="turn"><param>$1</param></bulletRef></fire>
+    </action>
+   </repeat>
+  </action>
+ </repeat>
+ <wait>50-$rank*35</wait>
+</action>
+
+<bullet label="turn">
+ <speed>0.6+$rank*0.6</speed>
+ <action>
+  <repeat><times>9999</times>
+   <action>
+    <changeDirection>
+     <direction type="relative">150*$1</direction>
+     <term>200-$rank*100</term>
+    </changeDirection>
+    <changeSpeed>
+     <speed type="relative">1</speed>
+     <term>150-$rank*75</term>
+    </changeSpeed>
+    <wait>50</wait>
+   </action>
+  </repeat>
+ </action>
+</bullet>
+
+</bulletml>

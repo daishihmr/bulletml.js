@@ -1,0 +1,122 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml 
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="accel">
+ <changeDirection>
+  <direction>360*$rand</direction>
+  <term>1</term>
+ </changeDirection>
+ <changeSpeed>
+  <speed>0.5+$rand*0.5</speed>
+  <term>1</term>
+ </changeSpeed>
+</action>
+
+<action label="stop">
+ <changeSpeed>
+  <speed>0</speed>
+  <term>1</term>
+ </changeSpeed>
+</action>
+
+<action label="stopAndWait">
+ <actionRef label="stop"/>
+ <wait>70-$rank*50</wait>
+</action>
+
+<action label="ippon">
+ <repeat> <times>26</times>
+ <action>
+  <fire>
+   <direction type="sequence">0</direction>
+   <speed type="sequence">0.12</speed>
+   <bullet/>
+  </fire>
+ </action>
+ </repeat>
+</action>
+
+<action label="murasaki">
+ <fire>
+  <direction type="absolute">$2</direction>
+  <speed>0.8</speed>
+  <bullet/>
+ </fire> 
+
+ <repeat> <times>3+$rand*17</times>
+ <action>
+
+  <actionRef label="ippon"/>
+
+  <wait>6</wait>
+
+  <fire>
+   <direction type="sequence">$1</direction>
+   <speed>0.8</speed>
+   <bullet/>
+  </fire>
+
+ </action>
+ </repeat>
+</action>
+
+<action label="ao">
+ <repeat> <times>3+$rand*17</times>
+ <action>
+
+  <fire>
+   <speed>0.8</speed>
+   <bullet/>
+  </fire>
+
+  <actionRef label="ippon"/>
+
+  <wait>6</wait>
+
+ </action>
+ </repeat>
+</action>
+
+<action label="gara5">
+ <repeat> <times>2</times>
+  <action>
+   <actionRef label="accel"/>
+
+   <actionRef label="murasaki">
+    <param>5</param>
+    <param>180-$rand*90</param>
+   </actionRef>
+
+   <actionRef label="stopAndWait"/>
+   <actionRef label="accel"/>
+
+   <actionRef label="ao"/>
+
+   <actionRef label="stopAndWait"/>
+   <actionRef label="accel"/>
+
+   <actionRef label="murasaki">
+    <param>-5</param>
+    <param>180+$rand*90</param>
+   </actionRef>
+
+   <actionRef label="stopAndWait"/>
+   <actionRef label="accel"/>
+
+   <actionRef label="ao"/>
+
+   <actionRef label="stopAndWait"/>
+
+  </action>
+ </repeat>
+</action>
+
+<action label="top">
+ <actionRef label="gara5"/>
+</action>
+
+</bulletml>
+

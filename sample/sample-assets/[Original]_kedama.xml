@@ -1,0 +1,65 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="vertical"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+
+  <repeat><times>3</times><action>
+    <fire>
+      <direction type="aim">90</direction>
+      <bulletRef label="bit">
+        <param>1</param>
+      </bulletRef>
+    </fire>
+    <fire>
+      <direction type="aim">-90</direction>
+      <bulletRef label="bit">
+        <param>-1</param>
+      </bulletRef>
+    </fire>
+    <wait>90</wait>
+  </action></repeat>
+
+  <wait>250</wait>
+
+</action>
+
+<bullet label="bit">
+<speed>3.0</speed>
+<action>
+
+  <wait>10</wait>
+
+  <changeSpeed>
+    <speed>0.6</speed>
+    <term>1</term>
+  </changeSpeed>
+  <wait>5</wait>
+
+  <changeDirection>
+    <direction type="relative">-105 * $1</direction>
+    <term>1</term>
+  </changeDirection>
+  <wait>5</wait>
+
+  <fire>
+    <direction type="relative">60 * $1</direction>
+    <speed>0.6 + 0.7 * $rank</speed>
+    <bullet/>
+  </fire>
+  <wait>12 - 10 * $rank</wait>
+  <repeat><times>999</times><action>
+    <fire>
+      <direction type="sequence">113 * $1</direction>
+      <speed>0.6 + 0.7 * $rank</speed>
+      <bullet/>
+    </fire>
+    <wait>12 - 10 * $rank</wait>
+  </action></repeat>
+
+</action>
+</bullet>
+
+</bulletml>

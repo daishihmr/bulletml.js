@@ -1,0 +1,67 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml 
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="5sp">
+  <fire>
+   <direction type="aim">$1</direction>
+   <speed>1</speed>
+   <bullet/>
+  </fire>
+ <repeat> <times>3</times>
+ <action>
+  <fire>
+   <speed type="sequence">0.4</speed>
+   <bullet/>
+  </fire>
+ </action>
+ </repeat>
+</action>
+
+<fire label="maru">
+ <direction type="absolute">90</direction>
+ <speed>4</speed>
+
+ <bullet>
+ <action>
+
+  <changeDirection>
+   <direction type="sequence">4</direction>
+   <term>1000</term>
+  </changeDirection>
+
+  <repeat> <times>90</times>
+  <action>
+
+   <actionRef label="5sp">
+    <param>0</param>
+   </actionRef>
+
+   <actionRef label="5sp">
+    <param>70-$rank*40</param>
+   </actionRef>
+
+   <actionRef label="5sp">
+    <param>-70+$rank*40</param>
+   </actionRef>
+
+   <wait>3</wait>
+
+  </action>
+  </repeat>
+
+
+  <vanish/>
+
+ </action>
+ </bullet>
+</fire>
+
+<action label="top">
+ <fireRef label="maru"/>
+ <wait>320</wait>
+</action>
+
+</bulletml>

@@ -1,0 +1,84 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+ <actionRef label="move"><param>180</param></actionRef>
+  <repeat><times>20+$rank*20</times>
+   <action>
+    <changeDirection>
+     <direction type="relative">-179+$rand*358</direction>
+     <term>(80+$rand*40)/(1+$rank)</term>
+    </changeDirection>
+    <repeat><times>5</times>
+     <action>
+      <fire>
+       <direction type="relative">0</direction>
+       <speed>1+$rank*0.5</speed>
+       <bulletRef label="curve"><param>1</param></bulletRef>
+      </fire>
+      <fire>
+       <direction type="sequence">10</direction>
+       <speed>1+$rank*0.5</speed>
+       <bulletRef label="curve"><param>-1</param></bulletRef>
+      </fire>
+      <repeat><times>17</times>
+       <action>
+        <fire>
+         <direction type="sequence">10</direction>
+         <speed>1+$rank*0.5</speed>
+         <bulletRef label="curve"><param>1</param></bulletRef>
+        </fire>
+        <fire>
+         <direction type="sequence">10</direction>
+         <speed>1+$rank*0.5</speed>
+         <bulletRef label="curve"><param>-1</param></bulletRef>
+        </fire>
+       </action>
+      </repeat>
+     <wait>16-$rank*8</wait>
+    </action>
+   </repeat>
+  </action>
+ </repeat>
+ <wait>80</wait>
+ <actionRef label="move"><param>0</param></actionRef>
+</action>
+
+<action label="move">
+ <changeDirection><direction type="absolute">$1</direction><term>1</term></changeDirection>
+ <changeSpeed><speed>2</speed><term>1</term></changeSpeed>
+ <wait>12</wait>
+ <changeSpeed><speed>0</speed><term>1</term></changeSpeed>
+ <wait>5</wait>
+</action>
+
+<bullet label="curve">
+ <action>
+  <wait>30-$rank*15</wait>
+  <changeDirection>
+   <direction type="relative">150*$1</direction>
+   <term>25</term>
+  </changeDirection>
+  <wait>25</wait>
+
+  <repeat><times>9999</times>
+   <action>
+    <changeDirection>
+     <direction type="relative">-150*$1*$rank</direction>
+     <term>1000-$rank*950</term>
+    </changeDirection>
+    <wait>30</wait>
+    <changeDirection>
+     <direction type="relative">150*$1*$rank</direction>
+     <term>1000-$rank*900</term>
+    </changeDirection>
+    <wait>60</wait>
+   </action>
+  </repeat>
+
+ </action>
+</bullet>
+
+</bulletml>

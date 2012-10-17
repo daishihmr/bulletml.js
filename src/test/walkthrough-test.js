@@ -243,7 +243,7 @@ WtTest.prototype.testFireBulletsRefDeep = function() {
     assertEquals("fire", fire.commandName);
     assertEquals("wait", wait.commandName);
     assertEquals(3, wait.value);
-    
+
     var b = fire.bullet;
 
     var bwalker = b.getWalker();
@@ -254,4 +254,67 @@ WtTest.prototype.testFireBulletsRefDeep = function() {
     assertEquals("changeDirection", bcd.commandName);
     assertEquals(0, bcd.direction.value);
     assertEquals(5, bcd.term);
+};
+
+WtTest.prototype.testFireRef = function() {
+    var bulletml = BulletML
+            .build("<bulletml>"
+                    + "<action label='top'><wait>5</wait><fireRef label='f'/><wait>10</wait></action>"
+                    + "<fire label='f'><direction type='absolute'>10</direction><speed type='sequence'>1</speed><bullet/></fire>"
+                    + "</bulletml>");
+    var walker = bulletml.getWalker("top");
+    var wait5 = walker.next();
+    var fire = walker.next();
+    var wait10 = walker.next();
+    assertEquals("wait", wait5.commandName);
+    assertEquals(5, wait5.value);
+    assertEquals("fire", fire.commandName);
+    assertEquals("absolute", fire.direction.type);
+    assertEquals(10, fire.direction.value);
+    assertEquals("sequence", fire.speed.type);
+    assertEquals(1, fire.speed.value);
+    assertEquals("wait", wait10.commandName);
+    assertEquals(10, wait10.value);
+};
+
+WtTest.prototype.testFireRef2 = function() {
+    var bulletml = BulletML
+            .build("<bulletml>"
+                    + "<action label='top'><wait>5</wait><fireRef label='f'><param>3</param><param>6</param></fireRef><wait>10</wait></action>"
+                    + "<fire label='f'><direction type='absolute'>$2</direction><speed type='sequence'>$1</speed><bullet/></fire>"
+                    + "</bulletml>");
+    var walker = bulletml.getWalker("top");
+    var wait5 = walker.next();
+    var fire = walker.next();
+    var wait10 = walker.next();
+    assertEquals("wait", wait5.commandName);
+    assertEquals(5, wait5.value);
+    assertEquals("fire", fire.commandName);
+    assertEquals("absolute", fire.direction.type);
+    assertEquals(6, fire.direction.value);
+    assertEquals("sequence", fire.speed.type);
+    assertEquals(3, fire.speed.value);
+    assertEquals("wait", wait10.commandName);
+    assertEquals(10, wait10.value);
+};
+
+WtTest.prototype.testXABossWinder = function() {
+    var bulletml = BulletML
+            .build('<bulletml><bullet label="winderBullet"><speed>3</speed></bullet><fire label="fireWinder"><direction type="sequence">$1</direction><bulletRef label="winderBullet" /></fire><action label="roundWinder"><fireRef label="fireWinder"><param>$1</param></fireRef><repeat><times>11</times><action><fireRef label="fireWinder"><param>30</param></fireRef></action></repeat><wait>5</wait></action><action label="winderSequence"><repeat><times>12</times><actionRef label="roundWinder"><param>30</param></actionRef></repeat><repeat><times>12</times><actionRef label="roundWinder"><param>$1</param></actionRef></repeat><repeat><times>12</times><actionRef label="roundWinder"><param>30</param></actionRef></repeat></action><action label="top1"><fire><direction type="absolute">2</direction><bulletRef label="winderBullet" /></fire><actionRef label="winderSequence"><param>31</param></actionRef></action><action label="top2"><fire><direction type="absolute">-2</direction><bulletRef label="winderBullet" /></fire><actionRef label="winderSequence"><param>29</param></actionRef></action></bulletml>');
+    var w1 = bulletml.getWalker("top1");
+    console.log(bulletml.findAction("roundWinder"));
+    var firstFire = w1.next();
+    var roundWinder0 = [];
+    for ( var i = 0; i < 12 * 12; i++) {
+        roundWinder0[i] = w1.next();
+    }
+    var roundWinder1 = [];
+    for ( var i = 0; i < 12 * 12; i++) {
+        roundWinder1[i] = w1.next();
+    }
+    var roundWinder2 = [];
+    for ( var i = 0; i < 12 * 12; i++) {
+        roundWinder2[i] = w1.next();
+    }
+
 };

@@ -1,0 +1,81 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+ <actionRef label="move"><param>180</param></actionRef>
+ <changeDirection><direction type="aim">0</direction><term>1</term></changeDirection>
+ <wait>1</wait>
+ <repeat><times>50</times>
+  <action>
+   <wait>1</wait>
+   <fireRef label="winder"><param> 22.5-$rank*12.5</param><param>7</param></fireRef>
+   <fireRef label="winder"><param>-22.5+$rank*12.5</param><param>7</param></fireRef>
+   <fireRef label="winder"><param> 22.5-$rank*12.5</param><param>7.1</param></fireRef>
+   <fireRef label="winder"><param>-22.5+$rank*12.5</param><param>7.1</param></fireRef>
+  </action>
+ </repeat>
+ <repeat><times>5</times>
+  <action>
+   <actionRef label="wall"/>
+   <fire>
+    <direction type="absolute">0</direction>
+    <speed>0</speed>
+    <bulletRef label="round"/>
+   </fire>
+   <actionRef label="wall"/>
+   <actionRef label="wall"/>
+   <actionRef label="wall"/>
+  </action>
+ </repeat>
+ <wait>50</wait>
+ <actionRef label="move"><param>0</param></actionRef>
+</action>
+
+<action label="move">
+ <changeDirection><direction type="absolute">$1</direction><term>1</term></changeDirection>
+ <changeSpeed><speed>2</speed><term>1</term></changeSpeed>
+ <wait>18</wait>
+ <changeSpeed><speed>0</speed><term>1</term></changeSpeed>
+ <wait>5</wait>
+</action>
+
+<action label="wall">
+ <changeDirection>
+  <direction type="relative">-60+$rand*120</direction>
+  <term>100+$rank*50</term>
+ </changeDirection>
+ <repeat><times>100-$rand*50</times>
+  <action>
+   <wait>1</wait>
+   <fireRef label="winder"><param> 22.5-$rank*12.5</param><param>7</param></fireRef>
+   <fireRef label="winder"><param>-22.5+$rank*12.5</param><param>7</param></fireRef>
+   <fireRef label="winder"><param> 22.5-$rank*12.5</param><param>7.1</param></fireRef>
+   <fireRef label="winder"><param>-22.5+$rank*12.5</param><param>7.1</param></fireRef>
+  </action>
+ </repeat>
+</action>
+
+<fire label="winder">
+ <direction type="relative">$1</direction>
+ <speed>$2</speed>
+ <bullet/>
+</fire>
+
+<bullet label="round">
+ <action>
+  <wait>100*$rand</wait>
+  <fire><direction type="absolute">$rand*360</direction><speed>1.0+$rank*1.0</speed><bullet/></fire>
+  <fire><direction type="sequence">        4</direction><speed>0.8+$rank*0.8</speed><bullet/></fire>
+  <repeat><times>44</times>
+   <action>
+    <fire><direction type="sequence">4</direction><speed>1.0+$rank*1.0</speed><bullet/></fire>
+    <fire><direction type="sequence">4</direction><speed>0.8+$rank*0.8</speed><bullet/></fire>
+   </action>
+  </repeat>
+  <vanish/>
+ </action>
+</bullet>
+
+</bulletml>

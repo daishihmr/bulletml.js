@@ -1,0 +1,340 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml>
+
+<action label="top">
+<fire><direction type="absolute">45</direction><speed>1+$rank*0.5</speed><bullet/></fire>
+ <repeat>
+  <times>113+900/(16-$rank*10)</times>
+  <action>
+   <fireRef label="four"/>
+   <fireRef label="four"/>
+   <fireRef label="four"/>
+   <fire><direction type="sequence">86</direction><speed>1+$rank*0.5</speed><bullet/></fire>
+   <wait>16-$rank*10</wait>
+  </action>
+ </repeat>
+</action>
+
+<action label="tops">
+<wait>(16-$rank*10)*22.5</wait>
+<fire><direction type="absolute">45</direction><speed>1+$rank*0.5</speed><bullet/></fire>
+ <repeat>
+  <times>91+900/(16-$rank*10)</times>
+  <action>
+   <fireRef label="four"/>
+   <fireRef label="four"/>
+   <fireRef label="four"/>
+   <fire><direction type="sequence">94</direction><speed>1+$rank*0.5</speed><bullet/></fire>
+   <wait>16-$rank*10</wait>
+  </action>
+ </repeat>
+</action>
+ 
+<action label="topt">
+<wait>(16-$rank*10)*45</wait>
+<fire>
+<bulletRef label="gurugurup"/>
+</fire>
+</action>
+
+<bullet label="gurugurup">
+<action>
+<changeSpeed>
+<speed>0</speed><term>1</term>
+</changeSpeed>
+<actionRef label="guru2"/>
+<vanish/>
+</action>
+</bullet>
+
+<action label="guru2">
+
+<fire><direction type="absolute">0</direction><speed>1+$rank</speed><bulletRef label="guruc"/></fire>
+<repeat>
+<times>450/(16-$rank*10)</times>
+<action>
+<fireRef label="guru"/><fireRef label="guru"/><fireRef label="guru"/><fireRef label="guru"/>
+<fireRef label="guru"/><fireRef label="guru"/><fireRef label="guru"/><fireRef label="guru"/>
+<fireRef label="guru"/><fireRef label="guru"/><fireRef label="guru"/><fireRef label="guru"/>
+<fireRef label="guru"/><fireRef label="guru"/><fireRef label="guru"/>
+<fire><direction type="sequence">20.5</direction><speed>1+$rank</speed><bulletRef label="guruc"/></fire>
+<wait>16-$rank*10</wait>
+</action>
+</repeat>
+<repeat>
+<times>3</times>
+<action>
+<fireRef label="guru2"/><fireRef label="guru2"/><fireRef label="guru2"/><fireRef label="guru2"/>
+<fireRef label="guru2"/><fireRef label="guru2"/><fireRef label="guru2"/><fireRef label="guru2"/>
+<fireRef label="guru2"/><fireRef label="guru2"/><fireRef label="guru2"/><fireRef label="guru2"/>
+<fireRef label="guru2"/><fireRef label="guru2"/><fireRef label="guru2"/>
+<fire><direction type="sequence">20.5</direction><speed>1+$rank</speed><bulletRef label="guruc2"/></fire>
+<wait>16-$rank*10</wait>
+</action>
+</repeat>
+
+<repeat>
+<times>3</times>
+<action>
+<fireRef label="guru3"/><fireRef label="guru3"/><fireRef label="guru3"/><fireRef label="guru3"/>
+<fireRef label="guru3"/><fireRef label="guru3"/><fireRef label="guru3"/><fireRef label="guru3"/>
+<fireRef label="guru3"/><fireRef label="guru3"/><fireRef label="guru3"/><fireRef label="guru3"/>
+<fireRef label="guru3"/><fireRef label="guru3"/><fireRef label="guru3"/>
+<fire><direction type="sequence">20.5</direction><speed>1+$rank</speed><bulletRef label="guruc3"/></fire>
+<wait>16-$rank*10</wait>
+</action>
+</repeat>
+
+<repeat>
+<times>3</times>
+<action>
+<fireRef label="guru4"/><fireRef label="guru4"/><fireRef label="guru4"/><fireRef label="guru4"/>
+<fireRef label="guru4"/><fireRef label="guru4"/><fireRef label="guru4"/><fireRef label="guru4"/>
+<fireRef label="guru4"/><fireRef label="guru4"/><fireRef label="guru4"/><fireRef label="guru4"/>
+<fireRef label="guru4"/><fireRef label="guru4"/><fireRef label="guru4"/>
+<fire><direction type="sequence">20.5</direction><speed>1+$rank</speed><bulletRef label="guruc4"/></fire>
+<wait>16-$rank*10</wait>
+</action>
+</repeat>
+
+<repeat>
+<times>3</times>
+<action>
+<fireRef label="guru5"/><fireRef label="guru5"/><fireRef label="guru5"/><fireRef label="guru5"/>
+<fireRef label="guru5"/><fireRef label="guru5"/><fireRef label="guru5"/><fireRef label="guru5"/>
+<fireRef label="guru5"/><fireRef label="guru5"/><fireRef label="guru5"/><fireRef label="guru5"/>
+<fireRef label="guru5"/><fireRef label="guru5"/><fireRef label="guru5"/>
+<fire><direction type="sequence">20.5</direction><speed>1+$rank</speed><bulletRef label="guruc5"/></fire>
+<wait>16-$rank*10</wait>
+</action>
+</repeat>
+<repeat>
+<times>4</times>
+<action>
+<fireRef label="guru6"/><fireRef label="guru6"/><fireRef label="guru6"/><fireRef label="guru6"/>
+<fireRef label="guru6"/><fireRef label="guru6"/><fireRef label="guru6"/><fireRef label="guru6"/>
+<fireRef label="guru6"/><fireRef label="guru6"/><fireRef label="guru6"/><fireRef label="guru6"/>
+<fireRef label="guru6"/><fireRef label="guru6"/><fireRef label="guru6"/>
+<fire><direction type="sequence">20.5</direction><speed>1+$rank</speed><bulletRef label="guruc6"/></fire>
+<wait>16-$rank*10</wait>
+</action>
+</repeat>
+<repeat>
+<times>4</times>
+<action>
+<fireRef label="guru7"/><fireRef label="guru7"/><fireRef label="guru7"/><fireRef label="guru7"/>
+<fireRef label="guru7"/><fireRef label="guru7"/><fireRef label="guru7"/><fireRef label="guru7"/>
+<fireRef label="guru7"/><fireRef label="guru7"/><fireRef label="guru7"/><fireRef label="guru7"/>
+<fireRef label="guru7"/><fireRef label="guru7"/><fireRef label="guru7"/>
+<fire><direction type="sequence">21</direction><speed>1+$rank</speed><bulletRef label="guruc7"/></fire>
+<wait>16-$rank*10</wait>
+</action>
+</repeat>
+<repeat>
+<times>6</times>
+<action>
+<fireRef label="guru8"/><fireRef label="guru8"/><fireRef label="guru8"/><fireRef label="guru8"/>
+<fireRef label="guru8"/><fireRef label="guru8"/><fireRef label="guru8"/><fireRef label="guru8"/>
+<fireRef label="guru8"/><fireRef label="guru8"/><fireRef label="guru8"/><fireRef label="guru8"/>
+<fireRef label="guru8"/><fireRef label="guru8"/><fireRef label="guru8"/>
+<fire><direction type="sequence">21.5</direction><speed>1+$rank</speed><bulletRef label="guruc8"/></fire>
+<wait>16-$rank*10</wait>
+</action>
+</repeat>
+<repeat>
+<times>7</times>
+<action>
+<fireRef label="guru9"/><fireRef label="guru9"/><fireRef label="guru9"/><fireRef label="guru9"/>
+<fireRef label="guru9"/><fireRef label="guru9"/><fireRef label="guru9"/><fireRef label="guru9"/>
+<fireRef label="guru9"/><fireRef label="guru9"/><fireRef label="guru9"/><fireRef label="guru9"/>
+<fireRef label="guru9"/><fireRef label="guru9"/><fireRef label="guru9"/>
+<fire><direction type="sequence">22</direction><speed>1+$rank</speed><bulletRef label="guruc9"/></fire>
+<wait>16-$rank*10</wait>
+</action>
+</repeat>
+<repeat>
+<times>2</times>
+<action>
+<fireRef label="guru10"/><fireRef label="guru10"/><fireRef label="guru10"/><fireRef label="guru10"/>
+<fireRef label="guru10"/><fireRef label="guru10"/><fireRef label="guru10"/>
+<fireRef label="guru10"/><fireRef label="guru10"/><fireRef label="guru10"/><fireRef label="guru10"/>
+<fireRef label="guru10"/><fireRef label="guru10"/><fireRef label="guru10"/><fireRef label="guru10"/>
+<fire><direction type="sequence">22.7</direction><speed>1+$rank</speed><bulletRef label="guruc10"/></fire>
+<wait>16-$rank*10</wait>
+</action>
+</repeat>
+
+<repeat>
+<times>7</times>
+<action>
+<fireRef label="guru11"/><fireRef label="guru11"/><fireRef label="guru11"/><fireRef label="guru11"/>
+<fireRef label="guru11"/><fireRef label="guru11"/><fireRef label="guru11"/>
+<fireRef label="guru11"/><fireRef label="guru11"/><fireRef label="guru11"/><fireRef label="guru11"/>
+<fireRef label="guru11"/><fireRef label="guru11"/><fireRef label="guru11"/><fireRef label="guru11"/>
+<fire><direction type="sequence">23</direction><speed>1+$rank</speed><bulletRef label="guruc11"/></fire>
+<wait>16-$rank*10</wait>
+</action>
+</repeat>
+
+<repeat>
+<times>6</times>
+<action>
+<fireRef label="guru12"/><fireRef label="guru12"/><fireRef label="guru12"/><fireRef label="guru12"/>
+<fireRef label="guru12"/><fireRef label="guru12"/><fireRef label="guru12"/><fireRef label="guru12"/>
+<fireRef label="guru12"/><fireRef label="guru12"/><fireRef label="guru12"/>
+<fireRef label="guru12"/><fireRef label="guru12"/><fireRef label="guru12"/><fireRef label="guru12"/>
+<fire><direction type="sequence">23.5</direction><speed>1+$rank</speed><bulletRef label="guruc12"/></fire>
+<wait>16-$rank*10</wait>
+</action>
+</repeat>
+
+<repeat>
+<times>4</times>
+<action>
+<fireRef label="guru13"/><fireRef label="guru13"/><fireRef label="guru13"/><fireRef label="guru13"/>
+<fireRef label="guru13"/><fireRef label="guru13"/><fireRef label="guru13"/><fireRef label="guru13"/>
+<fireRef label="guru13"/><fireRef label="guru13"/><fireRef label="guru13"/>
+<fireRef label="guru13"/><fireRef label="guru13"/><fireRef label="guru13"/><fireRef label="guru13"/>
+<fire><direction type="sequence">24</direction><speed>1+$rank</speed><bulletRef label="guruc13"/></fire>
+<wait>16-$rank*10</wait>
+</action>
+</repeat>
+
+<repeat>
+<times>4</times>
+<action>
+<fireRef label="guru14"/><fireRef label="guru14"/><fireRef label="guru14"/><fireRef label="guru14"/>
+<fireRef label="guru14"/><fireRef label="guru14"/><fireRef label="guru14"/><fireRef label="guru14"/>
+<fireRef label="guru14"/><fireRef label="guru14"/><fireRef label="guru14"/>
+<fireRef label="guru14"/><fireRef label="guru14"/><fireRef label="guru14"/><fireRef label="guru14"/>
+<fire><direction type="sequence">24.5</direction><speed>1+$rank</speed><bulletRef label="guruc14"/></fire>
+<wait>16-$rank*10</wait>
+</action>
+</repeat>
+
+<repeat>
+<times>3</times>
+<action>
+<fireRef label="guru15"/><fireRef label="guru15"/><fireRef label="guru15"/><fireRef label="guru15"/>
+<fireRef label="guru15"/><fireRef label="guru15"/><fireRef label="guru15"/><fireRef label="guru15"/>
+<fireRef label="guru15"/><fireRef label="guru15"/><fireRef label="guru15"/>
+<fireRef label="guru15"/><fireRef label="guru15"/><fireRef label="guru15"/><fireRef label="guru15"/>
+<fire><direction type="sequence">24.5</direction><speed>1+$rank</speed><bulletRef label="guruc15"/></fire>
+<wait>16-$rank*10</wait>
+</action>
+</repeat>
+
+<repeat>
+<times>3</times>
+<action>
+<fireRef label="guru16"/><fireRef label="guru16"/><fireRef label="guru16"/><fireRef label="guru16"/>
+<fireRef label="guru16"/><fireRef label="guru16"/><fireRef label="guru16"/><fireRef label="guru16"/>
+<fireRef label="guru16"/><fireRef label="guru16"/><fireRef label="guru16"/>
+<fireRef label="guru16"/><fireRef label="guru16"/><fireRef label="guru16"/><fireRef label="guru16"/>
+<fire><direction type="sequence">24.5</direction><speed>1+$rank</speed><bulletRef label="guruc16"/></fire>
+<wait>16-$rank*10</wait>
+</action>
+</repeat>
+
+
+<repeat>
+<times>3</times>
+<action>
+<fireRef label="guru17"/><fireRef label="guru17"/><fireRef label="guru17"/><fireRef label="guru17"/>
+<fireRef label="guru17"/><fireRef label="guru17"/><fireRef label="guru17"/><fireRef label="guru17"/>
+<fireRef label="guru17"/><fireRef label="guru17"/><fireRef label="guru17"/>
+<fireRef label="guru17"/><fireRef label="guru17"/><fireRef label="guru17"/><fireRef label="guru17"/>
+<fire><direction type="sequence">24.5</direction><speed>1+$rank</speed><bulletRef label="guruc17"/></fire>
+<wait>16-$rank*10</wait>
+</action>
+</repeat>
+
+<repeat>
+<times>3</times>
+<action>
+<fireRef label="guru18"/><fireRef label="guru18"/><fireRef label="guru18"/><fireRef label="guru18"/>
+<fireRef label="guru18"/><fireRef label="guru18"/><fireRef label="guru18"/><fireRef label="guru18"/>
+<fireRef label="guru18"/><fireRef label="guru18"/><fireRef label="guru18"/>
+<fireRef label="guru18"/><fireRef label="guru18"/><fireRef label="guru18"/><fireRef label="guru18"/>
+<fire><direction type="sequence">24.5</direction><speed>1+$rank</speed><bulletRef label="guruc18"/></fire>
+<wait>16-$rank*10</wait>
+</action>
+</repeat>
+
+<repeat>
+<times>450/(16-$rank*10)</times>
+<action>
+<fireRef label="guru19"/><fireRef label="guru19"/><fireRef label="guru19"/><fireRef label="guru19"/>
+<fireRef label="guru19"/><fireRef label="guru19"/><fireRef label="guru19"/><fireRef label="guru19"/>
+<fireRef label="guru19"/><fireRef label="guru19"/><fireRef label="guru19"/>
+<fireRef label="guru19"/><fireRef label="guru19"/><fireRef label="guru19"/><fireRef label="guru19"/>
+<fire><direction type="sequence">24.5</direction><speed>1+$rank</speed><bulletRef label="guruc19"/></fire>
+<wait>16-$rank*10</wait>
+</action>
+</repeat>
+
+
+
+
+
+
+
+
+
+
+</action>
+
+
+<fire label="guru"><direction type="sequence">22.5</direction><speed>1+$rank</speed><bulletRef label="guruc"/></fire>
+<fire label="guru2"><direction type="sequence">22.5</direction><speed>1+$rank</speed><bulletRef label="guruc2"/></fire>
+<fire label="guru3"><direction type="sequence">22.5</direction><speed>1+$rank</speed><bulletRef label="guruc3"/></fire>
+<fire label="guru4"><direction type="sequence">22.5</direction><speed>1+$rank</speed><bulletRef label="guruc4"/></fire>
+<fire label="guru5"><direction type="sequence">22.5</direction><speed>1+$rank</speed><bulletRef label="guruc5"/></fire>
+<fire label="guru6"><direction type="sequence">22.5</direction><speed>1+$rank</speed><bulletRef label="guruc6"/></fire>
+<fire label="guru7"><direction type="sequence">22.5</direction><speed>1+$rank</speed><bulletRef label="guruc7"/></fire>
+<fire label="guru8"><direction type="sequence">22.5</direction><speed>1+$rank</speed><bulletRef label="guruc8"/></fire>
+<fire label="guru9"><direction type="sequence">22.5</direction><speed>1+$rank</speed><bulletRef label="guruc9"/></fire>
+<fire label="guru10"><direction type="sequence">22.3+$rand*0.4</direction><speed>1+$rank</speed><bulletRef label="guruc10"/></fire>
+<fire label="guru11"><direction type="sequence">22.5</direction><speed>1+$rank</speed><bulletRef label="guruc11"/></fire>
+<fire label="guru12"><direction type="sequence">22.5</direction><speed>1+$rank</speed><bulletRef label="guruc12"/></fire>
+<fire label="guru13"><direction type="sequence">22.5</direction><speed>1+$rank</speed><bulletRef label="guruc13"/></fire>
+<fire label="guru14"><direction type="sequence">22.5</direction><speed>1+$rank</speed><bulletRef label="guruc14"/></fire>
+<fire label="guru15"><direction type="sequence">22.5</direction><speed>1+$rank</speed><bulletRef label="guruc15"/></fire>
+<fire label="guru16"><direction type="sequence">22.5</direction><speed>1+$rank</speed><bulletRef label="guruc16"/></fire>
+<fire label="guru17"><direction type="sequence">22.5</direction><speed>1+$rank</speed><bulletRef label="guruc17"/></fire>
+<fire label="guru18"><direction type="sequence">22.5</direction><speed>1+$rank</speed><bulletRef label="guruc18"/></fire>
+<fire label="guru19"><direction type="sequence">22.5</direction><speed>1+$rank</speed><bulletRef label="guruc19"/></fire>
+
+<fire label="four">
+
+<direction type="sequence">90</direction>
+<speed>1+$rank*0.5</speed>
+<bullet/>
+</fire>
+
+<bullet label="guruc"><action><changeDirection><direction type="relative">-270</direction><term>90</term></changeDirection></action></bullet>
+<bullet label="guruc2"><action><changeDirection><direction type="relative">-270</direction><term>170</term></changeDirection></action></bullet>
+<bullet label="guruc3"><action><changeDirection><direction type="relative">-270</direction><term>260</term></changeDirection></action></bullet>
+<bullet label="guruc4"><action><changeDirection><direction type="relative">-270</direction><term>300</term></changeDirection></action></bullet>
+<bullet label="guruc5"><action><changeDirection><direction type="relative">-270</direction><term>450</term></changeDirection></action></bullet>
+<bullet label="guruc6"><action><changeDirection><direction type="relative">-270</direction><term>600</term></changeDirection></action></bullet>
+<bullet label="guruc7"><action><changeDirection><direction type="relative">-270</direction><term>700</term></changeDirection></action></bullet>
+<bullet label="guruc8"><action><changeDirection><direction type="relative">-270</direction><term>800</term></changeDirection></action></bullet>
+<bullet label="guruc9"><action><changeDirection><direction type="relative">-270</direction><term>900</term></changeDirection></action></bullet>
+<bullet label="guruc10"><action><changeDirection><direction type="relative">0</direction><term>90</term></changeDirection></action></bullet>
+<bullet label="guruc11"><action><changeDirection><direction type="relative">270</direction><term>900</term></changeDirection></action></bullet>
+<bullet label="guruc12"><action><changeDirection><direction type="relative">270</direction><term>800</term></changeDirection></action></bullet>
+<bullet label="guruc13"><action><changeDirection><direction type="relative">270</direction><term>700</term></changeDirection></action></bullet>
+<bullet label="guruc14"><action><changeDirection><direction type="relative">270</direction><term>600</term></changeDirection></action></bullet>
+<bullet label="guruc15"><action><changeDirection><direction type="relative">270</direction><term>450</term></changeDirection></action></bullet>
+<bullet label="guruc16"><action><changeDirection><direction type="relative">270</direction><term>300</term></changeDirection></action></bullet>
+<bullet label="guruc17"><action><changeDirection><direction type="relative">270</direction><term>280</term></changeDirection></action></bullet>
+<bullet label="guruc18"><action><changeDirection><direction type="relative">270</direction><term>230</term></changeDirection></action></bullet>
+<bullet label="guruc19"><action><changeDirection><direction type="relative">270</direction><term>90</term></changeDirection></action></bullet>
+
+
+
+
+
+</bulletml>

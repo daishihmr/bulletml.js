@@ -1,0 +1,276 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="vertical"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+	<actionRef label="bara"><param>1</param></actionRef>
+	<actionRef label="bara"><param>-1</param></actionRef>
+	<actionRef label="3way"><param>180-55</param><param>-5</param></actionRef>
+	<actionRef label="3way"><param>180</param><param>0</param></actionRef>
+	<actionRef label="3way"><param>180+55</param><param>5</param></actionRef>
+	<actionRef label="roll"><param>180+45</param><param>1</param></actionRef>
+	<actionRef label="roll"><param>180-45</param><param>-1</param></actionRef>
+	<actionRef label="straight"><param>1</param></actionRef>
+	<actionRef label="straight"><param>-1</param></actionRef>
+	<wait>50</wait>
+	<repeat>
+		<times>3*$rank</times>
+		<action>
+			<fire>
+				<speed type="absolute">0</speed>
+				<bullet>
+					<actionRef label="fin1"><param>1</param></actionRef>
+				</bullet>
+			</fire>
+			<fire>
+				<speed type="absolute">0</speed>
+				<bullet>
+					<actionRef label="fin1"><param>-1</param></actionRef>
+				</bullet>
+			</fire>
+			<fire>
+				<bullet>
+					<actionRef label="white1"/>
+				</bullet>
+			</fire>
+			<wait>5*(6+(12*$rank))</wait>
+		</action>
+	</repeat>
+	<wait>110</wait>
+</action>
+
+
+<action label="fin1">
+	<actionRef label="fin2"><param>$1</param></actionRef>
+	<vanish/>
+</action>
+
+<action label="fin2">
+	<fire>
+		<direction type="aim">$1*90</direction>
+		<speed type="absolute">1.7+(0.8*$rank)</speed>
+		<bullet/>
+	</fire>
+	<wait>2/($rank+0.2)</wait>
+	<repeat>
+		<times>1+$rank*32</times>
+		<action>
+			<fire>
+				<direction type="sequence">-1*$1*((2.3/($rank+0.01))+0.35)</direction>
+				<speed type="absolute">1.7+(0.8*$rank)</speed>
+				<bullet/>
+			</fire>
+			<wait>2/($rank+0.2)</wait>
+		</action>
+	</repeat>
+</action>
+
+
+<action label="white1">
+	<fireRef label="white2"><param>0</param><param>0.00001</param><param>0</param></fireRef>
+	<fireRef label="white2"><param>90</param><param>1</param><param>1.5</param></fireRef>
+	<fireRef label="white2"><param>-90</param><param>1</param><param>-1.5</param></fireRef>
+	<vanish/>
+</action>
+
+<fire label="white2">
+	<direction type="relative">$1</direction>
+	<speed type="absolute">$2</speed>
+	<bullet>
+		<action>
+			<wait>4</wait>
+			<changeSpeed>
+				<speed type="absolute">0.00001</speed>
+				<term>1</term>
+			</changeSpeed>
+			<wait>83-(70*$rank)</wait>
+			<repeat>
+				<times>6+(12*$rank)</times>
+				<action>
+					<fire>
+						<direction type="relative">-1*$1+$3</direction>
+						<speed>2.9</speed>
+						<bullet/>
+					</fire>
+					<wait>5</wait>
+				</action>
+			</repeat>
+			<vanish/>
+		</action>
+	</bullet>
+</fire>
+
+
+<action label="bara">
+	<fireRef label="5c"><param>44*$1</param><param>4.1</param><param>4</param></fireRef>
+	<fireRef label="5c"><param>55.5*$1</param><param>3.45</param><param>3</param></fireRef>
+	<fireRef label="5c"><param>55*$1</param><param>4.2</param><param>2</param></fireRef>
+	<fireRef label="5c"><param>70*$1</param><param>3</param><param>0</param></fireRef>
+	<fireRef label="5c"><param>68*$1</param><param>3.74</param><param>1</param></fireRef>
+</action>
+
+<fire label="5c">
+	<direction type="absolute">180+$1</direction>
+	<speed>$2/1.1</speed>
+	<bullet>
+		<action>
+		<wait>10</wait>
+			<changeSpeed>
+				<speed type="absolute">0</speed>
+				<term>1</term>
+			</changeSpeed>
+			<wait>5+($3*5)</wait>
+			<repeat>
+				<times>10-(5/($rank+0.001))</times>
+				<action>
+					<repeat>
+						<times>3</times>
+						<actionRef label="almond1"/>
+					</repeat>
+					<wait>85-(40*$rank)</wait>
+				</action>
+			</repeat>
+			<vanish/>
+		</action>
+	</bullet>
+</fire>
+
+<action label="almond1">
+	<fire>
+		<direction type="aim">3.5-(7*$rand)</direction>
+		<speed type="absolute">0+(0.3*$rand)</speed>
+		<bulletRef label="almond2"/>
+	</fire>
+	<wait>3</wait>
+</action>
+
+<bullet label="almond2">
+	<action>
+		<changeSpeed>
+			<speed type="relative">1.8+(0.8*$rank)</speed>
+			<term>10</term>
+		</changeSpeed>
+	</action>
+</bullet>
+
+
+<action label="3way">
+	<fire>
+		<direction type="absolute">180+$2</direction>
+		<speed type="absolute">3.5</speed>
+		<bullet>
+			<action>
+				<wait>10</wait>
+				<changeSpeed>
+					<speed type="absolute">0</speed>
+					<term>1</term>
+				</changeSpeed>
+				<wait>1</wait>
+				<repeat>
+					<times>7+(10*$rank)</times>
+					<action>
+						<fireRef label="9way"><param>$1+16</param></fireRef>
+						<fireRef label="9way"><param>$1</param></fireRef>
+						<fireRef label="9way"><param>$1-16</param></fireRef>
+						<wait>25</wait>
+					</action>
+				</repeat>
+				<vanish/>
+			</action>
+		</bullet>
+	</fire>
+</action>
+
+<fire label="9way">
+	<direction type="absolute">$1</direction>
+	<speed type="absolute">1.5</speed>
+	<bullet/>
+</fire>
+
+
+<action label="roll">
+	<fire>
+		<direction type="absolute">180+(11*$2)</direction>
+		<speed type="absolute">10</speed>
+		<bullet>
+			<action>
+				<wait>5</wait>
+				<changeSpeed>
+					<speed type="absolute">0</speed>
+					<term>1</term>
+				</changeSpeed>
+				<wait>1</wait>
+				<fire>
+					<direction type="absolute">$1</direction>
+					<speed type="absolute">1.5</speed>
+					<bullet/>
+				</fire>
+				<fire>
+					<direction type="absolute">$1+(30*$2)</direction>
+					<speed type="absolute">1.5</speed>
+					<bullet/>
+				</fire>
+				<wait>15</wait>
+				<repeat>
+					<times>11+(17*$rank)</times>
+					<action>
+						<fire>
+							<direction type="sequence">-35*$2</direction>
+							<speed type="absolute">1.5</speed>
+							<bullet/>
+						</fire>
+						<fire>
+							<direction type="sequence">30*$2</direction>
+							<speed type="absolute">1.5</speed>
+							<bullet/>
+						</fire>
+						<wait>15</wait>
+					</action>
+				</repeat>
+				<vanish/>
+			</action>
+		</bullet>
+	</fire>
+</action>
+
+
+<action label="straight">
+	<fire>
+		<direction type="absolute">180+(82*$1)</direction>
+		<speed type="absolute">2.7</speed>
+		<bullet>
+			<action>
+				<wait>13</wait>
+				<changeSpeed>
+					<speed type="absolute">0</speed>
+					<term>1</term>
+				</changeSpeed>
+				<wait>1</wait>
+				<repeat>
+					<times>3+(5*$rank)</times>
+					<actionRef label="fall"/>
+				</repeat>
+				<vanish/>
+			</action>
+		</bullet>
+	</fire>
+</action>
+
+<action label="fall">
+	<repeat>
+		<times>7</times>
+		<action>
+			<fire>
+				<direction type="absolute">180</direction>
+				<speed type="absolute">2.9</speed>
+				<bullet/>
+			</fire>
+			<wait>5</wait>
+		</action>
+	</repeat>
+	<wait>15</wait>
+</action>
+
+</bulletml>

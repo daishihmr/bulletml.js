@@ -1,0 +1,108 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml>
+	<action label="src">
+		<fire>
+			<direction type="aim">
+				$1
+			</direction>
+			<speed>
+				1.5
+			</speed>
+			<bullet/>
+		</fire>
+		<repeat>
+			<times>
+				450/(4-$rank*2)
+			</times>
+			<action>
+				<wait>
+					4.5-$rank*3+$rand
+				</wait>
+				<fire>
+					<direction type="sequence">
+						$rand*10-5
+					</direction>
+					<speed>
+						1.5
+					</speed>
+					<bullet/>
+				</fire>
+			</action>
+		</repeat>
+		<vanish/>
+	</action>
+	<fire label="srcFire">
+		<direction type="absolute">
+			90
+		</direction>
+		<speed>
+			$1
+		</speed>
+		<bullet>
+			<action>
+				<wait>
+					5
+				</wait>
+				<changeSpeed>
+					<speed>
+						0
+					</speed>
+					<term>
+						1
+					</term>
+				</changeSpeed>
+				<actionRef label="src">
+					<param>
+						$2
+					</param>
+				</actionRef>
+			</action>
+		</bullet>
+	</fire>
+	<action label="top">
+		<fireRef label="srcFire">
+			<param>
+				0
+			</param>
+			<param>
+				0
+			</param>
+		</fireRef>
+		<fireRef label="srcFire">
+			<param>
+				4
+			</param>
+			<param>
+				10
+			</param>
+		</fireRef>
+		<fireRef label="srcFire">
+			<param>
+				8
+			</param>
+			<param>
+				20
+			</param>
+		</fireRef>
+		<fireRef label="srcFire">
+			<param>
+				-4
+			</param>
+			<param>
+				-10
+			</param>
+		</fireRef>
+		<fireRef label="srcFire">
+			<param>
+				-8
+			</param>
+			<param>
+				-20
+			</param>
+		</fireRef>
+		<wait>
+			500
+		</wait>
+	</action>
+</bulletml>

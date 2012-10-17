@@ -1,0 +1,137 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="vertical"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+
+ <fire>
+  <bulletRef label="dummy">
+   <param>8 + 28 * $rank</param>
+   <param>0.6 + 0.9 * $rank</param>
+  </bulletRef>
+ </fire>
+
+ <wait>440 - 90 * $rank</wait>
+
+</action>
+
+<bullet label="dummy">
+<direction type="absolute">0</direction>
+<speed>0</speed>
+<action>
+
+ <repeat><times>12</times><action>
+  <fire>
+   <bulletRef label="nwayabsolute">
+    <param>$1</param>
+    <param>$2</param>
+    <param>0</param>
+   </bulletRef>
+  </fire>
+  <wait>3</wait>
+
+  <repeat><times>2 + 3 * $rank</times><action>
+   <fire>
+    <bulletRef label="nwayabsolute">
+     <param>$1 / 3</param>
+     <param>$2 * (0.9 + 0.4 * $rand)</param>
+     <param>(360 / 12)</param>
+    </bulletRef>
+   </fire>
+  </action></repeat>
+  <wait>3</wait>
+
+  <fire>
+   <bulletRef label="nwayabsolute">
+    <param>$1</param>
+    <param>$2</param>
+    <param>(360 / 36) * (1/4)</param>
+   </bulletRef>
+  </fire>
+  <wait>3</wait>
+
+  <repeat><times>2 + 3 * $rank</times><action>
+   <fire>
+    <bulletRef label="nwayabsolute">
+     <param>$1 / 3</param>
+     <param>$2 * (0.9 + 0.4 * $rand)</param>
+     <param>(360 / 12) * (3/4)</param>
+    </bulletRef>
+   </fire>
+  </action></repeat>
+  <wait>3</wait>
+
+  <fire>
+   <bulletRef label="nwayabsolute">
+    <param>$1</param>
+    <param>$2</param>
+    <param>(360 / 36) * (1/2)</param>
+   </bulletRef>
+  </fire>
+  <wait>3</wait>
+
+  <repeat><times>2 + 3 * $rank</times><action>
+   <fire>
+    <bulletRef label="nwayabsolute">
+     <param>$1 / 3</param>
+     <param>$2 * (0.9 + 0.4 * $rand)</param>
+     <param>(360 / 12) * (1/2)</param>
+    </bulletRef>
+   </fire>
+  </action></repeat>
+  <wait>3</wait>
+
+  <fire>
+   <bulletRef label="nwayabsolute">
+    <param>$1</param>
+    <param>$2</param>
+    <param>(360 / 36) * (3/4)</param>
+   </bulletRef>
+  </fire>
+  <wait>3</wait>
+
+  <repeat><times>2 + 3 * $rank</times><action>
+   <fire>
+    <bulletRef label="nwayabsolute">
+     <param>$1 / 3</param>
+     <param>$2 * (0.9 + 0.4 * $rand)</param>
+     <param>(360 / 12) * (1/4)</param>
+    </bulletRef>
+   </fire>
+  </action></repeat>
+  <wait>3</wait>
+
+ </action></repeat>
+
+ <vanish/>
+
+</action></bullet>
+
+<bullet label="nwayabsolute">
+<direction type="absolute">0</direction>
+<speed>0</speed>
+<action>
+
+  <fire>
+   <direction type="absolute">$3</direction>
+   <speed>$2</speed>
+   <bullet/>
+  </fire>
+
+ <repeat><times>$1</times><action>
+  <fire>
+   <direction type="sequence">
+    (360 / $1) + (3 + 12 * (1 - $rank) * (1 - $rank)) * (-1 + 2 * $rand)
+   </direction>
+   <speed>$2</speed>
+   <bullet/>
+  </fire>
+ </action></repeat>
+
+ <vanish/>
+
+</action></bullet>
+
+</bulletml>

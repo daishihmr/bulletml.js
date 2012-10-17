@@ -1,0 +1,63 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml type="vertical" xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+ <actionRef label="move"><param>180</param></actionRef>
+ <changeDirection>
+  <direction type="absolute">$rand*360</direction>
+  <term>1</term>
+ </changeDirection>
+ <wait>5</wait>
+ <repeat><times>20+$rank*20</times>
+  <action>
+   <actionRef label="wall"><param>15</param></actionRef>
+   <wait>25-$rank*$rank*12</wait>
+   <actionRef label="wall"><param> 0</param></actionRef>
+   <wait>25-$rank*$rank*12</wait>
+  </action>
+ </repeat>
+ <actionRef label="move"><param>0</param></actionRef>
+</action>
+
+<action label="move">
+ <changeDirection><direction type="absolute">$1</direction><term>5</term></changeDirection>
+ <wait>6</wait>
+ <changeSpeed><speed>1</speed><term>50</term></changeSpeed>
+ <wait>55</wait>
+ <changeSpeed><speed>0</speed><term>50</term></changeSpeed>
+ <wait>55</wait>
+</action>
+
+<action label="wall">
+ <fire>
+  <direction type="relative">$1</direction>
+  <speed>1+$rank*1.2</speed>
+  <bullet/>
+ </fire>
+ <actionRef label="wallbody"/>
+ <repeat><times>11</times>
+  <action>
+   <fire>
+    <direction type="sequence">15</direction>
+    <speed>1+$rank*1.2</speed>
+    <bullet/>
+   </fire>
+   <actionRef label="wallbody"/>
+  </action>
+ </repeat>
+</action>
+
+<action label="wallbody">
+ <repeat><times>15</times>
+  <action>
+   <fire>
+    <direction type="sequence">1</direction>
+    <speed>1+$rank*1.2</speed>
+    <bullet/>
+   </fire>
+  </action>
+ </repeat>
+</action>
+
+</bulletml>

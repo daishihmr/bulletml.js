@@ -1,0 +1,73 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml 
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="gyakuhunsya">
+ <changeDirection>
+  <direction type="absolute">180</direction>
+  <term>1</term>
+ </changeDirection>
+ <changeSpeed>
+  <speed>2</speed>
+  <term>20</term>
+ </changeSpeed>
+
+ <wait>60</wait>
+
+ <changeSpeed>
+  <speed>0</speed>
+  <term>20</term>
+ </changeSpeed>
+
+ <wait>20</wait>
+
+ <changeDirection>
+  <direction type="absolute">0</direction>
+  <term>1</term>
+ </changeDirection>
+ <changeSpeed>
+  <speed>2</speed>
+  <term>30</term>
+ </changeSpeed>
+
+ <fire>
+  <speed>0.6</speed>
+  <bullet/>
+ </fire>
+
+ <repeat> <times>80</times>
+ <action>
+
+ <repeat> <times>2+$rank*2</times>
+ <action>
+
+  <fire>
+   <direction>$rand*120-60</direction>
+   <speed type="sequence">0.005</speed>
+   <bullet/>
+  </fire>
+
+ </action>
+ </repeat>
+
+ <wait>1</wait>
+
+ </action>
+ </repeat>
+
+ <changeSpeed>
+  <speed>0</speed>
+  <term>1</term>
+ </changeSpeed>
+
+ <wait>10</wait>
+
+</action>
+
+<action label="top">
+ <actionRef label="gyakuhunsya"/>
+</action>
+
+</bulletml>

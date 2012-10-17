@@ -1,10 +1,10 @@
 <?xml version="1.0" ?>
-<!DOCTYPE bulletml SYSTEM "http://www.asahi-net.or.jp/~cs8k-cyu/bulletml/bulletml.dtd">
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
 
 <bulletml type="horizontal"
           xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
 
-<action label="top">
+<action label="oogi">
 <fire>
  <direction type="absolute">270-(4+$rank*6)*15/2</direction>
  <bulletRef label="seed"/>
@@ -19,8 +19,25 @@
 </repeat>
 </action>
 
+<action label="top">
+ <repeat> <times>4</times>
+ <action>
+  <actionRef label="oogi"/>
+  <wait>40</wait>
+ </action>
+ </repeat>
+ <wait>40</wait>
+ <repeat> <times>8</times>
+ <action>
+  <actionRef label="oogi"/>
+  <wait>20</wait>
+ </action>
+ </repeat> 
+<wait>30</wait>
+</action>
+
 <bullet label="seed">
-<speed>1.2</speed>
+<speed>1.5</speed>
 <action>
 <changeSpeed>
  <speed>0</speed>
@@ -34,7 +51,7 @@
 <repeat><times>4+$rank*4</times>
 <action>
  <fire>
-  <speed type="sequence">0.15</speed>
+  <speed type="sequence">0.3</speed>
   <bullet/>
  </fire>
 </action>

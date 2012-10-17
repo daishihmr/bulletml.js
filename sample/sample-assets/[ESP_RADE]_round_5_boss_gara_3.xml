@@ -1,0 +1,179 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml 
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="stop">
+ <wait>15</wait>
+ <changeSpeed>
+  <speed>0</speed>
+  <term>1</term>
+ </changeSpeed>
+ <wait>1</wait>
+</action>
+
+<bullet label="featherAllWay">
+ <action>
+  <fire>
+   <direction type="relative">$2*(180-(10-$1)*60)</direction>
+   <speed>0</speed>
+   <bullet>
+    <action> <vanish/> </action>
+   </bullet>
+  </fire>
+
+  <actionRef label="stop"/>
+
+  <repeat> <times>40</times>
+   <action>
+    <fire>
+	 <direction type="sequence">-2*(7-$1)*$2</direction>
+	 <speed>0.9+0.2*(6-$1)</speed>
+	 <bullet/>
+	</fire>
+    <repeat> <times>$1-1</times> <action>
+	 <fire>
+ 	  <direction type="sequence">-2*$2</direction>
+	  <speed type="sequence">0</speed>
+	  <bullet/>
+	 </fire>
+	</action> </repeat>
+	<wait>15</wait>
+
+   </action>
+  </repeat>
+
+  <vanish/>
+ </action>
+</bullet>
+
+<bullet label="featherAim">
+ <action>
+  <actionRef label="stop"/>
+
+  <repeat> <times>10+$rank*20</times>
+   <action>
+    <fire>
+	 <direction type="aim">-3</direction>
+	 <speed>1.2</speed>
+     <bullet><action/></bullet>
+	</fire>
+    <repeat> <times>2</times> <action>
+	 <fire>
+ 	  <direction type="sequence">3</direction>
+	  <speed type="sequence">0</speed>
+	  <bullet><action/></bullet>
+	 </fire>
+	</action> </repeat>
+	<wait>40-$rank*20</wait>
+
+   </action>
+  </repeat>
+
+  <vanish/>
+ </action>
+</bullet>
+
+<action label="top">
+ <fire>
+  <direction type="absolute">90</direction>
+  <speed>1</speed>
+  <bulletRef label="featherAim"/>
+ </fire>
+
+ <fire>
+  <direction type="absolute">-90</direction>
+  <speed>1</speed>
+  <bulletRef label="featherAim"/>
+ </fire>
+
+ <fire>
+  <direction type="absolute">70</direction>
+  <speed>2</speed>
+  <bulletRef label="featherAim"/>
+ </fire>
+
+ <fire>
+  <direction type="absolute">-70</direction>
+  <speed>2</speed>
+  <bulletRef label="featherAim"/>
+ </fire>
+
+ <fire>
+  <direction type="absolute">100</direction>
+  <speed>1.8</speed>
+  <bulletRef label="featherAllWay">
+   <param>3</param>
+   <param>1</param>
+  </bulletRef>
+ </fire>
+
+ <fire>
+  <direction type="absolute">-100</direction>
+  <speed>1.8</speed>
+  <bulletRef label="featherAllWay">
+   <param>3</param>
+   <param>-1</param>
+  </bulletRef>
+ </fire>
+
+ <fire>
+  <direction type="absolute">90</direction>
+  <speed>3</speed>
+  <bulletRef label="featherAllWay">
+   <param>4</param>
+   <param>1</param>
+  </bulletRef>
+ </fire>
+
+ <fire>
+  <direction type="absolute">-90</direction>
+  <speed>3</speed>
+  <bulletRef label="featherAllWay">
+   <param>4</param>
+   <param>-1</param>
+  </bulletRef>
+ </fire>
+
+ <fire>
+  <direction type="absolute">85</direction>
+  <speed>4</speed>
+  <bulletRef label="featherAllWay">
+   <param>5</param>
+   <param>1</param>
+  </bulletRef>
+ </fire>
+
+ <fire>
+  <direction type="absolute">-85</direction>
+  <speed>4</speed>
+  <bulletRef label="featherAllWay">
+   <param>5</param>
+   <param>-1</param>
+  </bulletRef>
+ </fire>
+
+ <fire>
+  <direction type="absolute">72</direction>
+  <speed>5</speed>
+  <bulletRef label="featherAllWay">
+   <param>6</param>
+   <param>1</param>
+  </bulletRef>
+ </fire>
+
+ <fire>
+  <direction type="absolute">-72</direction>
+  <speed>5</speed>
+  <bulletRef label="featherAllWay">
+   <param>6</param>
+   <param>-1</param>
+  </bulletRef>
+ </fire>
+
+ <wait>700</wait>
+
+</action>
+
+</bulletml>

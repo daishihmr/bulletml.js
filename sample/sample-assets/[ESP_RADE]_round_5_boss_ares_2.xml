@@ -1,0 +1,490 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="vertical"
+		  xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<fire label="blue1">
+ <direction type="absolute">240</direction>
+ <speed>5</speed>
+ <bullet>
+
+  <action>
+
+   <wait>5</wait>
+
+   <changeSpeed>
+	<speed>0</speed>
+	<term>1</term>
+   </changeSpeed>
+
+   <repeat> <times>11</times> <action>
+	<fire>
+	 <direction type="aim">0</direction>
+	 <speed>1.5</speed>
+	 <bullet> <action/> </bullet>
+	</fire>
+	<repeat> <times>2+$rank*6+$rand</times> <action>
+	 <wait>5</wait>
+	 <fire>
+	  <direction type="sequence">0</direction>
+	  <speed type="sequence">0</speed>
+	  <bullet> <action/> </bullet>
+	 </fire>
+	</action> </repeat>
+
+	<wait>50-$rank*30</wait>
+
+   </action> </repeat>
+
+   <vanish/>
+
+  </action>
+
+ </bullet>
+</fire>
+
+<fire label="blue2Impl">
+ <speed>0</speed>
+
+ <bullet> <action>
+
+  <fire>
+   <direction type="absolute">$2</direction>
+   <speed>$3</speed>
+   <bullet> <action/> </bullet>
+  </fire>
+
+  <repeat> <times>40+80*$rank</times> <action>
+   <wait>640/(40+80*$rank)+$rand</wait>
+   <fire>
+	<direction type="sequence">$1</direction>
+	<speed type="sequence">0</speed>
+	<bullet> <action/> </bullet>
+   </fire>
+  </action> </repeat>
+
+  <vanish/>
+
+ </action> </bullet>
+</fire>
+
+<action label="blue2Delegate">
+ <wait>1</wait>
+
+ <fireRef label="blue2Impl">
+  <param>13.5</param>
+  <param>20</param>
+  <param>1.0</param>
+ </fireRef>
+ <wait>2</wait>
+
+ <fireRef label="blue2Impl">
+  <param>15</param>
+  <param>25</param>
+  <param>1.15</param>
+ </fireRef>
+ <wait>2</wait>
+
+ <fireRef label="blue2Impl">
+  <param>16.5</param>
+  <param>30</param>
+  <param>1.3</param>
+ </fireRef>
+ <wait>2</wait>
+
+ <fireRef label="blue2Impl">
+  <param>18</param>
+  <param>35</param>
+  <param>1.45</param>
+ </fireRef>
+
+</action>
+
+<fire label="blue2">
+ <direction type="absolute">175</direction>
+ <speed>8</speed>
+ <bullet>
+
+  <action>
+
+   <wait>5</wait>
+
+   <changeSpeed>
+	<speed>0</speed>
+	<term>1</term>
+   </changeSpeed>
+
+   <actionRef label="blue2Delegate">
+	<param>$rand*360</param>
+   </actionRef>
+
+   <vanish/>
+  </action>
+ </bullet>
+</fire>
+
+<fire label="red1Impl">
+ <speed>0</speed>
+
+ <bullet> <action>
+
+  <fire>
+   <direction type="absolute">$1</direction>
+   <speed>1.3</speed>
+   <bullet/>
+  </fire>
+
+  <repeat> <times>80+$rank*160</times> <action>
+   <wait>640/(80+$rank*160)+$rand</wait>
+
+   <fire>
+	<direction type="sequence">$2</direction>
+	<speed type="sequence">0</speed>
+	<bullet/>
+   </fire>
+  </action> </repeat>
+
+  <vanish/>
+
+ </action> </bullet>
+</fire>
+
+<fire label="red1Delegate">
+<bullet> <action>
+ <wait>1</wait>
+
+ <fireRef label="red1Impl">
+  <param>$1</param>
+  <param>-13.5</param>
+ </fireRef>
+ <fireRef label="red1Impl">
+  <param>$1</param>
+  <param>9</param>
+ </fireRef>
+
+ <vanish/>
+</action></bullet>
+</fire>
+
+<fire label="red1">
+ <direction type="absolute">250</direction>
+ <speed>7</speed>
+ <bullet>
+
+  <action>
+
+   <wait>5</wait>
+
+   <changeSpeed>
+	<speed>0</speed>
+	<term>1</term>
+   </changeSpeed>
+
+   <fireRef label="red1Delegate">
+	<param>$rand*360</param>
+   </fireRef>
+
+   <vanish/>
+  </action>
+
+ </bullet>
+</fire>
+
+<fire label="red2">
+ <direction type="absolute">180</direction>
+ <speed>1</speed>
+ <bullet>
+
+  <action>
+
+   <wait>5</wait>
+
+   <changeSpeed>
+	<speed>0</speed>
+	<term>1</term>
+   </changeSpeed>
+
+   <fire>
+	<direction type="absolute">330</direction>
+	<speed>1.3</speed>
+	<bullet/>
+   </fire>
+   <repeat> <times>120+$rank*240</times> <action>
+	<wait>640/(120+$rank*240)+$rand</wait>
+	<fire>
+	 <direction type="sequence">-4</direction>
+	 <speed type="sequence">0</speed>
+	 <bullet/>
+	</fire>
+   </action> </repeat>
+
+   <vanish/>
+
+  </action>
+
+ </bullet>
+</fire>
+
+<fire label="purple1ColChange">
+ <direction type="absolute">290</direction>
+ <speed>7</speed>
+ <bullet> <action>
+
+  <wait>5</wait>
+
+  <changeSpeed>
+   <speed>0</speed>
+   <term>1</term>
+  </changeSpeed>
+
+  <fire>
+   <direction type="absolute">60</direction>
+   <speed>1</speed>
+   <bullet/>
+  </fire>
+  <repeat> <times>9</times> <action>
+   <fire>
+	<direction type="sequence">-5</direction>
+	<speed type="sequence">0</speed>
+	<bullet/>
+   </fire>
+  </action> </repeat>
+
+  <repeat> <times>100+$rank*100</times> <action>
+   <wait>640/(100+$rank*100)+$rand</wait>
+   <fire>
+	<direction type="sequence">38</direction>
+	<speed>0.7+$rank*0.2</speed>
+	<bullet/>
+   </fire>
+   <repeat> <times>9</times> <action>
+	<fire>
+	 <direction type="sequence">-5</direction>
+	 <speed type="sequence">0.08+$rank*0.04</speed>
+	 <bullet/>
+	</fire>
+   </action> </repeat>
+  </action> </repeat>
+
+  <vanish/>
+
+ </action> </bullet>
+</fire>
+
+<fire label="purple1">
+ <bullet>
+  <action>
+   <fireRef label="purple1ColChange"/>
+   <vanish/>
+  </action>
+ </bullet>
+</fire>
+
+<fire label="purple2Impl">
+ <speed>0</speed>
+ <bullet> <action>
+
+  <fire>
+   <direction type="absolute">$1</direction>
+   <speed>1</speed>
+   <bullet/>
+  </fire>
+  <repeat> <times>3</times> <action>
+   <fire>
+	<direction type="sequence">9</direction>
+	<speed type="sequence">0.1</speed>
+	<bullet/>
+   </fire>
+  </action> </repeat>
+
+  <repeat> <times>40+$rank*70</times> <action>
+   <wait>640/(40+$rank*70)+$rand</wait>
+   <fire>
+	<direction type="sequence">9</direction>
+	<speed>0.9</speed>
+	<bullet/>
+   </fire>
+   <repeat> <times>3</times> <action>
+	<fire>
+	 <direction type="sequence">10</direction>
+	 <speed type="sequence">0.25</speed>
+	 <bullet/>
+	</fire>
+   </action> </repeat>
+  </action> </repeat>
+
+  <vanish/>
+
+ </action> </bullet>
+</fire>
+
+<action label="purple2Delegate">
+ <wait>1</wait>
+
+ <fireRef label="purple2Impl">
+  <param>$1</param>
+ </fireRef>
+ <fireRef label="purple2Impl">
+  <param>$1-180</param>
+ </fireRef>
+</action>
+
+<fire label="purple2">
+ <direction type="absolute">85</direction>
+ <speed>7</speed>
+ <bullet>
+
+  <action>
+
+   <wait>5</wait>
+
+   <changeSpeed>
+	<speed>0</speed>
+	<term>1</term>
+   </changeSpeed>
+
+   <actionRef label="purple2Delegate">
+	<param>$rand*360</param>
+   </actionRef>
+
+   <vanish/>
+  </action>
+
+ </bullet>
+</fire>
+
+<action label="deadOrAlive">
+ <changeSpeed>
+  <speed>10000</speed>
+  <term>1</term>
+ </changeSpeed>
+ <wait>$1</wait>
+</action>
+
+<fire label="firstBullet1">
+ <bullet> <action>
+  <actionRef label="deadOrAlive">
+   <param>$1</param>
+  </actionRef>
+
+  <fireRef label="blue1"/>
+  <vanish/>
+ </action> </bullet>
+</fire>
+
+<fire label="firstBullet2">
+ <bullet> <action>
+  <actionRef label="deadOrAlive">
+   <param>$1</param>
+  </actionRef>
+
+  <fireRef label="blue2"/>
+  <vanish/>
+ </action> </bullet>
+</fire>
+
+<fire label="firstBranch">
+ <bullet> <action>
+
+  <fireRef label="firstBullet1">
+   <param>$1</param>
+  </fireRef>
+  <fireRef label="firstBullet2">
+   <param>-$1</param>
+  </fireRef>
+  <vanish/>
+
+ </action> </bullet>
+</fire>
+
+<fire label="secondBullet1">
+ <bullet> <action>
+  <actionRef label="deadOrAlive">
+   <param>$1</param>
+  </actionRef>
+
+  <fireRef label="red1"/>
+  <vanish/>
+ </action> </bullet>
+</fire>
+
+<fire label="secondBullet2">
+ <bullet> <action>
+  <actionRef label="deadOrAlive">
+   <param>$1</param>
+  </actionRef>
+
+  <fireRef label="red2"/>
+  <vanish/>
+ </action> </bullet>
+</fire>
+
+<fire label="secondBranch">
+ <bullet> <action>
+  <fireRef label="secondBullet1">
+   <param>$1</param>
+  </fireRef>
+  <fireRef label="secondBullet2">
+   <param>-$1</param>
+  </fireRef>
+  <vanish/>
+
+ </action> </bullet>
+</fire>
+
+<fire label="thirdBullet1">
+ <bullet> <action>
+  <actionRef label="deadOrAlive">
+   <param>$1</param>
+  </actionRef>
+
+  <fireRef label="purple1"/>
+
+  <vanish/>
+ </action> </bullet>
+</fire>
+
+<fire label="thirdBullet2">
+ <bullet> <action>
+  <actionRef label="deadOrAlive">
+   <param>$1</param>
+  </actionRef>
+
+  <fireRef label="purple2"/>
+  <vanish/>
+ </action> </bullet>
+</fire>
+
+<fire label="thirdBranch">
+ <bullet> <action>
+
+  <fireRef label="thirdBullet1">
+   <param>$1</param>
+  </fireRef>
+  <fireRef label="thirdBullet2">
+   <param>-$1</param>
+  </fireRef>
+  <vanish/>
+
+ </action> </bullet>
+</fire>
+
+<action label="top">
+ <wait>2</wait>
+
+ <fireRef label="firstBranch">
+  <param>$rand*100000-50000</param>
+ </fireRef>
+ <fireRef label="secondBranch">
+  <param>$rand*100000-50000</param>
+ </fireRef>
+ <fireRef label="thirdBranch">
+  <param>$rand*100000-50000</param>
+ </fireRef>
+
+ <wait>660</wait>
+</action>
+
+</bulletml>
+

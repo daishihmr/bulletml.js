@@ -1,0 +1,138 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="vertical"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+  <fire>
+   <direction type="absolute">180</direction>
+   <speed>2</speed>
+   <bulletRef label="dummyspray">
+    <param>1.1 * (0.75 + 0.25 * $rank)</param>
+    <param>2</param>
+    <param>20 * (3.0 - 2.0 * $rank)</param>
+   </bulletRef>
+  </fire>
+
+  <wait>600</wait>
+
+</action>
+
+<bullet label="dummyspray"><action>
+
+ <wait>60</wait>
+
+ <changeSpeed>
+  <speed>0</speed>
+  <term>1</term>
+ </changeSpeed>
+
+ <wait>10</wait>
+
+  <fire>
+   <direction type="absolute">0</direction>
+   <speed>0</speed>
+   <bulletRef label="spray">
+    <param>$1</param>
+    <param>$2</param>
+    <param>$3</param>
+    <param>60</param>
+   </bulletRef>
+  </fire>
+
+  <fire>
+   <direction type="absolute">-29</direction>
+   <speed>2</speed>
+   <bulletRef label="spray">
+    <param>$1</param>
+    <param>$2</param>
+    <param>$3</param>
+    <param>60</param>
+   </bulletRef>
+  </fire>
+
+  <fire>
+   <direction type="absolute">29</direction>
+   <speed>2</speed>
+   <bulletRef label="spray">
+    <param>$1</param>
+    <param>$2</param>
+    <param>$3</param>
+    <param>60</param>
+   </bulletRef>
+  </fire>
+
+  <vanish/>
+
+</action></bullet>
+
+<bullet label="spray"><action>
+
+ <wait>$4</wait>
+
+ <changeSpeed>
+  <speed>0</speed>
+  <term>1</term>
+ </changeSpeed>
+
+ <wait>10</wait>
+
+ <repeat> <times>400 / ($3 * 2)</times> <action>
+  <fire>
+   <direction type="aim">0</direction>
+   <speed>$1</speed>
+   <bulletRef label="spraybit">
+    <param>$1</param>
+    <param>$2</param>
+    <param>30</param>
+   </bulletRef>
+  </fire>
+  <wait>$3</wait>
+
+  <fire>
+   <direction type="aim">0</direction>
+   <speed>$1</speed>
+   <bulletRef label="spraybit">
+    <param>$1</param>
+    <param>$2</param>
+    <param>-30</param>
+   </bulletRef>
+  </fire>
+  <wait>$3</wait>
+ </action></repeat>
+
+ <vanish/>
+
+</action></bullet>
+
+<bullet label="spraybit"><action>
+
+ <repeat> <times>999</times> <action>
+  <repeat> <times>5</times> <action>
+   <fire>
+    <direction type="relative">$3</direction>
+    <speed>$1 * (2 / 1.7320508)</speed>
+    <bullet/>
+   </fire>
+   <wait>$2</wait>
+  </action></repeat>
+
+  <wait>$2 * 10</wait>
+
+  <repeat> <times>5</times> <action>
+   <fire>
+    <direction type="relative">-$3</direction>
+    <speed>$1 * (2 / 1.7320508)</speed>
+    <bullet/>
+   </fire>
+   <wait>$2</wait>
+  </action></repeat>
+
+  <wait>$2 * 10</wait>
+
+ </action></repeat>
+
+</action></bullet>
+
+</bulletml>

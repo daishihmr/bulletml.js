@@ -1,0 +1,237 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml type="vertical" xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+	<bullet  label="Red">
+		<action/>
+	</bullet>
+	<bullet  label="Dummy">
+		<action>
+			<vanish/>
+		</action>
+	</bullet>
+	<action  label="Stop">
+		<changeSpeed>
+			<speed>
+				 0
+			</speed>
+			<term>
+				 1
+			</term>
+		</changeSpeed>
+	</action>
+	<action  label="XWay">
+		<actionRef  label="XWayFan">
+			<param>
+				 $1
+			</param>
+			<param>
+				 $2
+			</param>
+			<param>
+				 0
+			</param>
+		</actionRef>
+	</action>
+	<action  label="XWayFan">
+		<repeat>
+			<times>
+				 $1-1
+			</times>
+			<action>
+				<fire>
+					<direction  type="sequence">
+						$2
+					</direction>
+					<speed  type="sequence">
+						$3
+					</speed>
+					<bullet/>
+				</fire>
+			</action>
+		</repeat>
+	</action>
+	<action  label="top1">
+		<fire>
+			<direction  type="absolute">
+				90
+			</direction>
+			<bulletRef  label="aim2"/>
+		</fire>
+		<fire>
+			<direction  type="absolute">
+				-90
+			</direction>
+			<bulletRef  label="aim2"/>
+		</fire>
+		<fire>
+			<speed>
+				 0
+			</speed>
+			<bullet>
+				<actionRef  label="fanRoll">
+					<param>
+						 7
+					</param>
+				</actionRef>
+			</bullet>
+		</fire>
+		<fire>
+			<speed>
+				 0
+			</speed>
+			<bullet>
+				<actionRef  label="fanRoll">
+					<param>
+						 -7
+					</param>
+				</actionRef>
+			</bullet>
+		</fire>
+	</action>
+	<action  label="top2">
+		<actionRef  label="3wayRoll">
+			<param>
+				 13
+			</param>
+		</actionRef>
+	</action>
+	<action  label="top3">
+		<actionRef  label="3wayRoll">
+			<param>
+				 -13
+			</param>
+		</actionRef>
+	</action>
+	<action  label="3wayRoll">
+		<fire>
+			<direction  type="absolute">
+				180
+			</direction>
+			<bulletRef  label="Dummy"/>
+		</fire>
+		<repeat>
+			<times>
+				 14
+			</times>
+			<action>
+				<fire>
+					<direction  type="sequence">
+						-1.3*$1
+					</direction>
+					<speed>
+						 1.4+$rank*0.8
+					</speed>
+					<bullet/>
+				</fire>
+				<actionRef  label="XWay">
+					<param>
+						 3
+					</param>
+					<param>
+						 $1
+					</param>
+				</actionRef>
+				<wait>
+					 10
+				</wait>
+			</action>
+		</repeat>
+		<repeat>
+			<times>
+				 20
+			</times>
+			<action>
+				<fire>
+					<direction  type="sequence">
+						1.3*$1
+					</direction>
+					<speed>
+						 1.4+$rank*0.8
+					</speed>
+					<bullet/>
+				</fire>
+				<actionRef  label="XWay">
+					<param>
+						 3
+					</param>
+					<param>
+						 -$1
+					</param>
+				</actionRef>
+				<wait>
+					 10
+				</wait>
+			</action>
+		</repeat>
+	</action>
+	<action  label="fanRoll">
+		<fire>
+			<direction  type="absolute">
+				$1*8
+			</direction>
+			<bulletRef  label="Dummy"/>
+		</fire>
+		<repeat>
+			<times>
+				 32
+			</times>
+			<action>
+				<fire>
+					<direction  type="sequence">
+						-$1*2.1
+					</direction>
+					<speed>
+						 1.2+$rank*0.4
+					</speed>
+					<bullet/>
+				</fire>
+				<actionRef  label="XWayFan">
+					<param>
+						 4
+					</param>
+					<param>
+						 $1
+					</param>
+					<param>
+						 0.3
+					</param>
+				</actionRef>
+				<wait>
+					 10
+				</wait>
+			</action>
+		</repeat>
+		<vanish/>
+	</action>
+	<bullet  label="aim2">
+		<speed>
+			 1
+		</speed>
+		<action>
+			<wait>
+				 8
+			</wait>
+			<actionRef  label="Stop"/>
+			<repeat>
+				<times>
+					 14+$rank*12
+				</times>
+				<action>
+					<wait>
+						 320/(14+$rank*12)+$rand
+					</wait>
+					<fire>
+						<direction  type="aim">
+							0
+						</direction>
+						<speed>
+							 1.4+$rank*0.8
+						</speed>
+						<bulletRef  label="Red"/>
+					</fire>
+				</action>
+			</repeat>
+			<vanish/>
+		</action>
+	</bullet>
+</bulletml>

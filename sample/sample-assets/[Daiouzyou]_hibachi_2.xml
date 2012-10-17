@@ -1,0 +1,93 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml>
+<action label="top">
+
+<fire><direction type="absolute">175</direction><speed>1+$rank*4</speed><bullet/></fire>
+<repeat>
+<times>30</times>
+<action>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<wait>1</wait>
+<actionRef label="rights"/>
+<actionRef label="rights"/>
+<actionRef label="rights"/>
+<actionRef label="rights"/>
+<actionRef label="rights"/>
+<actionRef label="rights"/>
+<actionRef label="rights"/>
+<actionRef label="rights"/>
+
+<wait>15-$rank*10</wait>
+<fire><direction type="sequence">4</direction><speed>1+$rank*4</speed><bullet/></fire>
+
+</action>
+</repeat>
+</action>
+<action label="tops">
+
+<fire><direction type="absolute">185</direction><speed>1+$rank*4</speed><bullet/></fire>
+<repeat>
+<times>30</times>
+<action>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<wait>1</wait>
+<actionRef label="lefts"/>
+<actionRef label="lefts"/>
+<actionRef label="lefts"/>
+<actionRef label="lefts"/>
+<actionRef label="lefts"/>
+<actionRef label="lefts"/>
+<actionRef label="lefts"/>
+<actionRef label="lefts"/>
+
+<wait>15-$rank*10</wait>
+<fire><direction type="sequence">-4</direction><speed>1+$rank*4</speed><bullet/></fire>
+</action>
+</repeat>
+</action>
+
+<action label="lefts">
+<fire><direction type="sequence">-0.7</direction><speed>1+$rank*4</speed><bullet/></fire>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<wait>1</wait>
+</action>
+
+<action label="rights">
+<fire><direction type="sequence">0.7</direction><speed>1+$rank*4</speed><bullet/></fire>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<fireRef label="allway"/>
+<wait>1</wait>
+</action>
+
+
+
+<fire label="allway">
+<direction type="sequence">45</direction><speed>1+$rank*4</speed>
+<bullet />
+</fire>
+
+</bulletml>

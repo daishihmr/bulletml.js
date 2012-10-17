@@ -1,0 +1,97 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml 
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="sequenceThree">
+ <fire>
+  <direction type="sequence">12</direction>
+  <speed type="sequence">0</speed>
+  <bullet/>
+ </fire>
+
+ <actionRef label="sequenceTwo"/>
+</action>
+
+<action label="sequenceTwo">
+ <repeat> <times>2</times>
+ <action>
+  <fire>
+   <direction type="sequence">3</direction>
+   <speed type="sequence">0</speed>
+   <bullet/>
+  </fire>
+ </action>
+ </repeat>
+</action>
+
+<action label="oogi">
+ <fire>
+  <direction>-90</direction>
+  <speed>1.5</speed>
+  <bullet/>
+ </fire>
+
+ <actionRef label="sequenceTwo"/>
+
+ <repeat> <times>11</times>
+  <actionRef label="sequenceThree"/>
+ </repeat>
+
+ <wait>10</wait>
+</action>
+
+<action label="oogiOuHuku">
+ <fire>
+  <direction type="sequence">-213</direction>
+  <speed>1.5</speed>
+  <bullet/>
+ </fire>
+
+ <actionRef label="sequenceTwo"/>
+
+ <repeat> <times>11</times>
+  <actionRef label="sequenceThree"/>
+ </repeat>
+
+ <wait>10</wait>
+</action>
+
+<action label="gara1a">
+ <repeat> <times>5</times>
+  <action>
+   <changeDirection>
+    <direction>360*$rand</direction>
+    <term>1</term>
+   </changeDirection>
+   <changeSpeed>
+    <speed>0.5*$rand+0.5</speed>
+    <term>1</term>
+   </changeSpeed>
+
+   <actionRef label="oogi"/>
+
+   <repeat> <times>$rand*(3+$rank*2)+1+$rank*2</times>
+   <action>
+    <actionRef label="oogiOuHuku"/>
+   </action>
+   </repeat>
+
+   <changeSpeed>
+    <speed>0</speed>
+    <term>1</term>
+   </changeSpeed>
+
+   <wait>50</wait>
+
+  </action>
+ </repeat>
+</action>
+
+<action label="top">
+ <actionRef label="gara1a"/>
+</action>
+
+</bulletml>
+

@@ -1,0 +1,66 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml type="vertical" xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+ <repeat><times>5</times>
+  <action>
+   <actionRef label="move"><param> 1</param></actionRef>
+   <actionRef label="move"><param>-1</param></actionRef>
+   <actionRef label="move"><param>-1</param></actionRef>
+   <actionRef label="move"><param> 1</param></actionRef>
+  </action>
+ </repeat>
+ <changeSpeed>
+  <speed>0</speed>
+  <term>1</term>
+ </changeSpeed> 
+ <wait>300</wait>
+</action>
+
+<action label="move">
+ <changeDirection>
+  <direction type="absolute">90*$1</direction>
+  <term>1</term>
+ </changeDirection>
+ <changeSpeed>
+  <speed>1.6</speed>
+  <term>1</term>
+ </changeSpeed>
+ <repeat><times>10</times>
+  <action>
+   <wait>5</wait>
+   <repeat><times>1+$rank*$rank*$rank*$rank*3</times>
+    <action>
+     <fire>
+      <direction type="absolute">-30+$rand*60</direction>
+      <speed>2.5</speed>
+      <bulletRef label="bound"/>
+     </fire>
+    </action>
+   </repeat>
+  </action>
+ </repeat>
+</action>
+
+<bullet label="bound">
+ <action>
+  <accel>
+   <vertical>10</vertical>
+   <term>200</term>
+  </accel>
+  <wait>60+$rand*40</wait>
+  <repeat><times>1+$rank*$rank*$rank</times>
+   <action>
+    <fire>
+     <direction type="absolute">-15+$rand*30</direction>
+     <speed>1.6</speed>
+     <bulletRef label="bound"/>
+    </fire>
+   </action>
+  </repeat>
+  <vanish/>
+ </action>
+</bullet>
+
+</bulletml>

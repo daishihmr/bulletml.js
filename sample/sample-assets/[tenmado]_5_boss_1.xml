@@ -1,0 +1,80 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="vertical"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+ <fire>
+  <direction type="absolute">0</direction>
+  <speed>0</speed>
+  <bulletRef label="random"/>
+ </fire>
+
+ <repeat> <times>8</times> <action>
+  <fire>
+   <direction type="absolute">90</direction>
+   <speed>0.5</speed>
+   <bulletRef label="surprise"/>
+  </fire>
+  <fire>
+   <direction type="absolute">270</direction>
+   <speed>0.5</speed>
+   <bulletRef label="surprise"/>
+  </fire>
+  <wait>100</wait>
+ </action> </repeat>
+
+ <wait>20</wait>
+</action>
+
+<bullet label="surprise">
+
+<action>
+ <wait>100</wait>
+ <changeSpeed>
+  <speed>0</speed>
+  <term>1</term>
+ </changeSpeed>
+
+ <repeat> <times>5</times> <action>
+ <repeat> <times>30</times> <action>
+  <fire>
+   <direction type="aim">3.5</direction>
+   <speed>15+$rand*15</speed>
+   <bullet><action></action></bullet>
+  </fire>
+  <fire>
+   <direction type="aim">-3.5</direction>
+   <speed>15+$rand*15</speed>
+   <bullet><action></action></bullet>
+  </fire>
+
+ </action> </repeat>
+ <wait>1</wait>
+ </action> </repeat>
+ <vanish/>
+
+
+</action> </bullet>
+
+<bullet label="random">
+
+<action>
+
+  <wait>200</wait>
+
+  <repeat> <times>6000/(130 - 100 * $rank) </times> <action>
+   <fire>
+    <direction type="aim">-22 + 44 * $rand</direction>
+    <speed>1.6 + 1.0 * $rand</speed>
+    <bullet/>
+   </fire>
+   <wait>0.1 * (130 - 100 * $rank)</wait>
+  </action> </repeat>
+  <vanish/>
+
+</action> </bullet>
+
+
+</bulletml> 

@@ -1,0 +1,109 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml type="vertical" xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+ <fire>
+  <direction type="absolute">0</direction>
+  <speed>0</speed>
+  <bulletRef label="top"/>
+ </fire>
+ <fire>
+  <direction type="absolute">0</direction>
+  <bulletRef label="byakko"/>
+ </fire>
+ <actionRef label="byakko"/>
+ <repeat><times>120+$rank*$rank*$rank*120</times>
+  <action>
+   <wait>8-$rank*$rank*$rank*4</wait>
+   <fire>
+    <direction type="sequence">128+$rand*0.5</direction>
+    <bulletRef label="byakko"/>
+   </fire>
+   <actionRef label="byakko"/>
+  </action>
+ </repeat>
+</action>
+
+<action label="byakko">
+ <repeat><times>2</times>
+  <action>
+   <fire>
+    <direction type="sequence">120</direction>
+    <bulletRef label="byakko"/>
+   </fire>
+  </action>
+ </repeat>
+</action>
+
+<bullet label="byakko">
+ <speed>6</speed>
+ <action>
+  <fireRef label="byakkoway"><param> 48.4-$rand*0.8</param></fireRef>
+  <fireRef label="byakkoway"><param> 32.4-$rand*0.8</param></fireRef>
+  <fireRef label="byakkoway"><param> 16.4-$rand*0.8</param></fireRef>
+  <fireRef label="byakkoway"><param>  0.4-$rand*0.8</param></fireRef>
+  <fireRef label="byakkoway"><param>-16.4+$rand*0.8</param></fireRef>
+  <fireRef label="byakkoway"><param>-32.4+$rand*0.8</param></fireRef>
+  <fireRef label="byakkoway"><param>-48.4+$rand*0.8</param></fireRef>
+  <vanish/>
+ </action>
+</bullet>
+
+<fire label="byakkoway">
+ <direction type="relative">$1</direction>
+ <speed>0.8+$rank*$rank*1</speed>
+ <bullet/>
+</fire>
+
+<bullet label="top">
+ <action>
+  <fire>
+   <direction type="absolute">0</direction>
+   <bulletRef label="backfire"/>
+  </fire>
+  <actionRef label="backfire"/>
+  <repeat><times>120+$rank*$rank*$rank*120</times>
+   <action>
+    <wait>8-$rank*$rank*$rank*4</wait>
+    <fire>
+     <direction type="sequence">112+$rand*0.5-$rank*$rank*$rank*$rank*$rank*9.5</direction>
+     <bulletRef label="backfire"/>
+    </fire>
+    <actionRef label="backfire"/>
+   </action>
+  </repeat>
+ </action>
+</bullet>
+
+<action label="backfire">
+ <repeat><times>2</times>
+  <action>
+   <fire>
+    <direction type="sequence">120</direction>
+    <bulletRef label="backfire"/>
+   </fire>
+  </action>
+ </repeat>
+</action>
+
+<bullet label="backfire">
+ <speed>10</speed>
+ <action>
+  <wait>4</wait>
+  <fireRef label="backfire"><param>100.5</param></fireRef>
+  <fireRef label="backfire"><param>110.5</param></fireRef>
+  <fireRef label="backfire"><param>120.5</param></fireRef>
+  <fireRef label="backfire"><param>130.5</param></fireRef>
+  <fireRef label="backfire"><param>140.5</param></fireRef>
+  <vanish/>
+ </action>
+</bullet>
+
+<fire label="backfire">
+ <direction type="relative">$1-$rand</direction>
+ <speed>1+$rank*$rank</speed>
+ <bullet/>
+</fire>
+
+</bulletml>

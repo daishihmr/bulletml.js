@@ -1,20 +1,21 @@
 <?xml version="1.0" ?>
-<!DOCTYPE bulletml SYSTEM "http://www.asahi-net.or.jp/~cs8k-cyu/bulletml/bulletml.dtd">
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
 
 <bulletml type="vertical"
           xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
 
 <action label="top">
-<repeat> <times>100</times>
+<repeat> <times>600</times>
 <action>
  <fire>
   <direction>-45+$rand*90</direction>
-  <speed>0.4+$rand*0.8</speed>
+  <speed>(0.3+$rand*0.5)*($rank+1)</speed>
   <bullet/>
  </fire>
- <wait>2</wait>
+ <wait>1</wait>
 </action>
 </repeat>
+<wait>100</wait>
 </action>
 
 </bulletml>

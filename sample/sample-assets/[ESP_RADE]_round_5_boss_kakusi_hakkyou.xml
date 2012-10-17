@@ -1,0 +1,80 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<bullet label="6shots">
+ <speed>3</speed>
+
+ <action>
+  <wait>3</wait>
+
+  <repeat> <times>2</times> <action>
+   <fire>
+    <direction type="aim">-15+30*$rand</direction>
+    <speed>0.8+$rank+$rand</speed>
+    <bullet/>
+   </fire>
+  </action> </repeat>
+
+  <repeat> <times>2</times> <action>
+   <fire>
+    <direction type="aim">-45+30*$rand</direction>
+    <speed>0.8+$rank+$rand</speed>
+    <bullet/>
+   </fire>
+  </action> </repeat>
+
+  <repeat> <times>2</times> <action>
+   <fire>
+    <direction type="aim">15+30*$rand</direction>
+    <speed>0.8+$rank+$rand</speed>
+    <bullet/>
+   </fire>
+  </action> </repeat>
+
+  <vanish/>
+ </action>
+
+</bullet>
+
+<bullet label="kakusi">
+ <speed>6</speed>
+
+ <action>
+  <changeSpeed>
+   <speed>0</speed>
+   <term>10</term>
+  </changeSpeed>
+  <wait>10</wait>
+
+  <repeat> <times>4+$rank*6</times> <action>
+    <fire>
+     <direction type="aim">90</direction>
+     <bulletRef label="6shots"/>
+    </fire>
+    <fire>
+     <direction type="aim">-90</direction>
+     <bulletRef label="6shots"/>
+    </fire>
+    <wait>200/(4+$rank*6)</wait>
+  </action> </repeat>
+
+  <vanish/>
+ </action>
+</bullet>
+
+<action label="top">
+ <fire>
+  <direction type="absolute">90</direction>
+  <bulletRef label="kakusi"/>
+ </fire>
+ <fire>
+  <direction type="absolute">270</direction>
+  <bulletRef label="kakusi"/>
+ </fire>
+ <wait>200</wait>
+</action>
+
+</bulletml>

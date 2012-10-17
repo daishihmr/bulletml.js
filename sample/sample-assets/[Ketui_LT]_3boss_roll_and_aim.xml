@@ -1,0 +1,186 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml type="vertical" xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+	<bullet  label="Dummy">
+		<action>
+			<vanish/>
+		</action>
+	</bullet>
+	<action  label="XWay">
+		<actionRef  label="XWayFan">
+			<param>
+				 $1
+			</param>
+			<param>
+				 $2
+			</param>
+			<param>
+				 0
+			</param>
+		</actionRef>
+	</action>
+	<action  label="XWayFan">
+		<repeat>
+			<times>
+				 $1-1
+			</times>
+			<action>
+				<fire>
+					<direction  type="sequence">
+						$2
+					</direction>
+					<speed  type="sequence">
+						$3
+					</speed>
+					<bullet/>
+				</fire>
+			</action>
+		</repeat>
+	</action>
+	<bullet  label="curve">
+		<action>
+			<repeat>
+				<times>
+					 9999
+				</times>
+				<action>
+					<changeDirection>
+						<direction  type="relative">
+							-$1*(4+$rank*$rank*4)
+						</direction>
+						<term>
+							 10
+						</term>
+					</changeDirection>
+					<wait>
+						 10
+					</wait>
+				</action>
+			</repeat>
+		</action>
+	</bullet>
+	<action  label="spiral">
+		<wait>
+			 $rand * 30
+		</wait>
+		<repeat>
+			<times>
+				 10+$rank*15
+			</times>
+			<action>
+				<repeat>
+					<times>
+						 2
+					</times>
+					<action>
+						<fire>
+							<direction  type="sequence">
+								$1*5
+							</direction>
+							<speed>
+								 1.5+$rank*$rank*1.5
+							</speed>
+							<bulletRef  label="curve">
+								<param>
+									 $1
+								</param>
+							</bulletRef>
+						</fire>
+						<repeat>
+							<times>
+								 4
+							</times>
+							<action>
+								<fire>
+									<direction  type="sequence">
+										90
+									</direction>
+									<speed  type="sequence">
+										0
+									</speed>
+									<bulletRef  label="curve">
+										<param>
+											 $1
+										</param>
+									</bulletRef>
+								</fire>
+							</action>
+						</repeat>
+						<wait>
+							 6 + $rand * 3
+						</wait>
+					</action>
+				</repeat>
+				<wait>
+					 6
+				</wait>
+				<fire>
+					<direction  type="sequence">
+						$1
+					</direction>
+					<speed>
+						 1+$rank*2
+					</speed>
+					<bulletRef  label="Dummy"/>
+				</fire>
+			</action>
+		</repeat>
+	</action>
+	<action  label="twoWay">
+		<repeat>
+			<times>
+				 5+$rank*4
+			</times>
+			<action>
+				<repeat>
+					<times>
+						 3+$rank*4
+					</times>
+					<action>
+						<fire>
+							<direction  type="aim">
+								3
+							</direction>
+							<speed>
+								 1.8
+							</speed>
+							<bullet/>
+						</fire>
+						<fire>
+							<direction  type="aim">
+								-3
+							</direction>
+							<speed>
+								 1.8
+							</speed>
+							<bullet/>
+						</fire>
+						<wait>
+							 5
+						</wait>
+					</action>
+				</repeat>
+				<wait>
+					 20
+				</wait>
+			</action>
+		</repeat>
+	</action>
+	<action  label="top1">
+		<actionRef  label="spiral">
+			<param>
+				 -2
+			</param>
+		</actionRef>
+	</action>
+	<action  label="top2">
+		<actionRef  label="spiral">
+			<param>
+				 2
+			</param>
+		</actionRef>
+	</action>
+	<action  label="top3">
+		<actionRef  label="twoWay"/>
+	</action>
+</bulletml>

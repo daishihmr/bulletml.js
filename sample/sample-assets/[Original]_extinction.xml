@@ -1,0 +1,152 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="vertical"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+ <fire>
+  <direction type="absolute">180</direction>
+  <speed>0</speed>
+  <bulletRef label="dummy">
+    <param>0.5</param>
+  </bulletRef>
+ </fire>
+
+ <wait>1500</wait>
+
+</action>
+
+<bullet label="dummy">
+<action>
+ <fire>
+  <direction type="absolute">180</direction>
+  <speed>$1</speed>
+  <bulletRef label="triangle">
+    <param>0</param>
+    <param>7</param>
+    <param>3</param>
+  </bulletRef>
+ </fire>
+
+ <fire>
+  <direction type="absolute">180</direction>
+  <speed>$1</speed>
+  <bulletRef label="triangle">
+    <param>60</param>
+    <param>-11</param>
+    <param>-5</param>
+  </bulletRef>
+ </fire>
+
+ <fire>
+  <direction type="absolute">180</direction>
+  <speed>$1</speed>
+  <bulletRef label="triangle">
+    <param>120</param>
+    <param>7</param>
+    <param>3</param>
+  </bulletRef>
+ </fire>
+
+ <fire>
+  <direction type="absolute">180</direction>
+  <speed>$1</speed>
+  <bulletRef label="triangle">
+    <param>180</param>
+    <param>-11</param>
+    <param>-5</param>
+  </bulletRef>
+ </fire>
+
+ <fire>
+  <direction type="absolute">180</direction>
+  <speed>$1</speed>
+  <bulletRef label="triangle">
+    <param>240</param>
+    <param>7</param>
+    <param>3</param>
+  </bulletRef>
+ </fire>
+
+ <fire>
+  <direction type="absolute">180</direction>
+  <speed>$1</speed>
+  <bulletRef label="triangle">
+    <param>300</param>
+    <param>-11</param>
+    <param>-5</param>
+  </bulletRef>
+ </fire>
+
+ <vanish/>
+
+</action>
+</bullet>
+
+<bullet label="triangle">
+ <action>
+
+  <wait>60</wait>
+
+  <changeSpeed>
+   <speed>0</speed>
+   <term>1</term>
+  </changeSpeed>
+
+  <fire>
+   <direction type="absolute">$1</direction>
+   <speed>0.7</speed>
+   <bulletRef label="rotate"/>
+  </fire>
+  <wait>3</wait>
+
+  <repeat> <times>100</times> <action>
+   <fire>
+    <direction type="sequence">$2</direction>
+    <speed>0.7</speed>
+    <bulletRef label="rotate"/>
+   </fire>
+   <wait>3</wait>
+
+   <fire>
+    <direction type="sequence">0 - $3</direction>
+    <speed>0.5</speed>
+    <bulletRef label="rotate"/>
+   </fire>
+   <wait>3</wait>
+
+   <fire>
+    <direction type="sequence">$3</direction>
+    <speed>0.7</speed>
+    <bulletRef label="rotate"/>
+   </fire>
+   <wait>3</wait>
+  </action> </repeat>
+
+  <vanish/>
+
+ </action>
+</bullet>
+
+<bullet label="rotate">
+ <action>
+
+  <repeat> <times>300 - 100 * $rank + 5 * $rand</times> <action>
+   <changeDirection>
+    <direction type="relative">1.5</direction>
+    <term>3</term>
+   </changeDirection>
+   <wait>1</wait>
+  </action> </repeat>
+
+  <changeSpeed>
+   <speed>2</speed>
+   <term>120</term>
+  </changeSpeed>
+
+ </action>
+
+</bullet>
+
+</bulletml>

@@ -1,0 +1,63 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml 
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<fire label="weekHoming">
+ <direction type="aim">0</direction>
+ <speed>0.1</speed>
+
+ <bullet> <action>
+  <repeat> <times>3</times> <action>
+   <changeSpeed>
+    <speed>1.5</speed>
+    <term>30</term>
+   </changeSpeed>
+
+   <wait>30</wait>
+
+   <repeat> <times>2+$rank*4</times> <action>
+    <fire>
+     <direction type="relative">90</direction>
+     <speed>1.3</speed>
+     <bullet/>
+    </fire>
+    <fire>
+     <direction type="relative">-90</direction>
+     <speed>1.3</speed>
+     <bullet/>
+    </fire>
+    <wait>2</wait>
+   </action> </repeat>
+
+   <changeDirection>
+    <direction type="aim">60-120*$rand</direction>
+    <term>20</term>
+   </changeDirection>
+   <changeSpeed>
+    <speed>0.1</speed>
+    <term>20</term>
+   </changeSpeed>
+   <wait>20</wait>
+
+  </action> </repeat>
+
+  <changeSpeed>
+   <speed>1.5</speed>
+   <term>30</term>
+  </changeSpeed>
+  <wait>30</wait>
+
+ </action> </bullet>
+</fire>
+
+<action label="top">
+ <repeat> <times>10</times> <action>
+  <fireRef label="weekHoming"/>
+  <wait>60-$rank*30</wait>
+ </action> </repeat>
+ <wait>180</wait>
+</action>
+
+</bulletml>

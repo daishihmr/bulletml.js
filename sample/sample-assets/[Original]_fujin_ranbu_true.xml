@@ -1,0 +1,189 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="vertical"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+
+ <fire>
+  <bulletRef label="dummy">
+   <param>0.6 + 0.6 * $rank</param>
+   <param>48 - 41 * $rank</param>
+   <param>8 * $rank</param>
+  </bulletRef>
+ </fire>
+
+ <wait>400 - 100 * $rank</wait>
+
+</action>
+
+<bullet label="dummy">
+<direction type="absolute">0</direction>
+<speed>0</speed>
+<action>
+ <changeDirection>
+  <direction type="absolute">180</direction>
+  <term>1</term>
+ </changeDirection>
+ <changeSpeed>
+  <speed>2</speed>
+  <term>20</term>
+ </changeSpeed>
+
+ <repeat> <times>3</times><action>
+  <fire>
+   <direction type="absolute">180 + 60</direction>
+   <bulletRef label="bit">
+    <param>$1</param>
+    <param>$2</param>
+    <param>-$3</param>
+   </bulletRef>
+  </fire>
+
+  <wait>10</wait>
+
+  <fire>
+   <direction type="absolute">180 - 60</direction>
+   <bulletRef label="bit">
+    <param>$1</param>
+    <param>$2</param>
+    <param>$3</param>
+   </bulletRef>
+  </fire>
+
+  <wait>10</wait>
+ </action></repeat>
+
+ <changeSpeed>
+  <speed>0</speed>
+  <term>20</term>
+ </changeSpeed>
+
+ <repeat> <times>1</times><action>
+  <fire>
+   <direction type="absolute">180 + 60</direction>
+   <bulletRef label="bit">
+    <param>$1</param>
+    <param>$2</param>
+    <param>-$3</param>
+   </bulletRef>
+  </fire>
+
+  <wait>10</wait>
+
+  <fire>
+   <direction type="absolute">180 - 60</direction>
+   <bulletRef label="bit">
+    <param>$1</param>
+    <param>$2</param>
+    <param>$3</param>
+   </bulletRef>
+  </fire>
+
+  <wait>10</wait>
+ </action></repeat>
+
+ <changeDirection>
+  <direction type="absolute">0</direction>
+  <term>1</term>
+ </changeDirection>
+ <changeSpeed>
+  <speed>2</speed>
+  <term>30</term>
+ </changeSpeed>
+
+ <repeat> <times>999</times><action>
+  <fire>
+   <direction type="absolute">180 + 60</direction>
+   <bulletRef label="bit">
+    <param>$1</param>
+    <param>$2</param>
+    <param>-$3</param>
+   </bulletRef>
+  </fire>
+
+  <wait>10</wait>
+
+  <fire>
+   <direction type="absolute">180 - 60</direction>
+   <bulletRef label="bit">
+    <param>$1</param>
+    <param>$2</param>
+    <param>$3</param>
+   </bulletRef>
+  </fire>
+
+  <wait>10</wait>
+ </action></repeat>
+
+ <vanish/>
+
+</action></bullet>
+
+<bullet label="bit"><action>
+
+ <fire>
+  <direction type="aim">0</direction>
+  <bulletRef label="shotgun">
+   <param>$1</param>
+  </bulletRef>
+ </fire>
+
+ <wait>$2</wait>
+
+ <repeat> <times>200</times><action>
+  <fire>
+   <direction type="sequence">$3</direction>
+   <bulletRef label="shotgun">
+    <param>$1</param>
+   </bulletRef>
+  </fire>
+
+  <wait>$2</wait>
+
+ </action></repeat>
+
+ <vanish/>
+
+</action></bullet>
+
+<bullet label="shotgun">
+<speed>0.001</speed>
+<action>
+
+ <fire>
+  <direction type="relative">0</direction>
+  <speed>$1</speed>
+  <bullet/>
+ </fire>
+ <fire>
+  <direction type="relative">0</direction>
+  <speed>$1 * 1.1</speed>
+  <bullet/>
+ </fire>
+ <fire>
+  <direction type="relative">0</direction>
+  <speed>$1 * 1.21</speed>
+  <bullet/>
+ </fire>
+ <fire>
+  <direction type="relative">0</direction>
+  <speed>$1 * 1.331</speed>
+  <bullet/>
+ </fire>
+ <fire>
+  <direction type="relative">0</direction>
+  <speed>$1 * 1.4641</speed>
+  <bullet/>
+ </fire>
+ <fire>
+  <direction type="relative">0</direction>
+  <speed>$1 * 1.610510</speed>
+  <bullet/>
+ </fire>
+ <vanish/>
+
+</action></bullet>
+
+</bulletml>

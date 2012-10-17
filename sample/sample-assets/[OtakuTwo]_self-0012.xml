@@ -1,0 +1,146 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top1">
+ <fire>
+  <direction type="absolute">0</direction>
+  <speed>0</speed>
+  <bulletRef label="4way"><param>$rand</param><param>$rand</param></bulletRef>
+ </fire>
+ <actionRef label="3way"><param>$rand</param><param>$rand</param></actionRef>
+ <wait>100</wait>
+</action>
+
+<action label="3way">
+ <repeat><times>200</times>
+  <action>
+   <fire>
+    <direction type="sequence">123.7+$1</direction>
+    <speed>(1+$2*0.5)*(1+$rank*$rank*$rank*$rank)</speed>
+    <bullet/>
+   </fire>
+   <repeat><times>2</times>
+    <action>
+     <fire>
+      <direction type="sequence">120</direction>
+      <speed>(1+$2*0.5)*(1+$rank*$rank*$rank*$rank)</speed>
+      <bullet/>
+     </fire>
+    </action>
+   </repeat>
+   <wait>8-$rank*4</wait>
+  </action>
+ </repeat>
+</action>
+
+<bullet label="4way">
+ <action>
+  <repeat><times>200</times>
+   <action>
+    <fire>
+     <direction type="sequence">92.1+$1</direction>
+     <speed>(0.8+$2*0.8)*(1+$rank*$rank*$rank*$rank)</speed>
+     <bullet/>
+    </fire>
+    <repeat><times>3</times>
+     <action>
+      <fire>
+       <direction type="sequence">90</direction>
+       <speed>(0.8+$2*0.8)*(1+$rank*$rank*$rank*$rank)</speed>
+       <bullet/>
+      </fire>
+     </action>
+    </repeat>
+    <wait>8-$rank*4</wait>
+   </action>
+  </repeat>
+  <vanish/>
+ </action>
+</bullet>
+
+<action label="top5">
+ <actionRef label="5way"><param>$rand</param><param>$rand</param></actionRef>
+</action>
+
+<action label="5way">
+ <repeat><times>200</times>
+  <action>
+   <fire>
+    <direction type="sequence">78.7+$1</direction>
+    <speed>(0.6+$2*1.6)*(1+$rank*$rank*$rank*$rank)</speed>
+    <bullet>
+     <action>
+      <changeSpeed>
+       <speed type="relative">0</speed>
+       <term>9999</term>
+      </changeSpeed>
+     </action>
+    </bullet>
+   </fire>
+   <repeat><times>4</times>
+    <action>
+     <fire>
+      <direction type="sequence">72</direction>
+      <speed>(0.6+$2*1.6)*(1+$rank*$rank*$rank*$rank)</speed>
+      <bullet>
+       <action>
+        <changeSpeed>
+         <speed type="relative">0</speed>
+         <term>9999</term>
+        </changeSpeed>
+       </action>
+      </bullet>
+     </fire>
+    </action>
+   </repeat>
+   <wait>8-$rank*4</wait>
+  </action>
+ </repeat>
+</action>
+
+<action label="top6">
+ <actionRef label="6way"><param>$rand</param><param>$rand</param></actionRef>
+</action>
+
+<action label="6way">
+ <repeat><times>200</times>
+  <action>
+   <fire>
+    <direction type="sequence">63.3+$1</direction>
+    <speed>(0.6+$2*0.9)*(1+$rank*$rank*$rank*$rank)</speed>
+    <bullet>
+     <action>
+      <wait>9999</wait>
+      <fire>
+       <direction type="relative">0</direction>
+       <speed type="relative">0</speed>
+       <bullet><action><vanish/></action></bullet>
+      </fire>
+     </action>
+    </bullet>
+   </fire>
+   <repeat><times>5</times>
+    <action>
+     <fire>
+      <direction type="sequence">60</direction>
+      <speed>(0.6+$2*0.9)*(1+$rank*$rank*$rank*$rank)</speed>
+      <bullet>
+       <action>
+        <wait>9999</wait>
+        <fire>
+         <direction type="relative">0</direction>
+         <speed type="relative">0</speed>
+         <bullet><action><vanish/></action></bullet>
+        </fire>
+       </action>
+      </bullet>
+     </fire>
+    </action>
+   </repeat>
+   <wait>8-$rank*4</wait>
+  </action>
+ </repeat>
+</action>
+
+</bulletml>

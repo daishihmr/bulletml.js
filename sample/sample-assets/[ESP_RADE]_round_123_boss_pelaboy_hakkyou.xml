@@ -1,0 +1,360 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml type="vertical" xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+	<bullet  label="Red">
+		<action/>
+	</bullet>
+	<bullet  label="Dummy">
+		<action>
+			<vanish/>
+		</action>
+	</bullet>
+	<action  label="Stop">
+		<changeSpeed>
+			<speed>
+				 0
+			</speed>
+			<term>
+				 1
+			</term>
+		</changeSpeed>
+	</action>
+	<action  label="XWay">
+		<actionRef  label="XWayFan">
+			<param>
+				 $1
+			</param>
+			<param>
+				 $2
+			</param>
+			<param>
+				 0
+			</param>
+		</actionRef>
+	</action>
+	<action  label="XWayFan">
+		<repeat>
+			<times>
+				 $1-1
+			</times>
+			<action>
+				<fire>
+					<direction  type="sequence">
+						$2
+					</direction>
+					<speed  type="sequence">
+						$3
+					</speed>
+					<bullet/>
+				</fire>
+			</action>
+		</repeat>
+	</action>
+	<bullet  label="subBatteryFan">
+		<speed>
+			 4
+		</speed>
+		<action>
+			<wait>
+				 10
+			</wait>
+			<actionRef  label="Stop"/>
+			<wait>
+				 250
+			</wait>
+			<fire>
+				<direction  type="aim">
+					-45
+				</direction>
+				<speed>
+					 1.6
+				</speed>
+				<bullet/>
+			</fire>
+			<actionRef  label="XWay">
+				<param>
+					 10+$rank*10
+				</param>
+				<param>
+					 90/(10+$rank*10)
+				</param>
+			</actionRef>
+			<repeat>
+				<times>
+					 2
+				</times>
+				<action>
+					<wait>
+						 5
+					</wait>
+					<fire>
+						<direction  type="sequence">
+							-90
+						</direction>
+						<speed>
+							 1.6
+						</speed>
+						<bullet/>
+					</fire>
+					<actionRef  label="XWay">
+						<param>
+							 11+$rank*10
+						</param>
+						<param>
+							 90/(10+$rank*10)
+						</param>
+					</actionRef>
+				</action>
+			</repeat>
+			<vanish/>
+		</action>
+	</bullet>
+	<bullet  label="aimFan">
+		<speed>
+			 4
+		</speed>
+		<action>
+			<wait>
+				 5
+			</wait>
+			<fire>
+				<direction  type="aim">
+					-4-$rank*8
+				</direction>
+				<speed>
+					 1.6
+				</speed>
+				<bullet/>
+			</fire>
+			<actionRef  label="XWay">
+				<param>
+					 5+$rank*8
+				</param>
+				<param>
+					 2
+				</param>
+			</actionRef>
+			<vanish/>
+		</action>
+	</bullet>
+	<bullet  label="subBatteryAim">
+		<speed>
+			 1
+		</speed>
+		<action>
+			<wait>
+				 10
+			</wait>
+			<actionRef  label="Stop"/>
+			<repeat>
+				<times>
+					 4
+				</times>
+				<action>
+					<wait>
+						 100+$rand*50
+					</wait>
+					<fire>
+						<direction  type="absolute">
+							90
+						</direction>
+						<bulletRef  label="aimFan"/>
+					</fire>
+					<fire>
+						<direction  type="absolute">
+							-90
+						</direction>
+						<bulletRef  label="aimFan"/>
+					</fire>
+				</action>
+			</repeat>
+			<vanish/>
+		</action>
+	</bullet>
+	<bullet  label="soldier">
+		<direction  type="absolute">
+			90*$1
+		</direction>
+		<speed>
+			 2
+		</speed>
+		<action>
+			<wait>
+				 10
+			</wait>
+			<actionRef  label="Stop"/>
+			<fire>
+				<direction  type="absolute">
+					$2
+				</direction>
+				<speed>
+					 1.3
+				</speed>
+				<bulletRef  label="Dummy"/>
+			</fire>
+			<repeat>
+				<times>
+					 120+$rank*200
+				</times>
+				<action>
+					<wait>
+						 440/(120+$rank*200)+$rand
+					</wait>
+					<fire>
+						<direction  type="sequence">
+							17*$1
+						</direction>
+						<speed  type="sequence">
+							0
+						</speed>
+						<bullet/>
+					</fire>
+				</action>
+			</repeat>
+		</action>
+	</bullet>
+	<action  label="top">
+		<fire>
+			<bulletRef  label="soldier">
+				<param>
+					 1
+				</param>
+				<param>
+					 90
+				</param>
+			</bulletRef>
+		</fire>
+		<fire>
+			<bulletRef  label="soldier">
+				<param>
+					 -1
+				</param>
+				<param>
+					 -80
+				</param>
+			</bulletRef>
+		</fire>
+		<fire>
+			<direction  type="absolute">
+				180
+			</direction>
+			<bulletRef  label="subBatteryAim"/>
+		</fire>
+		<fire>
+			<direction  type="absolute">
+				90
+			</direction>
+			<bulletRef  label="subBatteryFan"/>
+		</fire>
+		<fire>
+			<direction  type="absolute">
+				-90
+			</direction>
+			<bulletRef  label="subBatteryFan"/>
+		</fire>
+		<fire>
+			<direction  type="absolute">
+				180
+			</direction>
+			<speed>
+				 2
+			</speed>
+			<bullet>
+				<action>
+					<wait>
+						 10
+					</wait>
+					<fire>
+						<speed>
+							 0
+						</speed>
+						<bullet>
+							<action>
+								<actionRef  label="mainBattery"/>
+								<vanish/>
+							</action>
+						</bullet>
+					</fire>
+					<vanish/>
+				</action>
+			</bullet>
+		</fire>
+		<wait>
+			 500
+		</wait>
+	</action>
+	<action  label="mainBattery">
+		<repeat>
+			<times>
+				 15
+			</times>
+			<action>
+				<wait>
+					 8
+				</wait>
+				<fire>
+					<direction  type="aim">
+						0
+					</direction>
+					<speed>
+						 1.6
+					</speed>
+					<bullet/>
+				</fire>
+			</action>
+		</repeat>
+		<wait>
+			 195
+		</wait>
+		<repeat>
+			<times>
+				 4
+			</times>
+			<action>
+				<wait>
+					 20
+				</wait>
+				<fire>
+					<direction  type="absolute">
+						88+$rand*4
+					</direction>
+					<speed>
+						 1.6
+					</speed>
+					<bullet/>
+				</fire>
+				<actionRef  label="XWay">
+					<param>
+						 12+$rank*16
+					</param>
+					<param>
+						 180/(12+$rank*16)
+					</param>
+				</actionRef>
+				<wait>
+					 20
+				</wait>
+				<fire>
+					<direction  type="absolute">
+						93+$rand*4
+					</direction>
+					<speed>
+						 1.6
+					</speed>
+					<bullet/>
+				</fire>
+				<actionRef  label="XWay">
+					<param>
+						 11+$rank*16
+					</param>
+					<param>
+						 170/(11+$rank*16)
+					</param>
+				</actionRef>
+			</action>
+		</repeat>
+		<wait>
+			 40
+		</wait>
+	</action>
+</bulletml>

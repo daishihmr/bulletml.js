@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml>
+<action label="top"><repeat> <times>5</times> <action><actionRef label="impl:48"></actionRef><wait>50</wait></action></repeat><wait>50</wait></action>
+<action label="impl:48"><wait>20</wait><fire><direction type="relative">-90</direction><speed type="absolute">0.6</speed><bullet><action><actionRef label="impl:60"></actionRef><actionRef label="impl:38"></actionRef></action></bullet></fire></action>
+<action label="impl:60"><fire><direction type="aim">0</direction><speed type="absolute">1</speed><bullet/></fire><fire><direction type="absolute">180</direction><speed type="absolute">1.8</speed><bullet/></fire><wait>3</wait></action>
+<bullet label="bulletmls/[Progear]_round_4_boss_fast_rocket.xml:_:downAccel"><action><accel><vertical type="absolute">2.7</vertical><term>120</term></accel></action></bullet>
+<action label="impl:38"><fireRef label="bulletmls/[Progear]_round_5_middle_boss_rockets.xml:_:udBlt"><param>90</param></fireRef><wait>24-$rank*8</wait><fireRef label="bulletmls/[Progear]_round_5_middle_boss_rockets.xml:_:udBlt"><param>-90</param></fireRef><wait>24-$rank*8</wait></action>
+<fire label="bulletmls/[Progear]_round_5_middle_boss_rockets.xml:_:udBlt"><direction type="relative">$1-25+$rand*50</direction><bullet><action><actionRef label="impl:59"></actionRef></action></bullet></fire>
+<action label="impl:59"><repeat><times>9999</times><action><fire><direction type="absolute">0</direction><speed type="absolute">1</speed><bulletRef label="bulletmls/[Progear]_round_4_boss_fast_rocket.xml:_:downAccel"></bulletRef></fire><fire><direction type="absolute">60</direction><speed type="absolute">1.8</speed><bulletRef label="bulletmls/[Progear]_round_4_boss_fast_rocket.xml:_:downAccel"></bulletRef></fire><wait>3</wait></action></repeat></action>
+</bulletml>

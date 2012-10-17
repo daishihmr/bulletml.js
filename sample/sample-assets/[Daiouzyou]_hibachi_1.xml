@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml>
+
+
+
+
+
+<action label="top">
+<repeat>
+<times>10+$rank*70</times>
+<action>
+<fire><direction type="aim">$rand*30-74+$rank*2</direction><speed>0.5+$rank*2</speed><bullet/></fire>
+<fireRef label="n"/>
+<fireRef label="n"/>
+<fireRef label="n"/>
+<fireRef label="n"/>
+<fireRef label="n"/>
+<fireRef label="n"/>
+<fireRef label="n"/>
+<fireRef label="n"/>
+<fireRef label="n"/>
+<fireRef label="n"/>
+<fireRef label="n"/>
+<fireRef label="n"/>
+<fireRef label="n"/>
+<fireRef label="n"/>
+<fireRef label="n"/>
+<fireRef label="n"/>
+
+
+
+<wait>14-$rank*10</wait>
+</action>
+</repeat>
+</action>
+
+<fire label="n">
+<direction type="sequence">$rand*2+7-$rank*2</direction><speed>0.5+$rank*2</speed><bullet/>
+</fire>
+
+
+</bulletml>

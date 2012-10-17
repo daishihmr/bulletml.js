@@ -1,0 +1,113 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="vertical"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+
+  <fire>
+    <direction type="absolute">90</direction>
+    <bulletRef label="bit">
+      <param>1</param>
+    </bulletRef>
+  </fire>
+  <fire>
+    <direction type="absolute">90</direction>
+    <bulletRef label="bit">
+      <param>-1</param>
+    </bulletRef>
+  </fire>
+
+  <fire>
+    <direction type="absolute">-90</direction>
+    <bulletRef label="bit">
+      <param>1</param>
+    </bulletRef>
+  </fire>
+  <fire>
+    <direction type="absolute">-90</direction>
+    <bulletRef label="bit">
+      <param>-1</param>
+    </bulletRef>
+  </fire>
+
+  <repeat><times>300</times><action>
+    <fire>
+      <direction type="absolute">
+        -(120 + 45 * $rank) + (240 + 90 * $rank) * $rand
+      </direction>
+      <speed>1.6</speed>
+      <bullet/>
+    </fire>
+    <repeat><times>5</times><action>
+      <fire>
+        <direction type="sequence">0</direction>
+        <speed type="sequence">0.2</speed>
+        <bullet/>
+      </fire>
+    </action></repeat>
+    <wait>2</wait>
+  </action></repeat>
+
+</action>
+
+<bullet label="bit">
+<speed>0.2</speed>
+<action>
+
+  <wait>60</wait>
+  <changeSpeed>
+    <speed>0</speed>
+    <term>1</term>
+  </changeSpeed>
+  <wait>5</wait>
+
+  <fire>
+    <direction type="aim">(45 - 25 * $rank) * $1</direction>
+    <bulletRef label="backstab"/>
+  </fire>
+  <wait>3</wait>
+  <repeat><times>29</times><action>
+    <fire>
+      <direction type="sequence">-0.5 * $1</direction>
+      <bulletRef label="backstab"/>
+    </fire>
+    <wait>3</wait>
+  </action></repeat>
+
+  <repeat><times>30</times><action>
+    <fire>
+      <direction type="sequence">0.5 * $1</direction>
+      <bulletRef label="backstab"/>
+    </fire>
+    <wait>3</wait>
+  </action></repeat>
+
+  <repeat><times>30</times><action>
+    <fire>
+      <direction type="sequence">-0.5 * $1</direction>
+      <bulletRef label="backstab"/>
+    </fire>
+    <wait>3</wait>
+  </action></repeat>
+
+  <vanish/>
+
+</action>
+</bullet>
+
+<bullet label="backstab">
+<speed>1.6</speed>
+<action>
+
+  <wait>70 + 20 * $rand</wait>
+  <changeDirection>
+    <direction type="aim">0</direction>
+    <term>1</term>
+  </changeDirection>
+
+</action>
+</bullet>
+
+</bulletml>

@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!DOCTYPE bulletml SYSTEM "http://www.asahi-net.or.jp/~cs8k-cyu/bulletml/bulletml.dtd">
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
 
 <bulletml type="horizontal"
           xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
@@ -14,7 +14,7 @@
 <action>
 <fire>
  <direction type="absolute">$1</direction>
- <speed type="sequence">0.4</speed>
+ <speed type="sequence">0.5</speed>
  <bulletRef label="rootBl"/>
 </fire>
 </action>
@@ -57,7 +57,7 @@
   <speed>1.8</speed>
   <bulletRef label="downAccel"/>
  </fire>
- <wait>3</wait>
+ <wait>5-$rank*4</wait>
 </action>
 </repeat>
 </action>

@@ -1,0 +1,166 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="vertical"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+
+    <fire>
+      <direction type="absolute">360 * $rand</direction>
+      <bulletRef label="centerbit"/>
+    </fire>
+
+    <wait>800</wait>
+
+</action>
+
+<bullet label="centerbit">
+<direction type="absolute">180</direction>
+<speed>0.9</speed>
+<action>
+
+  <wait>40</wait>
+
+  <changeSpeed>
+    <speed>0.0</speed>
+    <term>1</term>
+  </changeSpeed>
+
+  <wait>5</wait>
+
+  <fire>
+    <direction type="absolute">360 * $rand</direction>
+    <bulletRef label="pillarbit"/>
+  </fire>
+  <repeat><times>17</times><action>
+    <fire>
+      <direction type="sequence">5</direction>
+      <bulletRef label="dummybit"/>
+    </fire>
+  </action></repeat>
+
+  <repeat><times>3</times><action>
+    <fire>
+      <direction type="sequence">5</direction>
+      <bulletRef label="pillarbit"/>
+    </fire>
+    <repeat><times>17</times><action>
+      <fire>
+        <direction type="sequence">5</direction>
+        <bulletRef label="dummybit"/>
+      </fire>
+    </action></repeat>
+  </action></repeat>
+
+  <wait>120</wait>
+
+  <repeat><times>140</times><action>
+    <fire>
+      <direction type="absolute">360 * $rand</direction>
+      <speed>0.2</speed>
+      <bulletRef label="weak">
+        <param>240</param>
+      </bulletRef>
+    </fire>
+  <wait>2</wait>
+  </action></repeat>
+
+  <repeat><times>70</times><action>
+    <fire>
+      <direction type="absolute">360 * $rand</direction>
+      <speed>2.0</speed>
+      <bulletRef label="weak">
+        <param>24</param>
+      </bulletRef>
+    </fire>
+    <repeat><times>4</times><action>
+      <fire>
+        <direction type="sequence">0</direction>
+        <speed type="sequence">-0.2</speed>
+        <bulletRef label="weak">
+          <param>24</param>
+        </bulletRef>
+      </fire>
+    </action></repeat>
+  <wait>2</wait>
+  </action></repeat>
+
+  <vanish/>
+
+</action>
+</bullet>
+
+<bullet label="pillarbit">
+<speed>0.6</speed>
+<action>
+
+  <wait>120</wait>
+
+  <changeSpeed>
+    <speed>0.001</speed>
+    <term>1</term>
+  </changeSpeed>
+
+  <wait>120</wait>
+
+  <repeat><times>300 / (35 - 33 * $rank)</times><action>
+    <repeat><times>10</times><action>
+      <fire>
+        <direction type="absolute">360 * $rand</direction>
+        <speed>2.0</speed>
+        <bulletRef label="weak">
+          <param>15</param>
+        </bulletRef>
+      </fire>
+    </action></repeat>
+    <fire>
+      <direction type="relative">-45 + 90 * $rand</direction>
+      <speed>(2.5 + 1.0 * $rand) * (0.25 + 0.75 * $rank)</speed>
+      <bullet/>
+    </fire>
+    <wait>35 - 33 * $rank</wait>
+  </action></repeat>
+
+  <vanish/>
+
+</action>
+</bullet>
+
+<bullet label="dummybit">
+<speed>0.6</speed>
+<action>
+
+  <wait>120</wait>
+
+  <changeSpeed>
+    <speed>0.001</speed>
+    <term>1</term>
+  </changeSpeed>
+
+  <wait>120</wait>
+
+  <repeat><times>300 / (35 - 33 * $rank)</times><action>
+    <fire>
+      <direction type="relative">-45 + 90 * $rand</direction>
+      <speed>(2.5 + 1.0 * $rand) * (0.25 + 0.75 * $rank)</speed>
+      <bullet/>
+    </fire>
+    <wait>35 - 33 * $rank</wait>
+  </action></repeat>
+
+  <vanish/>
+
+</action>
+</bullet>
+
+<bullet label="weak">
+<action>
+
+  <wait>$1</wait>
+  <vanish/>
+
+</action>
+</bullet>
+
+</bulletml>

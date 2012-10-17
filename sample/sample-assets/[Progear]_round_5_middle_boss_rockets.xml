@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!DOCTYPE bulletml SYSTEM "http://www.asahi-net.or.jp/~cs8k-cyu/bulletml/bulletml.dtd">
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
 
 <bulletml type="horizontal"
           xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
@@ -14,6 +14,7 @@
  <wait>10</wait>
 </action>
 </repeat>
+<wait>120</wait>
 </action>
 
 <bullet label="rocket">
@@ -27,7 +28,7 @@
  <fireRef label="udBlt">
   <param>-90</param>
  </fireRef>
- <wait>20-$rank*8</wait>
+ <wait>$rand*10+15-$rank*8</wait>
 </action>
 </repeat>
 </action>

@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!DOCTYPE bulletml SYSTEM "http://www.asahi-net.or.jp/~cs8k-cyu/bulletml/bulletml.dtd">
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
 
 <bulletml type="vertical"
           xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
@@ -32,9 +32,15 @@
 </action>
 
 <action label="top">
+<repeat> <times>50</times>
+<action>
 <actionRef label="fireCircle">
  <param>180-45+90*$rand</param>
 </actionRef>
+<wait>12-$rank*4</wait>
+</action>
+</repeat>
+<wait>100</wait>
 </action>
 
 </bulletml>

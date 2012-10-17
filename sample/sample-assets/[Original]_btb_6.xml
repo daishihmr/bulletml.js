@@ -1,0 +1,223 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml type="vertical"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+
+  <fire>
+   <bulletRef label="halfwinder">
+    <param>1.8</param>
+    <param>2</param>
+    <param>360</param>
+    <param>-7</param>
+   </bulletRef>
+  </fire>
+  <fire>
+   <bulletRef label="halfwinder">
+    <param>1.8</param>
+    <param>2</param>
+    <param>330</param>
+    <param>-6</param>
+   </bulletRef>
+  </fire>
+  <fire>
+   <bulletRef label="halfwinder">
+    <param>1.8</param>
+    <param>2</param>
+    <param>300</param>
+    <param>-5</param>
+   </bulletRef>
+  </fire>
+  <fire>
+   <bulletRef label="halfwinder">
+    <param>1.8</param>
+    <param>2</param>
+    <param>270</param>
+    <param>-4</param>
+   </bulletRef>
+  </fire>
+  <fire>
+   <bulletRef label="halfwinder">
+    <param>1.8</param>
+    <param>2</param>
+    <param>240</param>
+    <param>-3</param>
+   </bulletRef>
+  </fire>
+  <fire>
+   <bulletRef label="halfwinder">
+    <param>1.8</param>
+    <param>2</param>
+    <param>210</param>
+    <param>-2</param>
+   </bulletRef>
+  </fire>
+  <fire>
+   <bulletRef label="halfwinder">
+    <param>1.8</param>
+    <param>2</param>
+    <param>180</param>
+    <param>-1</param>
+   </bulletRef>
+  </fire>
+
+  <fire>
+   <bulletRef label="halfwinder">
+    <param>1.8</param>
+    <param>2</param>
+    <param>180</param>
+    <param>1</param>
+   </bulletRef>
+  </fire>
+  <fire>
+   <bulletRef label="halfwinder">
+    <param>1.8</param>
+    <param>2</param>
+    <param>150</param>
+    <param>2</param>
+   </bulletRef>
+  </fire>
+  <fire>
+   <bulletRef label="halfwinder">
+    <param>1.8</param>
+    <param>2</param>
+    <param>120</param>
+    <param>3</param>
+   </bulletRef>
+  </fire>
+  <fire>
+   <bulletRef label="halfwinder">
+    <param>1.8</param>
+    <param>2</param>
+    <param>90</param>
+    <param>4</param>
+   </bulletRef>
+  </fire>
+  <fire>
+   <bulletRef label="halfwinder">
+    <param>1.8</param>
+    <param>2</param>
+    <param>60</param>
+    <param>5</param>
+   </bulletRef>
+  </fire>
+  <fire>
+   <bulletRef label="halfwinder">
+    <param>1.8</param>
+    <param>2</param>
+    <param>30</param>
+    <param>6</param>
+   </bulletRef>
+  </fire>
+  <fire>
+   <bulletRef label="halfwinder">
+    <param>1.8</param>
+    <param>2</param>
+    <param>0</param>
+    <param>7</param>
+   </bulletRef>
+  </fire>
+
+ <wait>700</wait>
+</action>
+
+<bullet label="halfwinder">
+<direction type="absolute">0</direction>
+<speed>0</speed>
+<action>
+
+  <fire>
+   <bulletRef label="bit">
+    <param>$1</param>
+    <param>$2</param>
+    <param>$3</param>
+    <param>$4</param>
+   </bulletRef>
+  </fire>
+
+  <fire>
+   <bulletRef label="changecolor">
+    <param>$1</param>
+    <param>$2</param>
+    <param>$3</param>
+    <param>-$4</param>
+   </bulletRef>
+  </fire>
+
+ <vanish/>
+
+</action></bullet>
+
+<bullet label="changecolor">
+<direction type="absolute">0</direction>
+<speed>0</speed>
+<action>
+
+  <wait>$2 * 2</wait>
+
+  <fire>
+   <bulletRef label="bit">
+    <param>$1</param>
+    <param>$2</param>
+    <param>$3</param>
+    <param>$4</param>
+   </bulletRef>
+  </fire>
+
+ <vanish/>
+
+</action></bullet>
+
+<bullet label="bit">
+<direction type="absolute">0</direction>
+<speed>0</speed>
+<action>
+
+  <fire>
+   <direction type="absolute">$3</direction>
+   <bulletRef label="laser">
+    <param>$1</param>
+    <param>$2</param>
+   </bulletRef>
+  </fire>
+
+  <wait>$2 * (15 - 9 * $rank)</wait>
+
+ <repeat> <times>300 / (15 - 9 * $rank)</times><action>
+  <fire>
+   <direction type="sequence">$4</direction>
+   <bulletRef label="laser">
+    <param>$1</param>
+    <param>$2</param>
+   </bulletRef>
+  </fire>
+
+  <wait>$2 * (15 - 9 * $rank)</wait>
+
+ </action></repeat>
+
+ <vanish/>
+
+</action></bullet>
+
+<bullet label="laser">
+<speed>0.01</speed>
+<action>
+
+ <repeat> <times>1 + 3 * $rank</times><action>
+  <fire>
+   <direction type="relative">0</direction>
+   <speed>$1 * (0.5 + 0.5 * $rank)</speed>
+   <bullet/>
+  </fire>
+
+  <wait>$2</wait>
+ </action></repeat>
+
+ <vanish/>
+
+</action></bullet>
+
+</bulletml>

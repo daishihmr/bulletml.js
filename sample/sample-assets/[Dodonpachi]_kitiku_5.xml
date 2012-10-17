@@ -1,0 +1,107 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top1">
+ <repeat> <times>30+$rank*30</times> <action>
+  <fire>
+   <direction type="sequence">220+$rand*2</direction>
+   <speed>1.2</speed>
+   <bullet/>
+  </fire>
+  <fire>
+   <direction type="sequence">15</direction>
+   <speed>1.2</speed>
+   <bullet/>
+  </fire>
+  <fire>
+   <direction type="sequence">120</direction>
+   <speed>1.2</speed>
+   <bullet/>
+  </fire>
+  <fire>
+   <direction type="sequence">15</direction>
+   <speed>1.2</speed>
+   <bullet/>
+  </fire>
+  <wait>20-$rank*10</wait>
+ </action> </repeat>
+</action>
+
+<action label="top2">
+ <repeat> <times>30+$rank*30</times> <action>
+  <fire>
+   <direction type="aim">-30+$rand*60</direction>
+   <speed>1.3</speed>
+   <bullet> <action/> </bullet>
+  </fire>
+  <wait>20-$rank*10</wait>
+ </action> </repeat>
+</action>
+
+<bullet label="kobati">
+ <action>
+  <wait>5</wait>
+
+  <changeDirection>
+   <direction type="absolute">180</direction>
+   <term>1</term>
+  </changeDirection>
+  <changeSpeed>
+   <speed type="absolute">1.2</speed>
+   <term>1</term>
+  </changeSpeed>
+  <wait>1</wait>
+
+  <repeat> <times>9999</times> <action>
+   <wait>30-$rank*10</wait>
+
+   <fire>
+    <direction type="sequence">45</direction>
+    <speed>0.4+$rank*0.2</speed>
+    <bullet/>
+   </fire>
+   <repeat> <times>3</times> <action>
+    <fire>
+     <direction type="sequence">90</direction>
+     <speed>0.4+$rank*0.2</speed>
+     <bullet/>
+    </fire>
+   </action> </repeat>
+
+  </action> </repeat>
+
+ </action>
+</bullet>
+
+<action label="top3">
+ <repeat> <times>5+$rank*5</times> <action>
+  <fire>
+   <direction type="absolute">90</direction>
+   <speed>10</speed>
+   <bulletRef label="kobati"/>
+  </fire>
+  <fire>
+   <direction type="absolute">90</direction>
+   <speed>5</speed>
+   <bulletRef label="kobati"/>
+  </fire>
+  <fire>
+   <direction type="absolute">-90</direction>
+   <speed>10</speed>
+   <bulletRef label="kobati"/>
+  </fire>
+  <fire>
+   <direction type="absolute">-90</direction>
+   <speed>5</speed>
+   <bulletRef label="kobati"/>
+  </fire>
+  <wait>120-$rank*60</wait>
+ </action> </repeat>
+
+ <wait>120</wait>
+</action>
+
+</bulletml>

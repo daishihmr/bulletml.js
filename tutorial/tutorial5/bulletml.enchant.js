@@ -1,7 +1,7 @@
 /*
- * bullet.enchant.js v0.3.0-SNAPSHOT
+ * bullet.enchant.js v0.3.0
  * @author daishi@dev7.jp
- * @require enchant.js v0.5.1 or later, bulletml.js v0.3.0-SNAPSHOT
+ * @require enchant.js v0.5.1 or later, bulletml.js v0.3.0
  * @description
  * enchant.js extension plugin for use BulletML.
  * 
@@ -233,34 +233,43 @@
                             tickers[tickers.length] = this._createTicker(
                                     config, "top" + i);
                         }
-                        var ticker = function() {
-                            for ( var i = 0, end = tickers.length; i < end; i++) {
-                                tickers[i].call(this);
+                        var parentTicker = function() {
+                            if (!parentTicker.complete) {
+                                for ( var i = 0, end = tickers.length; i < end; i++) {
+                                    tickers[i].call(this);
+                                }
+                                if (parentTicker.compChildCount == tickers.length) {
+                                    parentTicker.complete = true;
+                                    this.dispatchEvent(new Event(
+                                            "completeAttack"));
+                                }
                             }
                         };
-                        ticker.restart = function() {
+                        for ( var i = 0, end = tickers.length; i < end; i++) {
+                            tickers[i].parentTicker = parentTicker;
+                        }
+
+                        parentTicker.compChildCount = 0;
+                        parentTicker.completeChild = function() {
+                            this.compChildCount++;
+                        };
+
+                        parentTicker.restart = function() {
                             for ( var i = 0, end = tickers.length; i < end; i++) {
                                 tickers[i].restart();
                             }
+                            this.compChildCount = 0;
+                            this.complete = false;
                         };
-                        return ticker;
+                        parentTicker.restart();
+
+                        return parentTicker;
                     } else {
                         return this._createTicker(config, action);
                     }
                 },
                 _createTicker : function(config, action) {
                     config = this._getConf(config);
-
-                    var seq;
-                    if (action === undefined) {
-                        seq = this._bulletml.sequence("top", config.rank);
-                    } else if (typeof (action) === "string") {
-                        seq = this._bulletml.sequence(action, config.rank);
-                    } else if (action instanceof BulletML.Bullet) {
-                        seq = action.sequence();
-                    } else {
-                        throw new Error("引数が不正", action);
-                    }
 
                     var pattern = this;
 
@@ -309,8 +318,8 @@
                         if (this.age < ticker.waitTo || ticker.completed) {
                             return;
                         }
-                        for ( var end = seq.length; ticker.cursor < end; ticker.cursor++) {
-                            var cmd = seq[ticker.cursor];
+                        var cmd;
+                        while (cmd = ticker.walker.next()) {
                             switch (cmd.commandName) {
                             case "fire":
                                 pattern._fire.call(this, cmd, config, ticker,
@@ -318,20 +327,7 @@
                                 break;
                             case "wait":
                                 ticker.waitTo = this.age + eval(cmd.value);
-                                ticker.cursor += 1;
                                 return;
-                            case "loopEnd":
-                                cmd.loopCount = (cmd.loopCount == -1) ? 0
-                                        : (cmd.loopCount + 1);
-                                if (cmd.loopCount < eval(cmd.times) - 1) {
-                                    while (0 < ticker.cursor
-                                            && seq[ticker.cursor] != cmd.start) {
-                                        ticker.cursor -= 1;
-                                    }
-                                } else {
-                                    cmd.loopCount = -1;
-                                }
-                                break;
                             case "changeDirection":
                                 pattern._changeDirection.call(this, cmd,
                                         config, ticker);
@@ -346,16 +342,30 @@
                                 if (this.parentNode) {
                                     this.parentNode.removeChild(this);
                                 }
-                                ticker.cursor = end;
                                 break;
                             }
                         }
 
                         ticker.completed = true;
-                        this.dispatchEvent(new Event("completeAttack"));
+                        if (ticker.parentTicker) {
+                            ticker.parentTicker.completeChild();
+                        } else {
+                            this.dispatchEvent(new Event("completeAttack"));
+                        }
                     };
                     ticker.restart = function() {
-                        this.cursor = 0;
+                        if (action === undefined) {
+                            this.walker = pattern._bulletml.getWalker("top",
+                                    config.rank);
+                        } else if (typeof (action) === "string") {
+                            this.walker = pattern._bulletml.getWalker(action,
+                                    config.rank);
+                        } else if (action instanceof BulletML.Bullet) {
+                            this.walker = action.getWalker(config.rank);
+                        } else {
+                            throw new Error("引数が不正", config, action);
+                        }
+
                         this.waitTo = -1;
                         this.completed = false;
 

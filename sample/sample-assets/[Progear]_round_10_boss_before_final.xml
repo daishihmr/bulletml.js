@@ -1,0 +1,107 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+
+<bulletml 
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<fire label="rollOut">
+ <direction type="relative">90</direction>
+ <speed>0.0001</speed>
+
+ <bullet> <action>
+  <wait>350</wait>
+  <changeSpeed>
+   <speed>1</speed>
+   <term>100</term>
+  </changeSpeed>
+  <changeDirection>
+   <direction type="relative">50-$rank*40</direction>
+   <term>100</term>
+  </changeDirection>
+  <wait>1000</wait>
+ </action> </bullet>
+</fire>
+
+<bullet label="setter">
+ <speed>3</speed>
+
+ <action>
+  <repeat> <times>999</times> <action>
+   <wait>5</wait>
+   <fireRef label="rollOut"/>
+  </action> </repeat>
+ </action>
+</bullet>
+
+<action label="top1">
+ <fire>
+  <direction type="absolute">$rand*10</direction>
+  <bulletRef label="setter"/>
+ </fire>
+
+ <repeat> <times>45/(2-$rank)</times> <action>
+  <fire>
+   <direction type="sequence">16-$rank*8</direction>
+   <bulletRef label="setter"/>
+  </fire>
+  <wait>1</wait>
+ </action> </repeat>
+
+ <wait>40</wait>
+
+ <repeat> <times>125+$rank*125</times> <action>
+  <wait>1.5-$rank/2+$rand</wait>
+  <fire>
+   <direction type="aim">45-$rand*90</direction>
+   <speed>1.2</speed>
+   <bullet/>
+  </fire>
+ </action> </repeat>
+
+</action>
+
+<action label="top2">
+ <wait>80</wait>
+
+ <changeSpeed>
+  <speed>0.7</speed>
+  <term>1</term>
+ </changeSpeed>
+ <changeDirection>
+  <direction type="aim">0</direction>
+  <term>1</term>
+ </changeDirection>
+ <wait>1</wait>
+
+ <changeDirection>
+  <direction type="sequence">1.44444</direction>
+  <term>250</term>
+ </changeDirection>
+ <wait>250</wait>
+
+ <changeSpeed>
+  <speed>0</speed>
+  <term>1</term>
+ </changeSpeed>
+
+ <wait>20</wait>
+
+ <changeSpeed>
+  <speed>0.7</speed>
+  <term>1</term>
+ </changeSpeed>
+ <changeDirection>
+  <direction type="sequence">30</direction>
+  <term>12</term>
+ </changeDirection>
+ <wait>12</wait>
+
+ <changeSpeed>
+  <speed>0</speed>
+  <term>1</term>
+ </changeSpeed>
+
+ <wait>200-$rank*60</wait>
+</action>
+
+</bulletml>

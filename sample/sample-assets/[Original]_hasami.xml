@@ -1,0 +1,66 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "../bulletml.dtd">
+<bulletml>
+	<action label="curve">
+		<fire>
+			<direction type="aim">
+				$1
+			</direction>
+			<speed>
+				1.2+$rank*0.6
+			</speed>
+			<bullet>
+				<action>
+					<changeDirection>
+						<direction type="aim">
+							$1*-1.5
+						</direction>
+						<term>
+							100
+						</term>
+					</changeDirection>
+				</action>
+			</bullet>
+		</fire>
+		<fire>
+			<direction type="aim">
+				-$1
+			</direction>
+			<speed>
+				1.3+$rank*0.4
+			</speed>
+			<bullet>
+				<action>
+					<changeDirection>
+						<direction type="aim">
+							$1*1.5
+						</direction>
+						<term>
+							100
+						</term>
+					</changeDirection>
+				</action>
+			</bullet>
+		</fire>
+	</action>
+	<action label="top">
+		<repeat>
+			<times>
+				200
+			</times>
+			<action>
+				<wait>
+					2
+				</wait>
+				<actionRef label="curve">
+					<param>
+						$rand*90
+					</param>
+				</actionRef>
+			</action>
+		</repeat>
+		<wait>
+			50
+		</wait>
+	</action>
+</bulletml>
