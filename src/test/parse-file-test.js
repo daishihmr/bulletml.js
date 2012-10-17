@@ -20,9 +20,8 @@ ParseFileTest.prototype.test = function(queue) {
             "[Psyvariar]_X-B_colony_shape_satellite.xml",
             "[XEVIOUS]_garu_zakato.xml" ];
     for ( var i = 0, end = files.length; i < end; i++) {
-        ajax("/test/sample-xml/" + files[i], function(xml) {
-            var root = BulletML.build(xml);
-            root.sequence();
+        ajax("/test/sample/sample-assets/" + files[i], function(xml) {
+            BulletML.build(xml);
         });
     }
 };
