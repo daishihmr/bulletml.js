@@ -58,7 +58,7 @@ window.onload = function() {
         }
 
         // 攻撃パターンオブジェクト
-        var pattern = new AttackPattern(game.assets["rolling.xml"]);
+        var pattern = game.assets["rolling.xml"];
         // enterframeイベントリスナを生成
         var ticker = pattern.createTicker({
             target : player,

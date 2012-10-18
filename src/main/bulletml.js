@@ -1,5 +1,5 @@
 /*
- * bullet.js v0.3.0
+ * bullet.js v0.3.1
  * @author daishi@dev7.jp
  * @description
  * General-purpose parser BulletML.
@@ -104,6 +104,22 @@ var BulletML = {};
         return search(this.actions, label);
     };
     /**
+     * find top level action element by label. throw error if action is undefined.
+     * 
+     * @param {string}
+     *            label label attribute value
+     * @returns {BulletML.Action}
+     * @memberOf BulletML.Root.prototype
+     */
+    BulletML.Root.prototype.findActionOrThrow = function(label) {
+        var result;
+        if (result = this.findAction(label)) {
+            return result;
+        } else {
+            throw new Error("action labeled '" + label + "' is undefined.");
+        }
+    };
+    /**
      * find top level bullet element by label.
      * 
      * @param {string}
@@ -115,6 +131,22 @@ var BulletML = {};
         return search(this.bullets, label);
     };
     /**
+     * find top level bullet element by label. throw error if bullet is undefined.
+     * 
+     * @param {string}
+     *            label label attribute value
+     * @returns {BulletML.Bullet}
+     * @memberOf BulletML.Root.prototype
+     */
+    BulletML.Root.prototype.findBulletOrThrow = function(label) {
+        var result;
+        if (result = this.findBullet(label)) {
+            return result;
+        } else {
+            throw new Error("bullet labeled '" + label + "' is undefined.");
+        }
+    };
+    /**
      * find top level fire element by label.
      * 
      * @param {string}
@@ -124,6 +156,22 @@ var BulletML = {};
      */
     BulletML.Root.prototype.findFire = function(label) {
         return search(this.fires, label);
+    };
+    /**
+     * find top level fire element by label. throw error if fire is undefined.
+     * 
+     * @param {string}
+     *            label label attribute value
+     * @returns {BulletML.Fire}
+     * @memberOf BulletML.Root.prototype
+     */
+    BulletML.Root.prototype.findFireOrThrow = function(label) {
+        var result;
+        if (result = this.findFire(label)) {
+            return result;
+        } else {
+            throw new Error("fire labeled '" + label + "' is undefined.");
+        }
     };
     BulletML.Root.prototype.getWalker = function(actionLabel, rank) {
         var w = new BulletML.Walker(this, rank);
@@ -164,7 +212,7 @@ var BulletML = {};
                     this._localScopeStack.push(this._localScope);
                     this._localScope = this.newScope(n.params);
                     this.pushStack();
-                    this._action = this._root.findAction(n.label);
+                    this._action = this._root.findActionOrThrow(n.label);
                     return this.next();
                 case "repeat":
                     this._loopCounter = 0;
@@ -201,7 +249,7 @@ var BulletML = {};
                     this.pushStack();
                     this._action = {
                         commandName : "action",
-                        commands : [ this._root.findFire(n.label) ],
+                        commands : [ this._root.findFireOrThrow(n.label) ],
                         createdBy : "fireRef"
                     };
                     return this.next();
@@ -419,7 +467,7 @@ var BulletML = {};
     BulletML.BulletRef.prototype.clone = function(walker) {
         var bkup = walker._localScope;
         walker._localScope = walker.newScope(this.params);
-        var b = this.root.findBullet(this.label).clone(walker);
+        var b = this.root.findBulletOrThrow(this.label).clone(walker);
         walker._localScope = bkup;
         return b;
     };
@@ -764,6 +812,10 @@ var BulletML = {};
         var result = new BulletML.Root();
 
         var root = element.getElementsByTagName("bulletml")[0];
+        if (!root) {
+            return;
+        }
+
         attr(root, "type", function(type) {
             result.type = type;
         });

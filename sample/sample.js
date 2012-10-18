@@ -186,7 +186,7 @@ window.onload = function() {
         scene.addChild(enemy);
 
         // 攻撃パターン
-        var attackPattern = new AttackPattern(game.assets[xmlFiles.next()]);
+        var attackPattern = game.assets[xmlFiles.next()];
 
         // 攻撃パターン設定
         var config = {
@@ -217,7 +217,7 @@ window.onload = function() {
             console.log("complete")
             // 攻撃パターンさしかえ
             this.removeEventListener(ticker);
-            attackPattern = new AttackPattern(game.assets[xmlFiles.next()]);
+            attackPattern = game.assets[xmlFiles.next()];
             ticker = attackPattern.createTicker(config);
             this.on("enterframe", ticker);
         });
