@@ -1,7 +1,7 @@
 /*
- * bullet.enchant.js v0.3.0
+ * bullet.enchant.js v0.3.1
  * @author daishi@dev7.jp
- * @require enchant.js v0.5.1 or later, bulletml.js v0.3.0
+ * @require enchant.js v0.5.1 or later, bulletml.js v0.3.1
  * @description
  * enchant.js extension plugin for use BulletML.
  * 
@@ -44,7 +44,13 @@
                 }
 
                 if (xhr.responseXML != null) {
-                    game.assets[src] = BulletML.build(xhr.responseXML);
+                    var bulletml = BulletML.build(xhr.responseXML);
+                    if (bulletml) {
+                        game.assets[src] = new enchant.bulletml.AttackPattern(bulletml);
+                    } else {
+                        console.warn(src + "は妥当なBulletMLではありません。");
+                        game.assets[src] = xhr.responseXML;
+                    }
                     callback();
                 } else if (xhr.responseText != null) {
                     game.assets[src] = BulletML.build(xhr.responseText);
@@ -105,12 +111,12 @@
                  * @example
                  * 
                  * <pre>
-                 * game.preload(&quot;boss.xml&quot;);
+                 * game.preload(&quot;boss.xml&quot;); // BulletMLファイルを事前ロードする
                  * ...
                  * var player = new Sprite(... // 自機
                  * var boss = new Sprite(... // 敵機
-                 * var pattern = new AttackPattern(game.assets[&quot;boss.xml&quot;]); // 攻撃パターンを生成
-                 * var ticker = pattern.createTicker(player); // 自機を標的としたenterframeイベントリスナを生成
+                 * var attackPattern = game.assets[&quot;boss.xml&quot;]; // game.assetsにAttackPatternオブジェクトとして入っている
+                 * var ticker = attackPattern.createTicker(player); // 自機を標的としたenterframeイベントリスナを生成
                  * boss.addEventListener(&quot;enterframe&quot;, ticker); // パターンを敵機に設定する
                  * </pre>
                  * 
@@ -119,6 +125,9 @@
                  *            bulletml BulletMLデータ
                  */
                 initialize : function(bulletml) {
+                    if (!bulletml) {
+                        throw new Error("argument is invalid.", bulletml);
+                    }
                     this._bulletml = bulletml;
                 },
                 _getConf : function(base) {
@@ -220,32 +229,32 @@
                  *            設定する項目がtargetのみの場合、標的オブジェクトを直接引数として渡すことが可能.
                  * @param {string}
                  *            [action] 最初に読み込むactionのラベル.<br>
-                 *            省略可(デフォルト値は"top").
+                 *            省略可.
                  * @returns {function} enterframeイベントのリスナ.<br>
                  *          攻撃パターンを初めからやりなおすrestartメソッドを持つ.
                  */
                 createTicker : function(config, action) {
-                    if (action === undefined
-                            && !this._bulletml.findAction("top")) {
-                        // topN対応
+                    if (!action && !this._bulletml.findAction("top")) {
+                        // topN対応.actionがtop1～topNまで定義されていた場合、それらを同時に動かす.
                         var tickers = [];
                         for ( var i = 1; this._bulletml.findAction("top" + i); i++) {
                             tickers[tickers.length] = this._createTicker(
                                     config, "top" + i);
                         }
                         var parentTicker = function() {
-                            if (!parentTicker.complete) {
-                                for ( var i = 0, end = tickers.length; i < end; i++) {
-                                    tickers[i].call(this);
-                                }
-                                if (parentTicker.compChildCount == tickers.length) {
-                                    parentTicker.complete = true;
-                                    this.dispatchEvent(new Event(
-                                            "completeAttack"));
-                                }
+                            if (parentTicker.complete) {
+                                return;
+                            }
+                            for ( var i = tickers.length; i--;) {
+                                tickers[i].call(this);
+                            }
+                            if (parentTicker.compChildCount == tickers.length) {
+                                parentTicker.complete = true;
+                                this.dispatchEvent(new Event(
+                                        "completeAttack"));
                             }
                         };
-                        for ( var i = 0, end = tickers.length; i < end; i++) {
+                        for ( var i = tickers.length; i--;) {
                             tickers[i].parentTicker = parentTicker;
                         }
 
@@ -255,7 +264,7 @@
                         };
 
                         parentTicker.restart = function() {
-                            for ( var i = 0, end = tickers.length; i < end; i++) {
+                            for ( var i = tickers.length; i--;) {
                                 tickers[i].restart();
                             }
                             this.compChildCount = 0;
