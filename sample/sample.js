@@ -131,7 +131,7 @@ window.onload = function() {
             game.rootScene.addChild(result);
             return result;
         })();
-        scene.backgroundColor = "#000044";
+        scene.backgroundColor = "#000033";
 
         fileName = new Label();
         fileName.color = "white";
@@ -194,6 +194,7 @@ window.onload = function() {
             for ( var i = this.length; i--;) {
                 if (!this[i].active) {
                     this[i].active = true;
+                    this[i].age = 0;
                     return this[i];
                 }
             }
@@ -206,7 +207,7 @@ window.onload = function() {
         enemy.frame = 3;
         enemy.frameCount = 0;
         enemy.x = (game.width - enemy.width) / 2;
-        enemy.y = 32;
+        enemy.y = 64;
         enemy.on("enterframe", function() {
             // テクテク歩く
             if (this.age % 10 === 0) {
@@ -225,8 +226,10 @@ window.onload = function() {
                 return bulletPool.get();
             },
             testInWorld : function(b) {
-                if (b === enemy) return true;
-                else return -50 < b.x && b.x < 370 && -200 < b.y && b.y < 370;
+                return (b === enemy) ||
+                    (b.age < 600 &&
+                    -50 < b.x && b.x < 50+game.width &&
+                        -100 < b.y && b.y < 50+game.height);
             },
             rank : 0.5,
             speedRate: 1.2
