@@ -154,6 +154,14 @@ window.onload = function() {
             // 自機中心マーカーを移動させる
             playerCenter.x = this.x + (this.width - playerCenter.width) / 2;
             playerCenter.y = this.y + (this.height - playerCenter.height) / 2;
+
+            for ( var i = bulletPool.length; i--;) {
+                var b = bulletPool[i];
+                if (b.active && this.within(b, 4)) {
+                    b.parentNode.removeChild(b);
+                    explode(b);
+                }
+            }
         });
         scene.addChild(player);
         // 自機の中心マーカー
@@ -169,6 +177,28 @@ window.onload = function() {
             c.fillRect(0, 0, 8, 8);
         })();
         scene.addChild(playerCenter);
+
+        // 弾プール
+        var bulletPool = [];
+        for ( var i = 0; i < 1000; i++) {
+            var bullet = new enchant.Sprite(8, 8);
+            bullet.image = enchant.Surface
+                    .load(enchant.bulletml.DEFAULT_IMAGE);
+            bullet.active = false;
+            bullet.on("removed", function() {
+                this.active = false;
+            });
+            bulletPool[i] = bullet;
+        }
+        bulletPool.get = function() {
+            for ( var i = this.length; i--;) {
+                if (!this[i].active) {
+                    this[i].active = true;
+                    return this[i];
+                }
+            }
+            console.log("弾切れ");
+        };
 
         // 敵
         var enemy = new Sprite(32, 32);
@@ -191,19 +221,15 @@ window.onload = function() {
         // 攻撃パターン設定
         var config = {
             target : player, // 攻撃対象
-            bulletFactory : function(spec) { // 弾Spriteの生成関数
-                var bullet = new enchant.Sprite(8, 8);
-                bullet.image = enchant.Surface
-                        .load(enchant.bulletml.DEFAULT_IMAGE);
-                bullet.on("enterframe", function() {
-                    // 衝突判定（自機と弾との距離が4未満）
-                    if (this.within(player, 4)) {
-                        this.parentNode.removeChild(this);
-                        explode(this);
-                    }
-                });
-                return bullet;
-            }
+            bulletFactory : function() { // 弾Spriteの生成関数
+                return bulletPool.get();
+            },
+            testInWorld : function(b) {
+                if (b === enemy) return true;
+                else return -50 < b.x && b.x < 370 && -200 < b.y && b.y < 370;
+            },
+            rank : 0.5,
+            speedRate: 1.2
         };
 
         // enterframeイベントリスナを作成
@@ -214,7 +240,8 @@ window.onload = function() {
 
         // 攻撃完了時の処理
         enemy.on("completeAttack", function() {
-            console.log("complete")
+            console.log("complete");
+            this.moveTo((game.width - enemy.width) / 2, 64);
             // 攻撃パターンさしかえ
             this.removeEventListener(ticker);
             attackPattern = game.assets[xmlFiles.next()];
