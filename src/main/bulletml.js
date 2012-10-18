@@ -219,14 +219,10 @@ var BulletML = {};
                     n.end = this.eval(n.times, this._localScope,
                             this._globalScope);
                     this.pushStack();
-                    if (n.action.commandName === "action") {
-                        this._action = n.action;
-                    } else {
-                        this._action = {
-                            commandName : "action",
-                            commands : [ n.action ]
-                        };
-                    }
+                    this._action = {
+                        commandName : "action",
+                        commands : [ n.action ]
+                    };
                     return this.next();
                 case "fire":
                     result.bullet = n.bullet.clone(this);
@@ -249,8 +245,7 @@ var BulletML = {};
                     this.pushStack();
                     this._action = {
                         commandName : "action",
-                        commands : [ this._root.findFireOrThrow(n.label) ],
-                        createdBy : "fireRef"
+                        commands : [ this._root.findFireOrThrow(n.label) ]
                     };
                     return this.next();
                 case "changeDirection":
@@ -312,14 +307,10 @@ var BulletML = {};
                     if (this._loopCounter < current.end) {
                         // もう１回行ってこい
                         this.pushStack();
-                        if (current.action.commandName === "action") {
-                            this._action = current.action;
-                        } else {
-                            this._action = {
-                                commandName : "action",
-                                commands : [ current.action ]
-                            };
-                        }
+                        this._action = {
+                            commandName : "action",
+                            commands : [ current.action ]
+                        };
                         return this.next();
                     } else {
                         return this.next();
