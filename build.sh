@@ -1,17 +1,6 @@
 rm -rf target
 mkdir target
 
-cp src/main/bulletml.js         tutorial/tutorial4/bulletml.js
-cp src/main/bulletml.enchant.js tutorial/tutorial4/bulletml.enchant.js
-cp src/main/bulletml.js         tutorial/tutorial5/bulletml.js
-cp src/main/bulletml.enchant.js tutorial/tutorial5/bulletml.enchant.js
-cp src/main/bulletml.js         tutorial/tutorial6/bulletml.js
-cp src/main/bulletml.enchant.js tutorial/tutorial6/bulletml.enchant.js
-cp src/main/bulletml.js         tutorial/tutorial7/bulletml.js
-cp src/main/bulletml.enchant.js tutorial/tutorial7/bulletml.enchant.js
-cp src/main/bulletml.js         tutorial/tutorial8/bulletml.js
-cp src/main/bulletml.enchant.js tutorial/tutorial8/bulletml.enchant.js
-
 cp src/main/bulletml.js         target/bulletml-$1.js
 cp src/main/bulletml.enchant.js target/bulletml.enchant-$1.js
 

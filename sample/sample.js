@@ -106,14 +106,14 @@ var xmlFiles = [ "[1943]_rolling_fire.xml", "[Bulletsmorph]_aba_1.xml",
         "[SilverGun]_4D_boss_PENTA.xml", "[Strikers1999]_hanabi.xml",
         "[XEVIOUS]_garu_zakato.xml", "[XII_STAG]_3b.xml",
         "[tenmado]_3_boss_2.xml", "[tenmado]_5_boss_1.xml",
-        "[tenmado]_5_boss_3.xml", "[xsoldier]_8_boss_main.xml" ]
-        .map(function(f) {
-            return "sample-assets/" + f;
-        });
+        "[tenmado]_5_boss_3.xml", "[xsoldier]_8_boss_main.xml" ].map(function(
+        fileName) {
+    return "sample-assets/" + fileName;
+});
 xmlFiles.next = function() {
     var result = this[~~(Math.random() * this.length)];
     console.log(result);
-    fileName.text = result;
+    fileName.text = result.replace("sample-assets/", "");
     return result;
 };
 
@@ -182,8 +182,7 @@ window.onload = function() {
         var bulletPool = [];
         for ( var i = 0; i < 1000; i++) {
             var bullet = new enchant.Sprite(8, 8);
-            bullet.image = enchant.Surface
-                    .load(enchant.bulletml.DEFAULT_IMAGE);
+            bullet.image = enchant.Surface.load(enchant.bulletml.DEFAULT_IMAGE);
             bullet.active = false;
             bullet.on("removed", function() {
                 this.active = false;
@@ -216,40 +215,34 @@ window.onload = function() {
         });
         scene.addChild(enemy);
 
-        // 攻撃パターン
-        var attackPattern = game.assets[xmlFiles.next()];
-
         // 攻撃パターン設定
-        var config = {
-            target : player, // 攻撃対象
-            bulletFactory : function() { // 弾Spriteの生成関数
-                return bulletPool.get();
-            },
-            testInWorld : function(b) {
-                return (b === enemy) ||
-                    (b.age < 600 &&
-                    -50 < b.x && b.x < 50+game.width &&
-                        -100 < b.y && b.y < 50+game.height);
-            },
-            rank : 0.5,
-            speedRate: 1.2
+        // 攻撃対象
+        AttackPattern.defaultConfig.target = player;
+        // 弾の生成関数
+        AttackPattern.defaultConfig.bulletFactory = function() {
+            return bulletPool.get();
         };
+        // 弾の消去判定
+        AttackPattern.defaultConfig.testInWorld = function(b) {
+            return (b === enemy)
+                    || (b.age < 600 && -50 < b.x && b.x < 50 + game.width
+                            && -100 < b.y && b.y < 50 + game.height);
+        };
+        // 難易度ランク
+        AttackPattern.defaultConfig.rank = 0.5;
+        // 弾速
+        AttackPattern.defaultConfig.speedRate = 1.2;
 
-        // enterframeイベントリスナを作成
-        var ticker = attackPattern.createTicker(config);
-
-        // 作成したenterframeイベントリスナを敵機にセット
-        enemy.on("enterframe", ticker);
+        // 敵機に弾幕をセット
+        enemy.setDanmaku(game.assets[xmlFiles.next()]);
 
         // 攻撃完了時の処理
         enemy.on("completeAttack", function() {
-            console.log("complete");
+            console.log("攻撃完了");
             this.moveTo((game.width - enemy.width) / 2, 64);
-            // 攻撃パターンさしかえ
-            this.removeEventListener(ticker);
-            attackPattern = game.assets[xmlFiles.next()];
-            ticker = attackPattern.createTicker(config);
-            this.on("enterframe", ticker);
+            // 弾幕さしかえ
+            this.removeDanmaku();
+            enemy.setDanmaku(game.assets[xmlFiles.next()]);
         });
 
         // タッチ操作用パネル

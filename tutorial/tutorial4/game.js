@@ -19,33 +19,31 @@ window.onload = function() {
         enemy.y = 0;
         game.rootScene.addChild(enemy);
 
-        // 攻撃パターンオブジェクト
-        var pattern = game.assets["labeled.xml"];
-        // enterframeイベントリスナを生成
-        var ticker = pattern.createTicker({
-            target : player,
-            bulletFactory : function(spec) {
-                var bullet = new Sprite(16, 16);
-                bullet.image = game.assets["icon0.png"];
-                switch (spec.label) {
-                case "spade":
-                    bullet.frame = 67;
-                    break;
-                case "clover":
-                    bullet.frame = 68;
-                    break;
-                case "diamond":
-                    bullet.frame = 69;
-                    break;
-                case "heart":
-                    bullet.frame = 70;
-                    break;
-                }
-                return bullet;
+        AttackPattern.defaultConfig.target = player;
+        AttackPattern.defaultConfig.bulletFactory = function(spec) {
+            var bullet = new Sprite(16, 16);
+            bullet.image = game.assets["icon0.png"];
+            switch (spec.label) {
+            case "spade":
+                bullet.frame = 67;
+                break;
+            case "clover":
+                bullet.frame = 68;
+                break;
+            case "diamond":
+                bullet.frame = 69;
+                break;
+            case "heart":
+                bullet.frame = 70;
+                break;
             }
-        });
-        // 生成したイベントリスナを敵機に登録
-        enemy.addEventListener("enterframe", ticker);
+            return bullet;
+        }
+
+        // 弾幕パターンオブジェクトをアセットから取り出す
+        var pattern = game.assets["labeled.xml"];
+        // 敵機に弾幕をセット
+        enemy.setDanmaku(pattern);
     };
     game.start();
 };
