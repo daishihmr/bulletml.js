@@ -239,10 +239,10 @@ window.onload = function() {
         // 攻撃完了時の処理
         enemy.on("completeAttack", function() {
             console.log("攻撃完了");
-            this.moveTo((game.width - enemy.width) / 2, 64);
+            this.moveTo((game.width - this.width) / 2, 64);
             // 弾幕さしかえ
             this.removeDanmaku();
-            enemy.setDanmaku(game.assets[xmlFiles.next()]);
+            this.setDanmaku(game.assets[xmlFiles.next()]);
         });
 
         // タッチ操作用パネル
