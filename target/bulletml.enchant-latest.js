@@ -46,7 +46,8 @@
                 if (xhr.responseXML != null) {
                     var bulletml = BulletML.build(xhr.responseXML);
                     if (bulletml) {
-                        game.assets[src] = new enchant.bulletml.AttackPattern(bulletml);
+                        game.assets[src] = new enchant.bulletml.AttackPattern(
+                                bulletml);
                     } else {
                         console.warn(src + "は妥当なBulletMLではありません。");
                         game.assets[src] = xhr.responseXML;
@@ -67,6 +68,25 @@
             xhr.overrideMimeType("application/xml");
         }
         xhr.send(null);
+    };
+
+    // syntax sugar.
+    /**
+     * 弾幕enterframeイベントリスナを設定する.
+     */
+    enchant.EventTarget.prototype.setDanmaku = function(attackPattern, config) {
+        this.on("enterframe", attackPattern.createTicker(config));
+    };
+    enchant.EventTarget.prototype.removeDanmaku = function() {
+        var remove = [];
+        for ( var i = this._listeners["enterframe"].length; i--;) {
+            if (this._listeners["enterframe"][i].isDanmaku) {
+                remove[remove.length] = this._listeners["enterframe"][i];
+            }
+        }
+        for ( var i = remove.length; i--;) {
+            this.removeEventListener("enterframe", remove[i]);
+        }
     };
 
     /**
@@ -137,20 +157,13 @@
                         };
                     }
 
-                    var config = {
-                        bulletFactory : enchant.bulletml.DEFAULT_BULLET_FACTORY,
-                        testInWorld : function(bullet) {
-                            var scw = enchant.Game.instance.width;
-                            var sch = enchant.Game.instance.height;
-                            var w = bullet.width || 0;
-                            var h = bullet.height || 0;
-                            return (-w <= bullet.x && bullet.x < scw
-                                    && -h <= bullet.y && bullet.y < sch);
-                        },
-                        rank : 0,
-                        updateProperties : false,
-                        speedRate : 2
-                    };
+                    var config = {};
+                    var d = enchant.bulletml.AttackPattern.defaultConfig;
+                    for ( var prop in d) {
+                        if (d.hasOwnProperty(prop)) {
+                            config[prop] = d[prop];
+                        }
+                    }
                     if (base !== undefined) {
                         for ( var prop in base) {
                             if (base.hasOwnProperty(prop)) {
@@ -167,7 +180,7 @@
                  * 
                  * 
                  * @param {Object|enchant.Node}
-                 *            config 発射される弾に関する設定.<br>
+                 *            [config] 発射される弾に関する設定.<br>
                  *            <table border=1>
                  *            <tr>
                  *            <th>プロパティ名</th>
@@ -250,8 +263,7 @@
                             }
                             if (parentTicker.compChildCount == tickers.length) {
                                 parentTicker.complete = true;
-                                this.dispatchEvent(new Event(
-                                        "completeAttack"));
+                                this.dispatchEvent(new Event("completeAttack"));
                             }
                         };
                         for ( var i = tickers.length; i--;) {
@@ -279,6 +291,9 @@
                 },
                 _createTicker : function(config, action) {
                     config = this._getConf(config);
+                    if (!config.target) {
+                        throw new Error("not set target in config.");
+                    }
 
                     var pattern = this;
 
@@ -401,6 +416,7 @@
                     };
                     ticker.restart();
 
+                    ticker.isDanmaku = true;
                     return ticker;
                 },
                 _fire : function(cmd, config, ticker, pattern) {
@@ -568,6 +584,22 @@
                     }
                 }
             });
+    /**
+     * configのデフォルト値.
+     */
+    enchant.bulletml.AttackPattern.defaultConfig = {
+        bulletFactory : enchant.bulletml.DEFAULT_BULLET_FACTORY,
+        testInWorld : function(bullet) {
+            var scw = enchant.Game.instance.width;
+            var sch = enchant.Game.instance.height;
+            var w = bullet.width || 0;
+            var h = bullet.height || 0;
+            return (-w <= bullet.x && bullet.x < scw && -h <= bullet.y && bullet.y < sch);
+        },
+        rank : 0,
+        updateProperties : false,
+        speedRate : 2
+    };
 
     /**
      * ラジアンから度数に変換.

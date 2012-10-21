@@ -110,8 +110,9 @@ var xmlFiles = [ "[1943]_rolling_fire.xml", "[Bulletsmorph]_aba_1.xml",
         fileName) {
     return "sample-assets/" + fileName;
 });
+var c = 15;
 xmlFiles.next = function() {
-    var result = this[~~(Math.random() * this.length)];
+    var result = this[c];
     console.log(result);
     fileName.text = result.replace("sample-assets/", "");
     return result;
@@ -136,6 +137,41 @@ window.onload = function() {
         fileName = new Label();
         fileName.color = "white";
         game.rootScene.addChild(fileName);
+
+        game.on("downbuttonup", function() {
+            enemy.removeDanmaku();
+            c += 1;
+            enemy.setDanmaku(game.assets[xmlFiles.next()]);
+            bulletPool.forEach(function(b) {
+                if (b.parentNode)
+                    b.parentNode.removeChild(b);
+            });
+        });
+        game.on("upbuttonup", function() {
+            enemy.removeDanmaku();
+            c -= 1;
+            enemy.setDanmaku(game.assets[xmlFiles.next()]);
+            bulletPool.forEach(function(b) {
+                if (b.parentNode)
+                    b.parentNode.removeChild(b);
+            });
+        });
+        game.on("rightbuttonup", function() {
+            enemy.removeDanmaku();
+            enemy.setDanmaku(game.assets[xmlFiles.next()]);
+            bulletPool.forEach(function(b) {
+                if (b.parentNode)
+                    b.parentNode.removeChild(b);
+            });
+        });
+        game.on("leftbuttonup", function() {
+            enemy.removeDanmaku();
+            enemy.setDanmaku(game.assets[xmlFiles.next()]);
+            bulletPool.forEach(function(b) {
+                if (b.parentNode)
+                    b.parentNode.removeChild(b);
+            });
+        });
 
         // 自機
         var player = new Sprite(32, 32);
@@ -180,12 +216,13 @@ window.onload = function() {
 
         // 弾プール
         var bulletPool = [];
-        for ( var i = 0; i < 1000; i++) {
+        for ( var i = 0; i < 3000; i++) {
             var bullet = new enchant.Sprite(8, 8);
             bullet.image = enchant.Surface.load(enchant.bulletml.DEFAULT_IMAGE);
             bullet.active = false;
             bullet.on("removed", function() {
                 this.active = false;
+                this.clearEventListener("enterframe");
             });
             bulletPool[i] = bullet;
         }
@@ -225,7 +262,7 @@ window.onload = function() {
         // 弾の消去判定
         AttackPattern.defaultConfig.testInWorld = function(b) {
             return (b === enemy)
-                    || (b.age < 600 && -50 < b.x && b.x < 50 + game.width
+                    || (b.age < 1200 && -50 < b.x && b.x < 50 + game.width
                             && -100 < b.y && b.y < 50 + game.height);
         };
         // 難易度ランク
@@ -241,8 +278,8 @@ window.onload = function() {
             console.log("攻撃完了");
             this.moveTo((game.width - this.width) / 2, 64);
             // 弾幕さしかえ
-            this.removeDanmaku();
-            this.setDanmaku(game.assets[xmlFiles.next()]);
+            // this.removeDanmaku();
+            // this.setDanmaku(game.assets[xmlFiles.next()]);
         });
 
         // タッチ操作用パネル
