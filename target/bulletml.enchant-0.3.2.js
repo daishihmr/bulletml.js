@@ -1,6 +1,6 @@
 /**
  * @fileOverview bullet.enchant.js
- * @version 0.3.1
+ * @version 0.3.2
  * @require enchant.js v0.5.2+, bulletml-min.js v0.3.1
  * @author daishi_hmr
  * 
@@ -33,7 +33,7 @@
 (function() {
 
     // BulletML(*.bml)をpreloadで読み込めるようにする.
-    enchant.Game._loadFuncs["bml"] = /* enchant.Game._loadFuncs["xml"] = */function(
+    enchant.Game._loadFuncs["bml"] = enchant.Game._loadFuncs["xml"] = function(
             src, callback) {
         var game = this;
         var xhr = new XMLHttpRequest();
@@ -102,10 +102,26 @@
      * 
      * 8px x 8px.赤い球状の弾.
      * 
-     * @type {String}
+     * @type {enchant.Surface}
      * @memberOf enchant.bulletml
      */
-    enchant.bulletml.DEFAULT_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAa0lEQVQYV2NkgIL/DAw2QGYolLuakYHhCIgNpBkYgJITGWxs8hj8/CDymzYBpY9MAkrmM4J12tgcZlizhoFBXByi4OVLBoaQEJAiW5CCiQxdXXkMpaUw2yB0dzcDQ1nZJKIU4LeCoCMJeRMAewIxn7cIaLcAAAAASUVORK5CYII=";
+    enchant.bulletml.getDefaultImage = function() {
+        if (this.value) {
+            return this.value;
+        } else {
+            var s = new enchant.Surface(8, 8);
+            var c = s.context;
+            var g = c.createRadialGradient(4, 4, 0, 4, 4, 4);
+            g.addColorStop(0.0, "rgba(255,255,255,1.0)");
+            g.addColorStop(0.5, "rgba(255,255,255,1.0)");
+            g.addColorStop(0.8, "rgba(255,  0,  0,0.8)");
+            g.addColorStop(1.0, "rgba(255,  0,  0,0.0)");
+            c.fillStyle = g;
+            c.fillRect(0, 0, 8, 8);
+            this.value = s;
+            return s;
+        }
+    };
 
     /**
      * bulletFactory未指定時に使用される弾スプライトの生成関数.
@@ -116,7 +132,7 @@
      */
     enchant.bulletml.DEFAULT_BULLET_FACTORY = function() {
         var bullet = new enchant.Sprite(8, 8);
-        bullet.image = enchant.Surface.load(enchant.bulletml.DEFAULT_IMAGE);
+        bullet.image = enchant.bulletml.getDefaultImage();
         return bullet;
     };
 
