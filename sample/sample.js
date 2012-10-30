@@ -126,12 +126,7 @@ window.onload = function() {
             "sample-assets/explosion.png" ];
     game.preload(assets.concat(xmlFiles));
     game.onload = function() {
-        var scene = (function() {
-            var result = new CanvasGroup();
-            result.context.globalCompositeOperation = "lighter";
-            game.rootScene.addChild(result);
-            return result;
-        })();
+        var scene = game.rootScene;
         scene.backgroundColor = "#000033";
 
         fileName = new Label();
@@ -218,12 +213,13 @@ window.onload = function() {
         var bulletPool = [];
         for ( var i = 0; i < 3000; i++) {
             var bullet = new enchant.Sprite(8, 8);
-            bullet.image = enchant.Surface.load(enchant.bulletml.DEFAULT_IMAGE);
+            bullet.image = enchant.bulletml.getDefaultImage();
             bullet.active = false;
             bullet.on("removed", function() {
                 this.active = false;
                 this.clearEventListener("enterframe");
             });
+            bullet.alphaBlending = "lighter";
             bulletPool[i] = bullet;
         }
         bulletPool.get = function() {
@@ -315,6 +311,7 @@ window.onload = function() {
         // 爆発
         var explode = function(obj) {
             var e = new Sprite(32, 32);
+            e.alphaBlending = "lighter";
             e.x = obj.x + obj.width / 2 - 16;
             e.y = obj.y + obj.height / 2 - 16;
             e.scale(2);
