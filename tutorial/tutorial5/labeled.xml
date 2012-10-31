@@ -7,7 +7,7 @@
 			<bullet label='spade' />
 		</fire>
 		<fire>
-			<direction>-5</direction>
+			<direction>0</direction>
 			<bullet label='heart' />
 		</fire>
 		<fire>

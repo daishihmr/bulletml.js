@@ -1,5 +1,5 @@
 /*
- * bullet.js v0.3.0
+ * bullet.js v0.3.1
  * @author daishi@dev7.jp
  * @description
  * General-purpose parser BulletML.
@@ -104,6 +104,22 @@ var BulletML = {};
         return search(this.actions, label);
     };
     /**
+     * find top level action element by label. throw error if action is undefined.
+     * 
+     * @param {string}
+     *            label label attribute value
+     * @returns {BulletML.Action}
+     * @memberOf BulletML.Root.prototype
+     */
+    BulletML.Root.prototype.findActionOrThrow = function(label) {
+        var result;
+        if (result = this.findAction(label)) {
+            return result;
+        } else {
+            throw new Error("action labeled '" + label + "' is undefined.");
+        }
+    };
+    /**
      * find top level bullet element by label.
      * 
      * @param {string}
@@ -113,6 +129,22 @@ var BulletML = {};
      */
     BulletML.Root.prototype.findBullet = function(label) {
         return search(this.bullets, label);
+    };
+    /**
+     * find top level bullet element by label. throw error if bullet is undefined.
+     * 
+     * @param {string}
+     *            label label attribute value
+     * @returns {BulletML.Bullet}
+     * @memberOf BulletML.Root.prototype
+     */
+    BulletML.Root.prototype.findBulletOrThrow = function(label) {
+        var result;
+        if (result = this.findBullet(label)) {
+            return result;
+        } else {
+            throw new Error("bullet labeled '" + label + "' is undefined.");
+        }
     };
     /**
      * find top level fire element by label.
@@ -125,6 +157,22 @@ var BulletML = {};
     BulletML.Root.prototype.findFire = function(label) {
         return search(this.fires, label);
     };
+    /**
+     * find top level fire element by label. throw error if fire is undefined.
+     * 
+     * @param {string}
+     *            label label attribute value
+     * @returns {BulletML.Fire}
+     * @memberOf BulletML.Root.prototype
+     */
+    BulletML.Root.prototype.findFireOrThrow = function(label) {
+        var result;
+        if (result = this.findFire(label)) {
+            return result;
+        } else {
+            throw new Error("fire labeled '" + label + "' is undefined.");
+        }
+    };
     BulletML.Root.prototype.getWalker = function(actionLabel, rank) {
         var w = new BulletML.Walker(this, rank);
         var action = this.findAction(actionLabel);
@@ -136,15 +184,18 @@ var BulletML = {};
 
     BulletML.Walker = function(root, rank) {
         this._root = root;
+        /** callstack. */
         this._stack = [];
-        this._localScopeStack = [];
+        /** program counter. */
         this._cursor = -1;
+        /** current stack. */
         this._action = null;
+        /** current localScope variables. */
         this._localScope = {};
+        /** globalScope variables. */
         this._globalScope = {
             $rank : rank || 0
         };
-        this._loopCounter = 0;
     };
     BulletML.Walker.prototype.next = function() {
         this._cursor += 1;
@@ -159,26 +210,23 @@ var BulletML = {};
                 case "action":
                     this.pushStack();
                     this._action = n;
+                    this._localScope = this.newScope(n.params);
                     return this.next();
                 case "actionRef":
-                    this._localScopeStack.push(this._localScope);
-                    this._localScope = this.newScope(n.params);
                     this.pushStack();
-                    this._action = this._root.findAction(n.label);
+                    this._action = this._root.findActionOrThrow(n.label);
+                    this._localScope = this.newScope(n.params);
                     return this.next();
                 case "repeat":
-                    this._loopCounter = 0;
-                    n.end = this.eval(n.times, this._localScope,
-                            this._globalScope);
+                    this._localScope.loopCounter = 0;
+                    this._localScope.loopEnd = this.eval(n.times);
+                    // console.log("repeat begin", this._localScope.loopCounter, this._localScope.loopEnd);
                     this.pushStack();
-                    if (n.action.commandName === "action") {
-                        this._action = n.action;
-                    } else {
-                        this._action = {
-                            commandName : "action",
-                            commands : [ n.action ]
-                        };
-                    }
+                    this._action = {
+                        commandName : "action",
+                        commands : [ n.action ]
+                    };
+                    this._localScope = this.newScope(n.params);
                     return this.next();
                 case "fire":
                     result.bullet = n.bullet.clone(this);
@@ -196,14 +244,12 @@ var BulletML = {};
                     }
                     break;
                 case "fireRef":
-                    this._localScopeStack.push(this._localScope);
-                    this._localScope = this.newScope(n.params);
                     this.pushStack();
                     this._action = {
                         commandName : "action",
-                        commands : [ this._root.findFire(n.label) ],
-                        createdBy : "fireRef"
+                        commands : [ this._root.findFireOrThrow(n.label) ]
                     };
+                    this._localScope = this.newScope(n.params);
                     return this.next();
                 case "changeDirection":
                     if (n.direction) {
@@ -254,24 +300,17 @@ var BulletML = {};
                 if (!this._action) {
                     return;
                 }
-                var current = this._action.commands[this._cursor];
-                if (current
-                        && (current.commandName == "actionRef" || current.commandName == "fireRef")) {
-                    this._localScope = this._localScopeStack.pop();
-                    return this.next();
-                } else if (current && current.commandName == "repeat") {
-                    this._loopCounter++;
-                    if (this._loopCounter < current.end) {
-                        // もう１回行ってこい
+                n = this._action.commands[this._cursor];
+                if (n && n.commandName == "repeat") {
+                    // console.log("repeat end", this._localScope.loopCounter, this._localScope.loopEnd);
+                    this._localScope.loopCounter++;
+                    if (this._localScope.loopCounter < this._localScope.loopEnd) {
                         this.pushStack();
-                        if (current.action.commandName === "action") {
-                            this._action = current.action;
-                        } else {
-                            this._action = {
-                                commandName : "action",
-                                commands : [ current.action ]
-                            };
-                        }
+                        this._action = {
+                            commandName : "action",
+                            commands : [ n.action ]
+                        };
+                        this._localScope = this.newScope(n.params);
                         return this.next();
                     } else {
                         return this.next();
@@ -286,24 +325,24 @@ var BulletML = {};
         this._stack.push({
             action : this._action,
             cursor : this._cursor,
-            loopCounter : this._loopCounter
+            scope : this._localScope
         });
         this._cursor = -1;
-        this._loopCounter = 0;
     };
     BulletML.Walker.prototype.popStack = function() {
         var p = this._stack.pop();
         if (p) {
             this._cursor = p.cursor;
             this._action = p.action;
-            this._loopCounter = p.loopCounter;
+            this._localScope = p.scope;
         } else {
             this._cursor = -1;
             this._action = null;
-            this._loopCounter = 0;
+            this._localScope = {};
         }
     };
     BulletML.Walker.prototype.eval = function(exp) {
+        // console.log("eval", exp, this._localScope);
         // evalを使わずに済む場合
         var n;
         if (typeof exp == "number") {
@@ -336,8 +375,14 @@ var BulletML = {};
     };
     BulletML.Walker.prototype.newScope = function(params) {
         var result = {};
-        for ( var i = 0, end = params.length; i < end; i++) {
-            result["$" + (i + 1)] = this.eval(params[i]);
+        if (params) {
+            for ( var i = 0, end = params.length; i < end; i++) {
+                result["$" + (i + 1)] = this.eval(params[i]);
+            }
+        } else {
+            for ( var prop in this._localScope) if (this._localScope.hasOwnProperty(prop)) {
+                result[prop] = this._localScope[prop];
+            }
         }
         return result;
     };
@@ -419,7 +464,7 @@ var BulletML = {};
     BulletML.BulletRef.prototype.clone = function(walker) {
         var bkup = walker._localScope;
         walker._localScope = walker.newScope(this.params);
-        var b = this.root.findBullet(this.label).clone(walker);
+        var b = this.root.findBulletOrThrow(this.label).clone(walker);
         walker._localScope = bkup;
         return b;
     };
@@ -764,6 +809,10 @@ var BulletML = {};
         var result = new BulletML.Root();
 
         var root = element.getElementsByTagName("bulletml")[0];
+        if (!root) {
+            return;
+        }
+
         attr(root, "type", function(type) {
             result.type = type;
         });

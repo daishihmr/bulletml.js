@@ -27,7 +27,7 @@ window.onload = function() {
         game.rootScene.addChild(enemy);
 
         // 攻撃パターンオブジェクト
-        var pattern = new AttackPattern(game.assets["labeled.xml"]);
+        var pattern = game.assets["labeled.xml"];
         // enterframeイベントリスナを生成
         var ticker = pattern.createTicker({
             target : player,

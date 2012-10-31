@@ -35,19 +35,13 @@ ParseTest.prototype.testBuildTopLevelActions = function() {
     assertEquals(result, result.actions[2].root);
 };
 
-ParseTest.prototype.testBuildTopAction = function() {
-    var result = BulletML
-            .build("<bulletml><action label='top'><fire><bullet/></fire></action></bulletml>");
-    assertNotUndefined(result.topAction);
-};
-
 ParseTest.prototype.testRepeat2ActionRef = function() {
     var result = BulletML
             .build("<bulletml>"
                     + "<action label='top'>"
                     + "<repeat><times>5</times><action><actionRef label='sub'/><actionRef label='sub'/></action></repeat>"
                     + "</action><action label='sub'></action></bulletml>");
-    var repeat = result.topAction.commands[0];
+    var repeat = result.actions[0].commands[0];
     assertEquals("repeat", repeat.commandName);
     assertEquals(2, repeat.action.commands.length);
     assertEquals("actionRef", repeat.action.commands[0].commandName);
@@ -137,7 +131,7 @@ ParseTest.prototype.testParseSpeed = function() {
 ParseTest.prototype.testParseFire1 = function() {
     var result = BulletML.build("<bulletml><action label='top'>"
             + "<fire><bullet/></fire></action></bulletml>");
-    var fire = result.topAction.commands[0];
+    var fire = result.actions[0].commands[0];
     assertNotUndefined(fire.bullet);
     assertNull(fire.direction);
     assertNull(fire.speed);
@@ -148,7 +142,7 @@ ParseTest.prototype.testParseFire2 = function() {
             + "<direction type='relative'>180</direction>"
             + "<speed type='sequence'>(2+$1)*0.3</speed><bullet/></fire>"
             + "</action></bulletml>");
-    var fire = result.topAction.commands[0];
+    var fire = result.actions[0].commands[0];
     assertNotUndefined(fire.bullet);
     assertEquals("relative", fire.direction.type);
     assertEquals("180", fire.direction.value);
@@ -198,7 +192,7 @@ ParseTest.prototype.testParseAccel = function() {
                     + "<vertical type='relative'>3+8</vertical>"
                     + "<term>9+$rand*50</term></accel></action></action>"
                     + "</bullet></fire></action></bulletml>");
-    var accel = result.topAction.commands[0].bullet.actions[1].commands[0].commands[0];
+    var accel = result.actions[0].commands[0].bullet.actions[1].commands[0].commands[0];
     assertEquals("accel", accel.commandName);
     assertEquals("absolute", accel.horizontal.type);
     assertEquals("5+5", accel.horizontal.value);
@@ -210,7 +204,7 @@ ParseTest.prototype.testParseAccel = function() {
 ParseTest.prototype.testParseWait = function() {
     var result = BulletML
             .build("<bulletml><action label='top'><wait>120</wait></action></bulletml>");
-    var wait = result.topAction.commands[0];
+    var wait = result.actions[0].commands[0];
     assertEquals("wait", wait.commandName);
     assertEquals("120", wait.value);
 };
@@ -218,7 +212,7 @@ ParseTest.prototype.testParseWait = function() {
 ParseTest.prototype.testParseVanish = function() {
     var result = BulletML
             .build("<bulletml><action label='top'><vanish/></action></bulletml>");
-    var wait = result.topAction.commands[0];
+    var wait = result.actions[0].commands[0];
     assertEquals("vanish", wait.commandName);
 };
 
@@ -226,7 +220,7 @@ ParseTest.prototype.testParseRepeat1 = function() {
     var result = BulletML.build("<bulletml><action label='top'><repeat>"
             + "<times>120</times><actionRef label='a'/>"
             + "</repeat></action></bulletml>");
-    var repeat = result.topAction.commands[0];
+    var repeat = result.actions[0].commands[0];
     assertEquals("repeat", repeat.commandName);
     assertEquals("actionRef", repeat.action.commandName);
 };
@@ -235,7 +229,7 @@ ParseTest.prototype.testParseRepeat2 = function() {
     var result = BulletML.build("<bulletml><action label='top'><repeat>"
             + "<times>120</times><action><vanish/></action>"
             + "</repeat></action></bulletml>");
-    var repeat = result.topAction.commands[0];
+    var repeat = result.actions[0].commands[0];
     assertEquals("repeat", repeat.commandName);
     assertEquals("vanish", repeat.action.commands[0].commandName);
 };
@@ -246,7 +240,7 @@ ParseTest.prototype.testParseActionRef = function() {
             + "<param>1</param><param>2</param><param>3</param>"
             + "<param>5</param><param>8</param><param>13</param></actionRef>"
             + "</action><action label='aaa'></action></bulletml>");
-    var actionRef = result.topAction.commands[0];
+    var actionRef = result.actions[0].commands[0];
     assertEquals("actionRef", actionRef.commandName);
     assertEquals("aaa", actionRef.label);
     assertEquals(7, actionRef.params.length);
@@ -264,7 +258,7 @@ ParseTest.prototype.testParseBulletRef = function() {
             + "<bulletRef label='b'><param>3</param><param>1</param>"
             + "<param>4</param><param>1</param><param>5</param>"
             + "</bulletRef></fire></action></bulletml>");
-    var bulletRef = result.topAction.commands[0].bullet;
+    var bulletRef = result.actions[0].commands[0].bullet;
     assertEquals("b", bulletRef.label);
     assertEquals(5, bulletRef.params.length);
     assertEquals("3", bulletRef.params[0]);
@@ -278,7 +272,7 @@ ParseTest.prototype.testParseFireRef = function() {
     var result = BulletML.build("<bulletml><action label='top'>"
             + "<fireRef label='f'><param>5</param><param>10</param>"
             + "</fireRef></action></bulletml>");
-    var fireRef = result.topAction.commands[0];
+    var fireRef = result.actions[0].commands[0];
     assertEquals("fireRef", fireRef.commandName);
     assertEquals("f", fireRef.label);
     assertEquals(2, fireRef.params.length);

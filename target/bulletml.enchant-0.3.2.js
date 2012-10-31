@@ -1,37 +1,38 @@
-/*
- * bullet.enchant.js v0.3.0
- * @author daishi@dev7.jp
- * @require enchant.js v0.5.1 or later, bulletml.js v0.3.0
+/**
+ * @fileOverview bullet.enchant.js
+ * @version 0.3.2
+ * @require enchant.js v0.5.2+, bulletml-min.js v0.3.1
+ * @author daishi_hmr
+ * 
  * @description
- * enchant.js extension plugin for use BulletML.
+ * 弾幕記述言語BulletMLをenchant.jsで扱うためのプラグイン
  * 
- * This project has hosted by github.com (https://github.com/daishihmr/bulletml.js).
+ * @detail
+ * BulletMLのパースにはbulletml.jsを使用しています
+ * bulletml.js:
+ * https://github.com/daishihmr/bulletml.js
  * 
- * The MIT License (MIT)
- * Copyright (c) 2012 dev7.jp
+ * @example
+ * game.preload('boss.bml');
+ * ...
+ * var player = new Sprite(32, 32);
+ * var boss = new Sprite(32, 32);
+ * var attackPattern = game.assets['boss.xml'];
+ * var ticker = attackPattern.createTicker(player);
+ * boss.addEventListener('enterframe', ticker);
  * 
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
+ * @example
+ * game.preload('boss.bml');
+ * ...
+ * var player = new Sprite(32, 32);
+ * AttackPattern.defaultConfig.target = player;
+ * var boss = new Sprite(32, 32);
+ * boss.setDanmaku(game.assets['boss.bml']);
  */
 
 (function() {
 
-    // BulletML(*.xml)をpreloadで読み込めるようにする.
+    // BulletML(*.bml)をpreloadで読み込めるようにする.
     enchant.Game._loadFuncs["bml"] = enchant.Game._loadFuncs["xml"] = function(
             src, callback) {
         var game = this;
@@ -44,7 +45,14 @@
                 }
 
                 if (xhr.responseXML != null) {
-                    game.assets[src] = BulletML.build(xhr.responseXML);
+                    var bulletml = BulletML.build(xhr.responseXML);
+                    if (bulletml) {
+                        game.assets[src] = new enchant.bulletml.AttackPattern(
+                                bulletml);
+                    } else {
+                        console.warn(src + "は妥当なBulletMLではありません。");
+                        game.assets[src] = xhr.responseXML;
+                    }
                     callback();
                 } else if (xhr.responseText != null) {
                     game.assets[src] = BulletML.build(xhr.responseText);
@@ -63,8 +71,29 @@
         xhr.send(null);
     };
 
+    // syntax sugar.
     /**
-     * @namespace
+     * 弾幕enterframeイベントリスナを設定する.
+     */
+    enchant.EventTarget.prototype.setDanmaku = function(attackPattern, config) {
+        this.on("enterframe", attackPattern.createTicker(config));
+    };
+    enchant.EventTarget.prototype.removeDanmaku = function() {
+        var remove = [];
+        for ( var i = this._listeners["enterframe"].length; i--;) {
+            if (this._listeners["enterframe"][i].isDanmaku) {
+                remove[remove.length] = this._listeners["enterframe"][i];
+            }
+        }
+        for ( var i = remove.length; i--;) {
+            this.removeEventListener("enterframe", remove[i]);
+        }
+    };
+
+    /**
+     * plugin namespace object
+     * 
+     * @type {Object}
      */
     enchant.bulletml = {};
 
@@ -73,10 +102,26 @@
      * 
      * 8px x 8px.赤い球状の弾.
      * 
-     * @type string
+     * @type {enchant.Surface}
      * @memberOf enchant.bulletml
      */
-    enchant.bulletml.DEFAULT_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAa0lEQVQYV2NkgIL/DAw2QGYolLuakYHhCIgNpBkYgJITGWxs8hj8/CDymzYBpY9MAkrmM4J12tgcZlizhoFBXByi4OVLBoaQEJAiW5CCiQxdXXkMpaUw2yB0dzcDQ1nZJKIU4LeCoCMJeRMAewIxn7cIaLcAAAAASUVORK5CYII=";
+    enchant.bulletml.getDefaultImage = function() {
+        if (this.value) {
+            return this.value;
+        } else {
+            var s = new enchant.Surface(8, 8);
+            var c = s.context;
+            var g = c.createRadialGradient(4, 4, 0, 4, 4, 4);
+            g.addColorStop(0.0, "rgba(255,255,255,1.0)");
+            g.addColorStop(0.5, "rgba(255,255,255,1.0)");
+            g.addColorStop(0.8, "rgba(255,  0,  0,0.8)");
+            g.addColorStop(1.0, "rgba(255,  0,  0,0.0)");
+            c.fillStyle = g;
+            c.fillRect(0, 0, 8, 8);
+            this.value = s;
+            return s;
+        }
+    };
 
     /**
      * bulletFactory未指定時に使用される弾スプライトの生成関数.
@@ -87,38 +132,26 @@
      */
     enchant.bulletml.DEFAULT_BULLET_FACTORY = function() {
         var bullet = new enchant.Sprite(8, 8);
-        bullet.image = enchant.Surface.load(enchant.bulletml.DEFAULT_IMAGE);
+        bullet.image = enchant.bulletml.getDefaultImage();
         return bullet;
     };
 
     /**
      * @scope enchant.bulletml.AttackPattern.prototype
-     * @memberOf enchant.bulletml
      */
     enchant.bulletml.AttackPattern = enchant.Class
             .create({
                 /**
                  * 攻撃パターン.
                  * 
-                 * 単一の敵機に対応する.
-                 * 
-                 * @example
-                 * 
-                 * <pre>
-                 * game.preload(&quot;boss.xml&quot;);
-                 * ...
-                 * var player = new Sprite(... // 自機
-                 * var boss = new Sprite(... // 敵機
-                 * var pattern = new AttackPattern(game.assets[&quot;boss.xml&quot;]); // 攻撃パターンを生成
-                 * var ticker = pattern.createTicker(player); // 自機を標的としたenterframeイベントリスナを生成
-                 * boss.addEventListener(&quot;enterframe&quot;, ticker); // パターンを敵機に設定する
-                 * </pre>
-                 * 
                  * @constructs
                  * @param {BulletML.Root}
                  *            bulletml BulletMLデータ
                  */
                 initialize : function(bulletml) {
+                    if (!bulletml) {
+                        throw new Error("argument is invalid.", bulletml);
+                    }
                     this._bulletml = bulletml;
                 },
                 _getConf : function(base) {
@@ -128,20 +161,13 @@
                         };
                     }
 
-                    var config = {
-                        bulletFactory : enchant.bulletml.DEFAULT_BULLET_FACTORY,
-                        testInWorld : function(bullet) {
-                            var scw = enchant.Game.instance.width;
-                            var sch = enchant.Game.instance.height;
-                            var w = bullet.width || 0;
-                            var h = bullet.height || 0;
-                            return (-w <= bullet.x && bullet.x < scw
-                                    && -h <= bullet.y && bullet.y < sch);
-                        },
-                        rank : 0,
-                        updateProperties : false,
-                        speedRate : 2
-                    };
+                    var config = {};
+                    var d = enchant.bulletml.AttackPattern.defaultConfig;
+                    for ( var prop in d) {
+                        if (d.hasOwnProperty(prop)) {
+                            config[prop] = d[prop];
+                        }
+                    }
                     if (base !== undefined) {
                         for ( var prop in base) {
                             if (base.hasOwnProperty(prop)) {
@@ -158,7 +184,7 @@
                  * 
                  * 
                  * @param {Object|enchant.Node}
-                 *            config 発射される弾に関する設定.<br>
+                 *            [config] 発射される弾に関する設定.<br>
                  *            <table border=1>
                  *            <tr>
                  *            <th>プロパティ名</th>
@@ -220,32 +246,31 @@
                  *            設定する項目がtargetのみの場合、標的オブジェクトを直接引数として渡すことが可能.
                  * @param {string}
                  *            [action] 最初に読み込むactionのラベル.<br>
-                 *            省略可(デフォルト値は"top").
+                 *            省略可.
                  * @returns {function} enterframeイベントのリスナ.<br>
                  *          攻撃パターンを初めからやりなおすrestartメソッドを持つ.
                  */
                 createTicker : function(config, action) {
-                    if (action === undefined
-                            && !this._bulletml.findAction("top")) {
-                        // topN対応
+                    if (!action && !this._bulletml.findAction("top")) {
+                        // topN対応.actionがtop1～topNまで定義されていた場合、それらを同時に動かす.
                         var tickers = [];
                         for ( var i = 1; this._bulletml.findAction("top" + i); i++) {
                             tickers[tickers.length] = this._createTicker(
                                     config, "top" + i);
                         }
                         var parentTicker = function() {
-                            if (!parentTicker.complete) {
-                                for ( var i = 0, end = tickers.length; i < end; i++) {
-                                    tickers[i].call(this);
-                                }
-                                if (parentTicker.compChildCount == tickers.length) {
-                                    parentTicker.complete = true;
-                                    this.dispatchEvent(new Event(
-                                            "completeAttack"));
-                                }
+                            if (parentTicker.complete) {
+                                return;
+                            }
+                            for ( var i = tickers.length; i--;) {
+                                tickers[i].call(this);
+                            }
+                            if (parentTicker.compChildCount == tickers.length) {
+                                parentTicker.complete = true;
+                                this.dispatchEvent(new Event("completeAttack"));
                             }
                         };
-                        for ( var i = 0, end = tickers.length; i < end; i++) {
+                        for ( var i = tickers.length; i--;) {
                             tickers[i].parentTicker = parentTicker;
                         }
 
@@ -255,7 +280,7 @@
                         };
 
                         parentTicker.restart = function() {
-                            for ( var i = 0, end = tickers.length; i < end; i++) {
+                            for ( var i = tickers.length; i--;) {
                                 tickers[i].restart();
                             }
                             this.compChildCount = 0;
@@ -270,6 +295,9 @@
                 },
                 _createTicker : function(config, action) {
                     config = this._getConf(config);
+                    if (!config.target) {
+                        throw new Error("not set target in config.");
+                    }
 
                     var pattern = this;
 
@@ -392,6 +420,7 @@
                     };
                     ticker.restart();
 
+                    ticker.isDanmaku = true;
                     return ticker;
                 },
                 _fire : function(cmd, config, ticker, pattern) {
@@ -559,6 +588,22 @@
                     }
                 }
             });
+    /**
+     * configのデフォルト値.
+     */
+    enchant.bulletml.AttackPattern.defaultConfig = {
+        bulletFactory : enchant.bulletml.DEFAULT_BULLET_FACTORY,
+        testInWorld : function(bullet) {
+            var scw = enchant.Game.instance.width;
+            var sch = enchant.Game.instance.height;
+            var w = bullet.width || 0;
+            var h = bullet.height || 0;
+            return (-w <= bullet.x && bullet.x < scw && -h <= bullet.y && bullet.y < sch);
+        },
+        rank : 0,
+        updateProperties : false,
+        speedRate : 2
+    };
 
     /**
      * ラジアンから度数に変換.

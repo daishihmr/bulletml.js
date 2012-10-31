@@ -106,14 +106,15 @@ var xmlFiles = [ "[1943]_rolling_fire.xml", "[Bulletsmorph]_aba_1.xml",
         "[SilverGun]_4D_boss_PENTA.xml", "[Strikers1999]_hanabi.xml",
         "[XEVIOUS]_garu_zakato.xml", "[XII_STAG]_3b.xml",
         "[tenmado]_3_boss_2.xml", "[tenmado]_5_boss_1.xml",
-        "[tenmado]_5_boss_3.xml", "[xsoldier]_8_boss_main.xml" ]
-        .map(function(f) {
-            return "sample-assets/" + f;
-        });
+        "[tenmado]_5_boss_3.xml", "[xsoldier]_8_boss_main.xml" ].map(function(
+        fileName) {
+    return "sample-assets/" + fileName;
+});
+var c = 15;
 xmlFiles.next = function() {
-    var result = this[~~(Math.random() * this.length)];
+    var result = this[c];
     console.log(result);
-    fileName.text = result;
+    fileName.text = result.replace("sample-assets/", "");
     return result;
 };
 
@@ -125,17 +126,47 @@ window.onload = function() {
             "sample-assets/explosion.png" ];
     game.preload(assets.concat(xmlFiles));
     game.onload = function() {
-        var scene = (function() {
-            var result = new CanvasGroup();
-            result.context.globalCompositeOperation = "lighter";
-            game.rootScene.addChild(result);
-            return result;
-        })();
-        scene.backgroundColor = "#000044";
+        var scene = game.rootScene;
+        scene.backgroundColor = "#000033";
 
         fileName = new Label();
         fileName.color = "white";
         game.rootScene.addChild(fileName);
+
+        game.on("downbuttonup", function() {
+            enemy.removeDanmaku();
+            c += 1;
+            enemy.setDanmaku(game.assets[xmlFiles.next()]);
+            bulletPool.forEach(function(b) {
+                if (b.parentNode)
+                    b.parentNode.removeChild(b);
+            });
+        });
+        game.on("upbuttonup", function() {
+            enemy.removeDanmaku();
+            c -= 1;
+            enemy.setDanmaku(game.assets[xmlFiles.next()]);
+            bulletPool.forEach(function(b) {
+                if (b.parentNode)
+                    b.parentNode.removeChild(b);
+            });
+        });
+        game.on("rightbuttonup", function() {
+            enemy.removeDanmaku();
+            enemy.setDanmaku(game.assets[xmlFiles.next()]);
+            bulletPool.forEach(function(b) {
+                if (b.parentNode)
+                    b.parentNode.removeChild(b);
+            });
+        });
+        game.on("leftbuttonup", function() {
+            enemy.removeDanmaku();
+            enemy.setDanmaku(game.assets[xmlFiles.next()]);
+            bulletPool.forEach(function(b) {
+                if (b.parentNode)
+                    b.parentNode.removeChild(b);
+            });
+        });
 
         // 自機
         var player = new Sprite(32, 32);
@@ -154,6 +185,14 @@ window.onload = function() {
             // 自機中心マーカーを移動させる
             playerCenter.x = this.x + (this.width - playerCenter.width) / 2;
             playerCenter.y = this.y + (this.height - playerCenter.height) / 2;
+
+            for ( var i = bulletPool.length; i--;) {
+                var b = bulletPool[i];
+                if (b.active && this.within(b, 4)) {
+                    b.parentNode.removeChild(b);
+                    explode(b);
+                }
+            }
         });
         scene.addChild(player);
         // 自機の中心マーカー
@@ -170,13 +209,37 @@ window.onload = function() {
         })();
         scene.addChild(playerCenter);
 
+        // 弾プール
+        var bulletPool = [];
+        for ( var i = 0; i < 3000; i++) {
+            var bullet = new enchant.Sprite(8, 8);
+            bullet.image = enchant.bulletml.getDefaultImage();
+            bullet.active = false;
+            bullet.on("removed", function() {
+                this.active = false;
+                this.clearEventListener("enterframe");
+            });
+            bullet.alphaBlending = "lighter";
+            bulletPool[i] = bullet;
+        }
+        bulletPool.get = function() {
+            for ( var i = this.length; i--;) {
+                if (!this[i].active) {
+                    this[i].active = true;
+                    this[i].age = 0;
+                    return this[i];
+                }
+            }
+            console.log("弾切れ");
+        };
+
         // 敵
         var enemy = new Sprite(32, 32);
         enemy.image = game.assets["sample-assets/chara6.png"];
         enemy.frame = 3;
         enemy.frameCount = 0;
         enemy.x = (game.width - enemy.width) / 2;
-        enemy.y = 32;
+        enemy.y = 64;
         enemy.on("enterframe", function() {
             // テクテク歩く
             if (this.age % 10 === 0) {
@@ -185,41 +248,34 @@ window.onload = function() {
         });
         scene.addChild(enemy);
 
-        // 攻撃パターン
-        var attackPattern = new AttackPattern(game.assets[xmlFiles.next()]);
-
         // 攻撃パターン設定
-        var config = {
-            target : player, // 攻撃対象
-            bulletFactory : function(spec) { // 弾Spriteの生成関数
-                var bullet = new enchant.Sprite(8, 8);
-                bullet.image = enchant.Surface
-                        .load(enchant.bulletml.DEFAULT_IMAGE);
-                bullet.on("enterframe", function() {
-                    // 衝突判定（自機と弾との距離が4未満）
-                    if (this.within(player, 4)) {
-                        this.parentNode.removeChild(this);
-                        explode(this);
-                    }
-                });
-                return bullet;
-            }
+        // 攻撃対象
+        AttackPattern.defaultConfig.target = player;
+        // 弾の生成関数
+        AttackPattern.defaultConfig.bulletFactory = function() {
+            return bulletPool.get();
         };
+        // 弾の消去判定
+        AttackPattern.defaultConfig.testInWorld = function(b) {
+            return (b === enemy)
+                    || (b.age < 1200 && -50 < b.x && b.x < 50 + game.width
+                            && -100 < b.y && b.y < 50 + game.height);
+        };
+        // 難易度ランク
+        AttackPattern.defaultConfig.rank = 0.5;
+        // 弾速
+        AttackPattern.defaultConfig.speedRate = 1.2;
 
-        // enterframeイベントリスナを作成
-        var ticker = attackPattern.createTicker(config);
-
-        // 作成したenterframeイベントリスナを敵機にセット
-        enemy.on("enterframe", ticker);
+        // 敵機に弾幕をセット
+        enemy.setDanmaku(game.assets[xmlFiles.next()]);
 
         // 攻撃完了時の処理
         enemy.on("completeAttack", function() {
-            console.log("complete")
-            // 攻撃パターンさしかえ
-            this.removeEventListener(ticker);
-            attackPattern = new AttackPattern(game.assets[xmlFiles.next()]);
-            ticker = attackPattern.createTicker(config);
-            this.on("enterframe", ticker);
+            console.log("攻撃完了");
+            this.moveTo((game.width - this.width) / 2, 64);
+            // 弾幕さしかえ
+            // this.removeDanmaku();
+            // this.setDanmaku(game.assets[xmlFiles.next()]);
         });
 
         // タッチ操作用パネル
@@ -255,6 +311,7 @@ window.onload = function() {
         // 爆発
         var explode = function(obj) {
             var e = new Sprite(32, 32);
+            e.alphaBlending = "lighter";
             e.x = obj.x + obj.width / 2 - 16;
             e.y = obj.y + obj.height / 2 - 16;
             e.scale(2);
