@@ -283,6 +283,8 @@
                             this.complete = false;
                         };
                         parentTicker.restart();
+                        
+                        parentTicker.isDanmaku = true;
 
                         return parentTicker;
                     } else {
