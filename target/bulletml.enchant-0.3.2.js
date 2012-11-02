@@ -1,37 +1,38 @@
-/*
- * bullet.enchant.js v0.3.1
- * @author daishi@dev7.jp
- * @require enchant.js v0.5.1 or later, bulletml.js v0.3.1
+/**
+ * @fileOverview bullet.enchant.js
+ * @version 0.3.2
+ * @require enchant.js v0.5.2+, bulletml-min.js v0.3.1
+ * @author daishi_hmr
+ * 
  * @description
- * enchant.js extension plugin for use BulletML.
+ * 弾幕記述言語BulletMLをenchant.jsで扱うためのプラグイン
  * 
- * This project has hosted by github.com (https://github.com/daishihmr/bulletml.js).
+ * @detail
+ * BulletMLのパースにはbulletml.jsを使用しています
+ * bulletml.js:
+ * https://github.com/daishihmr/bulletml.js
  * 
- * The MIT License (MIT)
- * Copyright (c) 2012 dev7.jp
+ * @example
+ * game.preload('boss.bml');
+ * ...
+ * var player = new Sprite(32, 32);
+ * var boss = new Sprite(32, 32);
+ * var attackPattern = game.assets['boss.xml'];
+ * var ticker = attackPattern.createTicker(player);
+ * boss.addEventListener('enterframe', ticker);
  * 
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
+ * @example
+ * game.preload('boss.bml');
+ * ...
+ * var player = new Sprite(32, 32);
+ * AttackPattern.defaultConfig.target = player;
+ * var boss = new Sprite(32, 32);
+ * boss.setDanmaku(game.assets['boss.bml']);
  */
 
 (function() {
 
-    // BulletML(*.xml)をpreloadで読み込めるようにする.
+    // BulletML(*.bml)をpreloadで読み込めるようにする.
     enchant.Game._loadFuncs["bml"] = enchant.Game._loadFuncs["xml"] = function(
             src, callback) {
         var game = this;
@@ -90,7 +91,9 @@
     };
 
     /**
-     * @namespace
+     * plugin namespace object
+     * 
+     * @type {Object}
      */
     enchant.bulletml = {};
 
@@ -99,10 +102,26 @@
      * 
      * 8px x 8px.赤い球状の弾.
      * 
-     * @type string
+     * @type {enchant.Surface}
      * @memberOf enchant.bulletml
      */
-    enchant.bulletml.DEFAULT_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAa0lEQVQYV2NkgIL/DAw2QGYolLuakYHhCIgNpBkYgJITGWxs8hj8/CDymzYBpY9MAkrmM4J12tgcZlizhoFBXByi4OVLBoaQEJAiW5CCiQxdXXkMpaUw2yB0dzcDQ1nZJKIU4LeCoCMJeRMAewIxn7cIaLcAAAAASUVORK5CYII=";
+    enchant.bulletml.getDefaultImage = function() {
+        if (this.value) {
+            return this.value;
+        } else {
+            var s = new enchant.Surface(8, 8);
+            var c = s.context;
+            var g = c.createRadialGradient(4, 4, 0, 4, 4, 4);
+            g.addColorStop(0.0, "rgba(255,255,255,1.0)");
+            g.addColorStop(0.5, "rgba(255,255,255,1.0)");
+            g.addColorStop(0.8, "rgba(255,  0,  0,0.8)");
+            g.addColorStop(1.0, "rgba(255,  0,  0,0.0)");
+            c.fillStyle = g;
+            c.fillRect(0, 0, 8, 8);
+            this.value = s;
+            return s;
+        }
+    };
 
     /**
      * bulletFactory未指定時に使用される弾スプライトの生成関数.
@@ -113,32 +132,17 @@
      */
     enchant.bulletml.DEFAULT_BULLET_FACTORY = function() {
         var bullet = new enchant.Sprite(8, 8);
-        bullet.image = enchant.Surface.load(enchant.bulletml.DEFAULT_IMAGE);
+        bullet.image = enchant.bulletml.getDefaultImage();
         return bullet;
     };
 
     /**
      * @scope enchant.bulletml.AttackPattern.prototype
-     * @memberOf enchant.bulletml
      */
     enchant.bulletml.AttackPattern = enchant.Class
             .create({
                 /**
                  * 攻撃パターン.
-                 * 
-                 * 単一の敵機に対応する.
-                 * 
-                 * @example
-                 * 
-                 * <pre>
-                 * game.preload(&quot;boss.xml&quot;); // BulletMLファイルを事前ロードする
-                 * ...
-                 * var player = new Sprite(... // 自機
-                 * var boss = new Sprite(... // 敵機
-                 * var attackPattern = game.assets[&quot;boss.xml&quot;]; // game.assetsにAttackPatternオブジェクトとして入っている
-                 * var ticker = attackPattern.createTicker(player); // 自機を標的としたenterframeイベントリスナを生成
-                 * boss.addEventListener(&quot;enterframe&quot;, ticker); // パターンを敵機に設定する
-                 * </pre>
                  * 
                  * @constructs
                  * @param {BulletML.Root}

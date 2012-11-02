@@ -191,8 +191,6 @@ ul.inheritsList
 	
 	<li><i><a href="../symbols/_global_.html">_global_</a></i></li>
 	
-	<li><a href="../symbols/enchant.bulletml.html">enchant.bulletml</a></li>
-	
 	<li><a href="../symbols/enchant.bulletml.AttackPattern.html">enchant.bulletml.AttackPattern</a></li>
 	
 </ul>
@@ -329,23 +327,8 @@ ul.inheritsList
 				
 				<div class="description">
 					攻撃パターン.
-
-単一の敵機に対応する.
 					
 				</div>
-				
-				
-				
-				<pre class="code">
-<pre>
-game.preload(&quot;boss.xml&quot;); // BulletMLファイルを事前ロードする
-...
-var player = new Sprite(... // 自機
-var boss = new Sprite(... // 敵機
-var attackPattern = game.assets[&quot;boss.xml&quot;]; // game.assetsにAttackPatternオブジェクトとして入っている
-var ticker = attackPattern.createTicker(player); // 自機を標的としたenterframeイベントリスナを生成
-boss.addEventListener(&quot;enterframe&quot;, ticker); // パターンを敵機に設定する
-</pre></pre>
 				
 				
 				
@@ -386,10 +369,7 @@ boss.addEventListener(&quot;enterframe&quot;, ticker); // パターンを敵機�
 					
 					</div>
 					<div class="description">
-						攻撃パターンの元となるBulletML定義.
-
-解析済みのBulletMLオブジェクト.<br>
-読み取り専用.
+						攻撃パターンの元となるBulletML定義.解析済みのBulletMLオブジェクト.<br>読み取り専用.
 						
 						
 					</div>
@@ -441,9 +421,7 @@ boss.addEventListener(&quot;enterframe&quot;, ticker); // パターンを敵機�
 					
 					</div>
 					<div class="description">
-						enterframeイベントのリスナを作成する.<br>
-<br>
-第1引数configで各種設定を行う. <br>
+						enterframeイベントのリスナを作成する.<br><br>第1引数configで各種設定を行う. <br>
 						
 						
 					</div>
@@ -458,73 +436,13 @@ boss.addEventListener(&quot;enterframe&quot;, ticker); // パターンを敵機�
 									<span class="light fixedFont">{Object|enchant.Node}</span> <b>config</b>
 									<i>Optional</i>
 								</dt>
-								<dd>発射される弾に関する設定.<br>
-           <table border=1>
-           <tr>
-           <th>プロパティ名</th>
-           <th>型</th>
-           <th>設定内容</th>
-           <th>デフォルト値</th>
-           <th>必須</th>
-           </tr>
-           <tr>
-           <td>target</td>
-           <td>enchant.Node</td>
-           <td>攻撃の標的となるオブジェクト</td>
-           <td>null</td>
-           <td>○</td>
-           </tr>
-           <tr>
-           <td>addTarget</td>
-           <td>enchant.Group</td>
-           <td>生成した弾を追加するノード</td>
-           <td>攻撃を実行するノードのparentNode</td>
-           <td></td>
-           </tr>
-           <tr>
-           <td>bulletFactory</td>
-           <td>function</td>
-           <td>弾ノードを生成する関数</td>
-           <td>小さな赤い弾を生成</td>
-           <td></td>
-           </tr>
-           <tr>
-           <td>updateProperties</td>
-           <td>boolean</td>
-           <td>弾のプロパティ(direction, speed)を更新するかどうか</td>
-           <td>false</td>
-           <td></td>
-           </tr>
-           <tr>
-           <td>testInWorld</td>
-           <td>function</td>
-           <td>弾が画面内に存在することを判定する関数</td>
-           <td>Gameインスタンスの大きさをベースにして判定する</td>
-           <td></td>
-           </tr>
-           <tr>
-           <td>rank</td>
-           <td>number</td>
-           <td>弾幕ランク.BulletMLの$rankに対応する.0.0～1.0の範囲で指定.</td>
-           <td>0</td>
-           <td></td>
-           </tr>
-           <tr>
-           <td>speedRate</td>
-           <td>number</td>
-           <td>弾速度の補正倍率.</td>
-           <td>1</td>
-           <td></td>
-           </tr>
-           </table>
-           設定する項目がtargetのみの場合、標的オブジェクトを直接引数として渡すことが可能.</dd>
+								<dd>発射される弾に関する設定.<br>           <table border=1>           <tr>           <th>プロパティ名</th>           <th>型</th>           <th>設定内容</th>           <th>デフォルト値</th>           <th>必須</th>           </tr>           <tr>           <td>target</td>           <td>enchant.Node</td>           <td>攻撃の標的となるオブジェクト</td>           <td>null</td>           <td>○</td>           </tr>           <tr>           <td>addTarget</td>           <td>enchant.Group</td>           <td>生成した弾を追加するノード</td>           <td>攻撃を実行するノードのparentNode</td>           <td></td>           </tr>           <tr>           <td>bulletFactory</td>           <td>function</td>           <td>弾ノードを生成する関数</td>           <td>小さな赤い弾を生成</td>           <td></td>           </tr>           <tr>           <td>updateProperties</td>           <td>boolean</td>           <td>弾のプロパティ(direction, speed)を更新するかどうか</td>           <td>false</td>           <td></td>           </tr>           <tr>           <td>testInWorld</td>           <td>function</td>           <td>弾が画面内に存在することを判定する関数</td>           <td>Gameインスタンスの大きさをベースにして判定する</td>           <td></td>           </tr>           <tr>           <td>rank</td>           <td>number</td>           <td>弾幕ランク.BulletMLの$rankに対応する.0.0～1.0の範囲で指定.</td>           <td>0</td>           <td></td>           </tr>           <tr>           <td>speedRate</td>           <td>number</td>           <td>弾速度の補正倍率.</td>           <td>1</td>           <td></td>           </tr>           </table>           設定する項目がtargetのみの場合、標的オブジェクトを直接引数として渡すことが可能.</dd>
 							
 								<dt>
 									<span class="light fixedFont">{string}</span> <b>action</b>
 									<i>Optional</i>
 								</dt>
-								<dd>最初に読み込むactionのラベル.<br>
-           省略可.</dd>
+								<dd>最初に読み込むactionのラベル.<br>           省略可.</dd>
 							
 							</dl>
 						
@@ -535,8 +453,7 @@ boss.addEventListener(&quot;enterframe&quot;, ticker); // パターンを敵機�
 							<dl class="detailList">
 							<dt class="heading">Returns:</dt>
 							
-								<dd><span class="light fixedFont">{function}</span> enterframeイベントのリスナ.<br>
-         攻撃パターンを初めからやりなおすrestartメソッドを持つ.</dd>
+								<dd><span class="light fixedFont">{function}</span> enterframeイベントのリスナ.<br>         攻撃パターンを初めからやりなおすrestartメソッドを持つ.</dd>
 							
 							</dl>
 						
@@ -557,7 +474,7 @@ boss.addEventListener(&quot;enterframe&quot;, ticker); // パターンを敵機�
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sat Oct 20 2012 08:06:27 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Oct 30 2012 19:53:08 GMT+0900 (JST)
 		</div>
 	</body>
 </html>
