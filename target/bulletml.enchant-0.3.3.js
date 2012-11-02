@@ -1,6 +1,6 @@
 /**
  * @fileOverview bullet.enchant.js
- * @version 0.3.2
+ * @version 0.3.3
  * @require enchant.js v0.5.2+, bulletml-min.js v0.3.1
  * @author daishi_hmr
  * 
@@ -287,6 +287,8 @@
                             this.complete = false;
                         };
                         parentTicker.restart();
+                        
+                        parentTicker.isDanmaku = true;
 
                         return parentTicker;
                     } else {
