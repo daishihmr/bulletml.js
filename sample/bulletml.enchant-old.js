@@ -4,20 +4,30 @@
  * @require enchant.js v0.5.2+, bulletml-min.js v0.3.1
  * @author daishi_hmr
  * 
- * @description 弾幕記述言語BulletMLをenchant.jsで扱うためのプラグイン
+ * @description
+ * 弾幕記述言語BulletMLをenchant.jsで扱うためのプラグイン
  * 
- * @detail BulletMLのパースにはbulletml.jsを使用しています bulletml.js:
- *         https://github.com/daishihmr/bulletml.js
+ * @detail
+ * BulletMLのパースにはbulletml.jsを使用しています
+ * bulletml.js:
+ * https://github.com/daishihmr/bulletml.js
  * 
- * @example game.preload('boss.bml'); ... var player = new Sprite(32, 32); var
- *          boss = new Sprite(32, 32); var attackPattern =
- *          game.assets['boss.xml']; var ticker =
- *          attackPattern.createTicker(player);
- *          boss.addEventListener('enterframe', ticker);
+ * @example
+ * game.preload('boss.bml');
+ * ...
+ * var player = new Sprite(32, 32);
+ * var boss = new Sprite(32, 32);
+ * var attackPattern = game.assets['boss.xml'];
+ * var ticker = attackPattern.createTicker(player);
+ * boss.addEventListener('enterframe', ticker);
  * 
- * @example game.preload('boss.bml'); ... var player = new Sprite(32, 32);
- *          AttackPattern.defaultConfig.target = player; var boss = new
- *          Sprite(32, 32); boss.setDanmaku(game.assets['boss.bml']);
+ * @example
+ * game.preload('boss.bml');
+ * ...
+ * var player = new Sprite(32, 32);
+ * AttackPattern.defaultConfig.target = player;
+ * var boss = new Sprite(32, 32);
+ * boss.setDanmaku(game.assets['boss.bml']);
  */
 
 (function() {
@@ -90,7 +100,7 @@
      * 
      * @type {Object}
      */
-    enchant.bulletml = enchant.bulletml || {};
+    enchant.bulletml = {};
 
     /**
      * 弾の画像が指定されなかった場合に使用される.
@@ -130,56 +140,6 @@
         bullet.image = enchant.bulletml.getDefaultImage();
         return bullet;
     };
-
-    // var tickerPool = [];
-    // tickerPool.get = function() {
-    // var o = this.pop();
-    // if (o) {
-    // return o;
-    // } else {
-    // this.expand(100);
-    // return this.get();
-    // }
-    // };
-    // tickerPool.dispose = function(t) {
-    // console.debug("tickerPool.dispose()");
-    // delete t._pattern;
-    // delete t.config;
-    // delete t.waitTo;
-    // delete t.completed;
-    // delete t.direction;
-    // delete t.lastDirection;
-    // delete t.speed;
-    // delete t.lastSpeed;
-    // delete t.speedH;
-    // delete t.speedV;
-    // delete t.dirIncr;
-    // delete t.dirFin;
-    // delete t.chDirEnd;
-    // delete t.spdIncr;
-    // delete t.spdFin;
-    // delete t.chSpdEnd;
-    // delete t.aclIncrH;
-    // delete t.aclFinH;
-    // delete t.aclIncrV;
-    // delete t.aclFinV;
-    // delete t.aclEnd;
-    // this.push(t);
-    // };
-    // tickerPool.expand = function(count) {
-    // console.debug("tickerPool.expand()");
-    // for ( var i = 0; i < count; i++) {
-    // tickerPool[tickerPool.length] = newTicker();
-    // }
-    // };
-    // tickerPool.expand(1000);
-    // /**
-    // * enterframeリスナーの生成.
-    // */
-    // function newTicker() {
-    //
-    // return ticker;
-    // }
 
     /**
      * @scope enchant.bulletml.AttackPattern.prototype
@@ -292,16 +252,16 @@
                  * @param {string}
                  *            [action] 最初に読み込むactionのラベル.<br>
                  *            省略可.
+                 * @returns {function} enterframeイベントのリスナ.<br>
+                 *          攻撃パターンを初めからやりなおすrestartメソッドを持つ.
                  */
                 createTicker : function(config, action) {
-                    var topLabels = this._bulletml.getTopActionLabels()
-                    if (action === undefined && topLabels.length > 1) {
-                        // top***対応.
-                        // actionラベルtop***が定義されていた場合、それらを同時に動かす.
+                    if (!action && !this._bulletml.findAction("top")) {
+                        // topN対応.actionがtop1～topNまで定義されていた場合、それらを同時に動かす.
                         var tickers = [];
-                        for ( var i = 0, end = topLabels.length; i < end; i++) {
+                        for ( var i = 1; this._bulletml.findAction("top" + i); i++) {
                             tickers[tickers.length] = this._createTicker(
-                                    config, topLabels[i]);
+                                    config, "top" + i);
                         }
                         var parentTicker = function() {
                             if (parentTicker.complete) {
@@ -324,8 +284,14 @@
                             this.compChildCount++;
                         };
 
-                        parentTicker.compChildCount = 0;
-                        parentTicker.complete = false;
+                        parentTicker.restart = function() {
+                            for ( var i = tickers.length; i--;) {
+                                tickers[i].restart();
+                            }
+                            this.compChildCount = 0;
+                            this.complete = false;
+                        };
+                        parentTicker.restart();
 
                         parentTicker.isDanmaku = true;
 
@@ -337,32 +303,27 @@
                 _createTicker : function(config, action) {
                     config = this._getConf(config);
                     if (!config.target) {
-                        throw new Error("target is undefined in config.");
+                        throw new Error("not set target in config.");
                     }
 
-                    // var ticker = tickerPool.get();
+                    var pattern = this;
+
                     var ticker = function() {
-                        if (!ticker._pattern) {
-                            return;
-                        }
-
-                        var conf = ticker.config;
-
-                        // update direction
+                        // change direction
                         if (this.age < ticker.chDirEnd) {
                             ticker.direction += ticker.dirIncr;
                         } else if (this.age == ticker.chDirEnd) {
                             ticker.direction = ticker.dirFin;
                         }
 
-                        // update speed
+                        // change speed
                         if (this.age < ticker.chSpdEnd) {
                             ticker.speed += ticker.spdIncr;
                         } else if (this.age == ticker.chSpdEnd) {
                             ticker.speed = ticker.spdFin;
                         }
 
-                        // update accel
+                        // accel
                         if (this.age < ticker.aclEnd) {
                             ticker.speedH += ticker.aclIncrH;
                             ticker.speedV += ticker.aclIncrV;
@@ -371,35 +332,24 @@
                             ticker.speedV = ticker.aclFinV;
                         }
 
-                        // move sprite
+                        // move
                         this.x += Math.cos(ticker.direction) * ticker.speed
-                                * conf.speedRate;
+                                * config.speedRate;
                         this.y += Math.sin(ticker.direction) * ticker.speed
-                                * conf.speedRate;
-                        this.x += ticker.speedH * conf.speedRate;
-                        this.y += ticker.speedV * conf.speedRate;
+                                * config.speedRate;
+                        this.x += ticker.speedH * config.speedRate;
+                        this.y += ticker.speedV * config.speedRate;
 
-                        // test out of world
-                        if (!conf.testInWorld(this)) {
+                        if (!config.testInWorld(this)) {
                             this.parentNode.removeChild(this);
-                            // tickerPool.dispose(ticker);
-                            ticker.completed = true;
-                            if (ticker.parentTicker) {
-                                ticker.parentTicker.completeChild();
-                            } else {
-                                this.dispatchEvent(new Event("completeAttack"));
-                            }
-                            return;
                         }
 
-                        // set direction, speed to bullet
-                        if (conf.updateProperties) {
+                        if (config.updateProperties) {
                             this.direction = toDegree(ticker.direction
                                     + Math.PI / 2);
                             this.speed = ticker.speed;
                         }
 
-                        // proccess walker
                         if (this.age < ticker.waitTo || ticker.completed) {
                             return;
                         }
@@ -407,33 +357,30 @@
                         while (cmd = ticker.walker.next()) {
                             switch (cmd.commandName) {
                             case "fire":
-                                ticker._pattern._fire.call(this, cmd, conf,
-                                        ticker, ticker._pattern);
+                                pattern._fire.call(this, cmd, config, ticker,
+                                        pattern);
                                 break;
                             case "wait":
                                 ticker.waitTo = this.age + eval(cmd.value);
                                 return;
                             case "changeDirection":
-                                ticker._pattern._changeDirection.call(this,
-                                        cmd, conf, ticker);
+                                pattern._changeDirection.call(this, cmd,
+                                        config, ticker);
                                 break;
                             case "changeSpeed":
-                                ticker._pattern._changeSpeed.call(this, cmd,
-                                        ticker);
+                                pattern._changeSpeed.call(this, cmd, ticker);
                                 break;
                             case "accel":
-                                ticker._pattern._accel.call(this, cmd, ticker);
+                                pattern._accel.call(this, cmd, ticker);
                                 break;
                             case "vanish":
                                 if (this.parentNode) {
                                     this.parentNode.removeChild(this);
-                                    // tickerPool.dispose(ticker);
                                 }
                                 break;
                             }
                         }
 
-                        // complete
                         ticker.completed = true;
                         if (ticker.parentTicker) {
                             ticker.parentTicker.completeChild();
@@ -441,41 +388,44 @@
                             this.dispatchEvent(new Event("completeAttack"));
                         }
                     };
+                    ticker.restart = function() {
+                        if (action === undefined) {
+                            this.walker = pattern._bulletml.getWalker("top",
+                                    config.rank);
+                        } else if (typeof (action) === "string") {
+                            this.walker = pattern._bulletml.getWalker(action,
+                                    config.rank);
+                        } else if (action instanceof BulletML.Bullet) {
+                            this.walker = action.getWalker(config.rank);
+                        } else {
+                            throw new Error("引数が不正", config, action);
+                        }
 
-                    if (action === undefined) {
-                        ticker.walker = this._bulletml.getWalker("top",
-                                config.rank);
-                    } else if (typeof (action) === "string") {
-                        ticker.walker = this._bulletml.getWalker(action,
-                                config.rank);
-                    } else if (action instanceof BulletML.Bullet) {
-                        ticker.walker = action.getWalker(config.rank);
-                    } else {
-                        console.error(config, action);
-                        throw new Error("引数が不正");
-                    }
+                        this.waitTo = -1;
+                        this.completed = false;
 
-                    ticker._pattern = this;
-                    ticker.config = config;
-                    ticker.waitTo = -1;
-                    ticker.completed = false;
-                    ticker.direction = 0;
-                    ticker.lastDirection = 0;
-                    ticker.speed = 0;
-                    ticker.lastSpeed = 0;
-                    ticker.speedH = 0;
-                    ticker.speedV = 0;
-                    ticker.dirIncr = 0;
-                    ticker.dirFin = 0;
-                    ticker.chDirEnd = -1;
-                    ticker.spdIncr = 0;
-                    ticker.spdFin = 0;
-                    ticker.chSpdEnd = -1;
-                    ticker.aclIncrH = 0;
-                    ticker.aclFinH = 0;
-                    ticker.aclIncrV = 0;
-                    ticker.aclFinV = 0;
-                    ticker.aclEnd = -1;
+                        this.direction = 0;
+                        this.lastDirection = 0;
+                        this.speed = 0;
+                        this.lastSpeed = 0;
+                        this.speedH = 0;
+                        this.speedV = 0;
+
+                        this.dirIncr = 0;
+                        this.dirFin = 0;
+                        this.chDirEnd = -1;
+
+                        this.spdIncr = 0;
+                        this.spdFin = 0;
+                        this.chSpdEnd = -1;
+
+                        this.aclIncrH = 0;
+                        this.aclFinH = 0;
+                        this.aclIncrV = 0;
+                        this.aclFinV = 0;
+                        this.aclEnd = -1;
+                    };
+                    ticker.restart();
 
                     ticker.isDanmaku = true;
                     return ticker;
@@ -493,7 +443,7 @@
                     var attacker = this;
                     var calcDirection = function(d) {
                         var dv = toRadian(eval(d.value));
-                        // console.debug(d.type);
+                        // console.log(d.type);
                         switch (d.type) {
                         case "aim":
                             if (config.target) {
@@ -506,14 +456,14 @@
                         case "relative":
                             return ticker.direction + dv;
                         case "sequence":
-                            // console.debug(ticker.lastDirection, dv);
+                            // console.log(ticker.lastDirection, dv);
                             return ticker.lastDirection + dv;
                         }
                     };
                     bt.direction = calcDirection(cmd.direction
                             || cmd.bullet.direction);
                     ticker.lastDirection = bt.direction;
-                    // console.debug(bt.direction);
+                    // console.log(bt.direction);
 
                     var calcSpeed = function(s) {
                         var sv = eval(s.value);
@@ -645,11 +595,8 @@
                     }
                 }
             });
-
     /**
      * configのデフォルト値.
-     * 
-     * @scope enchant.bulletml.AttackPattern
      */
     enchant.bulletml.AttackPattern.defaultConfig = {
         bulletFactory : enchant.bulletml.DEFAULT_BULLET_FACTORY,

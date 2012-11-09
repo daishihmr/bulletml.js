@@ -104,24 +104,7 @@ var BulletML = {};
         return search(this.actions, label);
     };
     /**
-     * find actions label starts with 'top'.
-     * 
-     * @returns Array.<BulletML.Action>
-     * @memberOf BulletML.Root.prototype
-     */
-    BulletML.Root.prototype.getTopActionLabels = function() {
-        var result = [];
-        for ( var i = 0, end = this.actions.length; i < end; i++) {
-            var action = this.actions[i];
-            if (action.label && action.label.indexOf("top") === 0) {
-                result[result.length] = action.label;
-            }
-        }
-        return result;
-    };
-    /**
-     * find top level action element by label. throw error if action is
-     * undefined.
+     * find top level action element by label. throw error if action is undefined.
      * 
      * @param {string}
      *            label label attribute value
@@ -148,8 +131,7 @@ var BulletML = {};
         return search(this.bullets, label);
     };
     /**
-     * find top level bullet element by label. throw error if bullet is
-     * undefined.
+     * find top level bullet element by label. throw error if bullet is undefined.
      * 
      * @param {string}
      *            label label attribute value
@@ -238,8 +220,7 @@ var BulletML = {};
                 case "repeat":
                     this._localScope.loopCounter = 0;
                     this._localScope.loopEnd = this.eval(n.times);
-                    // console.log("repeat begin", this._localScope.loopCounter,
-                    // this._localScope.loopEnd);
+                    // console.log("repeat begin", this._localScope.loopCounter, this._localScope.loopEnd);
                     this.pushStack();
                     this._action = {
                         commandName : "action",
@@ -321,8 +302,7 @@ var BulletML = {};
                 }
                 n = this._action.commands[this._cursor];
                 if (n && n.commandName == "repeat") {
-                    // console.log("repeat end", this._localScope.loopCounter,
-                    // this._localScope.loopEnd);
+                    // console.log("repeat end", this._localScope.loopCounter, this._localScope.loopEnd);
                     this._localScope.loopCounter++;
                     if (this._localScope.loopCounter < this._localScope.loopEnd) {
                         this.pushStack();
@@ -400,10 +380,9 @@ var BulletML = {};
                 result["$" + (i + 1)] = this.eval(params[i]);
             }
         } else {
-            for ( var prop in this._localScope)
-                if (this._localScope.hasOwnProperty(prop)) {
-                    result[prop] = this._localScope[prop];
-                }
+            for ( var prop in this._localScope) if (this._localScope.hasOwnProperty(prop)) {
+                result[prop] = this._localScope[prop];
+            }
         }
         return result;
     };
