@@ -6,23 +6,30 @@
  * 
  * @description 弾幕記述言語BulletMLをenchant.jsで扱うためのプラグイン
  * 
- * @detail BulletMLのパースにはbulletml.jsを使用しています bulletml.js:
- *         https://github.com/daishihmr/bulletml.js
+ * @detail BulletMLのパースにはbulletml.jsを使用しています
+ *      bulletml.js: https://github.com/daishihmr/bulletml.js
  * 
- * @example game.preload('boss.bml'); ... var player = new Sprite(32, 32); var
- *          boss = new Sprite(32, 32); var attackPattern =
- *          game.assets['boss.xml']; var ticker =
- *          attackPattern.createTicker(player);
- *          boss.addEventListener('enterframe', ticker);
+ * @example
+ *      game.preload('boss.bml');
+ *      ...
+ *      var player = new Sprite(32, 32);
+ *      var boss = new Sprite(32, 32);
+ *      var attackPattern = game.assets['boss.xml'];
+ *      var ticker = attackPattern.createTicker(player);
+ *      boss.addEventListener('enterframe', ticker);
  * 
- * @example game.preload('boss.bml'); ... var player = new Sprite(32, 32);
- *          AttackPattern.defaultConfig.target = player; var boss = new
- *          Sprite(32, 32); boss.setDanmaku(game.assets['boss.bml']);
+ * @example
+ *      game.preload('boss.bml');
+ *      ...
+ *      var player = new Sprite(32, 32);
+ *      AttackPattern.defaultConfig.target = player;
+ *      var boss = new Sprite(32, 32);
+ *      boss.setDanmaku(game.assets['boss.bml']);
  */
 
 (function() {
 
-    // BulletML(*.bml)をpreloadで読み込めるようにする.
+    // BulletML(*.bml, *.xml)をpreloadで読み込めるようにする.
     enchant.Game._loadFuncs["bml"] = enchant.Game._loadFuncs["xml"] = function(
             src, callback) {
         var game = this;
