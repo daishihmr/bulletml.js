@@ -132,7 +132,7 @@
      * @type function
      * @memberOf enchant.bulletml
      */
-    enchant.bulletml.DEFAULT_BULLET_FACTORY = function() {
+    enchant.bulletml.defaultBulletFactory = function() {
         var bullet = new enchant.Sprite(8, 8);
         bullet.image = enchant.bulletml.getDefaultImage();
         return bullet;
@@ -659,7 +659,7 @@
      * @scope enchant.bulletml.AttackPattern
      */
     enchant.bulletml.AttackPattern.defaultConfig = {
-        bulletFactory : enchant.bulletml.DEFAULT_BULLET_FACTORY,
+        bulletFactory : enchant.bulletml.defaultBulletFactory,
         testInWorld : function(bullet) {
             var scw = enchant.Game.instance.width;
             var sch = enchant.Game.instance.height;
