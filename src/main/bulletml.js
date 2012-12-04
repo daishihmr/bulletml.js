@@ -32,24 +32,24 @@
  * @namespace
  */
 var BulletML = {};
+BulletML.global = this;
 
 (function() {
     /**
      * BulletMLを解析し、JavaScriptオブジェクトツリーを生成する.
      * 
-     * @param {String|Document}
-     *            xml
+     * @param {String|Document|Object} data 弾幕定義
      * @return {BulletML.Root}
      */
-    BulletML.build = function(xml) {
+    BulletML.build = function(data) {
         var result;
-        if (typeof (xml) == "string") {
+        if (typeof (data) == "string") {
             var domParser = new DOMParser();
-            result = parse(domParser.parseFromString(xml, "application/xml"));
-        } else if (xml.getElementsByTagName("bulletml")) {
-            result = parse(xml);
+            result = parse(domParser.parseFromString(data, "application/xml"));
+        } else if (data.getElementsByTagName("bulletml")) {
+            result = parse(data);
         } else {
-            throw new Error("cannot build " + xml);
+            throw new Error("cannot build " + data);
         }
         return result;
     };
@@ -59,7 +59,7 @@ var BulletML = {};
      * 
      * @constructor
      */
-    BulletML.Root = function() {
+    BulletML.Root = function(data) {
         /**
          * @type {string}
          * @field
@@ -91,6 +91,20 @@ var BulletML = {};
          * @field
          */
         this.fires = [];
+
+        if (data) {
+            for (var prop in data) if (data.hasOwnProperty(prop)) {
+                data[prop].label = prop;
+                if (data[prop] instanceof BulletML.Action) {
+                    this.actions.push(data[prop]);
+                } else if (data[prop] instanceof BulletML.Bullet) {
+                    this.bullets.push(data[prop]);
+                } else if (data[prop] instanceof BulletML.Fire) {
+                    this.fires.push(data[prop]);
+                }
+            }
+            this.setRoot(this);
+        }
     };
     /**
      * find top level action element by label.
@@ -197,6 +211,17 @@ var BulletML = {};
         if (action) {
             w._action = action;
             return w;
+        }
+    };
+    BulletML.Root.prototype.setRoot = function() {
+        for (var i = 0, end = this.actions.length; i < end; i++) {
+            this.actions[i].setRoot(this);
+        }
+        for (var i = 0, end = this.bullets.length; i < end; i++) {
+            this.bullets[i].setRoot(this);
+        }
+        for (var i = 0, end = this.fires.length; i < end; i++) {
+            this.fires[i].setRoot(this);
         }
     };
 
@@ -466,6 +491,12 @@ var BulletML = {};
         c._localScope = walker._localScope;
         return c;
     };
+    BulletML.Bullet.prototype.setRoot = function(root) {
+        this.root = root;
+        for (var i = 0, end = this.actions.length; i < end; i++) {
+            this.actions[i].setRoot(root);
+        }
+    };
 
     /**
      * @constructor
@@ -489,6 +520,9 @@ var BulletML = {};
         walker._localScope = bkup;
         return b;
     };
+    BulletML.BulletRef.prototype.setRoot = function(root) {
+        this.root = root;
+    };
 
     // commandクラス --------------------------------------------
 
@@ -505,6 +539,9 @@ var BulletML = {};
          * @field
          */
         this.commandName = null;
+    };
+    BulletML.Command.prototype.setRoot = function(root) {
+        this.root = root;
     };
 
     /**
@@ -533,6 +570,12 @@ var BulletML = {};
         this.commands = [];
     };
     BulletML.Action.prototype = new BulletML.Command();
+    BulletML.Action.prototype.setRoot = function(root) {
+        this.root = root;
+        for (var i = 0, end = this.commands.length; i < end; i++) {
+            this.commands[i].setRoot(root);
+        }
+    };
 
     /**
      * @constructor
@@ -595,6 +638,11 @@ var BulletML = {};
         this.bullet = null;
     };
     BulletML.Fire.prototype = new BulletML.Command();
+    BulletML.Fire.prototype.setRoot = function(root) {
+        this.root = root;
+        // console.log("this.bullet = ", this.bullet);
+        if (this.bullet) this.bullet.setRoot(root);
+    };
 
     /**
      * @constructor
@@ -741,6 +789,10 @@ var BulletML = {};
         this.action = null;
     };
     BulletML.Repeat.prototype = new BulletML.Command();
+    BulletML.Repeat.prototype.setRoot = function(root) {
+        this.root = root;
+        if (this.action) this.action.setRoot(root);
+    };
 
     // valueクラス -----------------------------------------------
 
@@ -1125,6 +1177,108 @@ var BulletML = {};
         });
         return obj;
     }
+
+    // dsl -------------------------------------------------------
+
+    BulletML.dsl = function() {
+        for (var func in BulletML.dsl) if (BulletML.dsl.hasOwnProperty(func)) {
+            BulletML.global[func] = BulletML.dsl[func];
+        }
+    };
+    BulletML.dsl.action = function(commands) {
+        var result = new BulletML.Action();
+        result.commands = commands;
+        return result;
+    };
+    BulletML.dsl.actionRef = function(label) {
+        var result = new BulletML.ActionRef();
+        result.label = label;
+        for (var i = 1; i < arguments.length; i++) {
+            result.params.push(arguments[i]);
+        }
+        return result;
+    };
+    BulletML.dsl.bullet = function(direction, speed, action) {
+        var result = new BulletML.Bullet();
+        if (direction) result.direction = direction;
+        if (speed) result.speed = speed;
+        if (action) result.actions.push(action);
+        return result;
+    };
+    BulletML.dsl.bulletRef = function(label) {
+        var result = new BulletML.BulletRef();
+        result.label = label;
+        for (var i = 1; i < arguments.length; i++) {
+            result.params.push(arguments[i]);
+        }
+        return result;
+    };
+    BulletML.dsl.fire = function(bullet, direction, speed) {
+        var result = new BulletML.Fire();
+        result.bullet = bullet;
+        if (direction) result.direction = direction;
+        if (speed) result.speed = speed;
+        return result;
+    };
+    BulletML.dsl.fireRef = function(label) {
+        var result = new BulletML.FireRef();
+        result.label = label;
+        for (var i = 1; i < arguments.length; i++) {
+            result.params.push(arguments[i]);
+        }
+        return result;
+    };
+    BulletML.dsl.changeDirection = function(direction, term) {
+        var result = new BulletML.ChangeDirection();
+        result.direction = direction;
+        result.term = term;
+        return result;
+    };
+    BulletML.dsl.changeSpeed = function(speed, term) {
+        var result = new BulletML.ChangeSpeed();
+        result.speed = speed;
+        result.term = term;
+        return result;
+    };
+    BulletML.dsl.accel = function(horizontal, vertical, term) {
+        var result = new BulletML.Accel();
+        result.horizontal = horizontal;
+        result.vertical = vertical;
+        result.term = term;
+        return result;
+    };
+    BulletML.dsl.wait = function(value) {
+        return new BulletML.Wait(value);
+    };
+    BulletML.dsl.vanish = function() {
+        return new BulletML.Vanish();
+    };
+    BulletML.dsl.repeat = function(times, action) {
+        var result = new BulletML.Repeat();
+        result.times = times;
+        result.action = action;
+        return result;
+    };
+    BulletML.dsl.direction = function(value, type) {
+        var result = new BulletML.Direction(value);
+        if (type) result.type = type;
+        return result;
+    };
+    BulletML.dsl.speed = function(value, type) {
+        var result = new BulletML.Speed(value);
+        if (type) result.type = type;
+        return result;
+    };
+    BulletML.dsl.horizontal = function(value, type) {
+        var result = new BulletML.Horizontal(value);
+        if (type) result.type = type;
+        return result;
+    };
+    BulletML.dsl.vertical = function(value, type) {
+        var result = new BulletML.Vertical(value);
+        if (type) result.type = type;
+        return result;
+    };
 
     // utility ---------------------------------------------------
 
