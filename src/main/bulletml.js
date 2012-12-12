@@ -1186,6 +1186,10 @@ BulletML.global = this;
         }
     };
     BulletML.dsl.action = function(commands) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
         var result = new BulletML.Action();
         if (commands instanceof Array) {
             if (commands.some(function(c) {
@@ -1206,6 +1210,10 @@ BulletML.global = this;
         return result;
     };
     BulletML.dsl.actionRef = function(label, args) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
         if (label == undefined) throw new Error("label is required.");
         var result = new BulletML.ActionRef();
         result.label = "" + label;
@@ -1219,6 +1227,10 @@ BulletML.global = this;
         return result;
     };
     BulletML.dsl.bullet = function(direction, speed, action, label) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
         var result = new BulletML.Bullet();
         for (var i = 0; i < arguments.length; i++) {
             if (arguments[i] instanceof BulletML.Direction) {
@@ -1236,6 +1248,10 @@ BulletML.global = this;
         return result;
     };
     BulletML.dsl.bulletRef = function(label, args) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
         if (label == undefined) throw new Error("label is required.");
         var result = new BulletML.BulletRef();
         result.label = "" + label;
@@ -1249,6 +1265,10 @@ BulletML.global = this;
         return result;
     };
     BulletML.dsl.fire = function(bullet, direction, speed) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
         var result = new BulletML.Fire();
         for (var i = 0; i < arguments.length; i++) {
             if (arguments[i] instanceof BulletML.Direction) {
@@ -1266,6 +1286,10 @@ BulletML.global = this;
         return result;
     };
     BulletML.dsl.fireRef = function(label, args) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
         if (label == undefined) throw new Error("label is required.");
         var result = new BulletML.FireRef();
         result.label = "" + label;
@@ -1279,6 +1303,10 @@ BulletML.global = this;
         return result;
     };
     BulletML.dsl.changeDirection = function(direction, term) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
         if (direction == undefined) throw new Error("direction is required.");
         if (term == undefined) throw new Error("term is required.");
         var result = new BulletML.ChangeDirection();
@@ -1290,6 +1318,10 @@ BulletML.global = this;
         return result;
     };
     BulletML.dsl.changeSpeed = function(speed, term) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
         if (speed == undefined) throw new Error("speed is required.");
         if (term == undefined) throw new Error("term is required.");
         var result = new BulletML.ChangeSpeed();
@@ -1301,6 +1333,10 @@ BulletML.global = this;
         return result;
     };
     BulletML.dsl.accel = function(horizontal, vertical, term) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
         var result = new BulletML.Accel();
         for (var i = 0; i < arguments.length; i++) {
             if (arguments[i] instanceof BulletML.Horizontal) {
@@ -1317,6 +1353,10 @@ BulletML.global = this;
         return result;
     };
     BulletML.dsl.wait = function(value) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
         if (value == undefined) throw new Error("value is required.");
         return new BulletML.Wait(value);
     };
@@ -1324,6 +1364,10 @@ BulletML.global = this;
         return new BulletML.Vanish();
     };
     BulletML.dsl.repeat = function(times, action) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
         if (times == undefined) throw new Error("times is required.");
         if (action == undefined) throw new Error("action is required.");
         var result = new BulletML.Repeat();
@@ -1336,24 +1380,40 @@ BulletML.global = this;
         return result;
     };
     BulletML.dsl.direction = function(value, type) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
         if (value == undefined) throw new Error("value is required.");
         var result = new BulletML.Direction(value);
         if (type) result.type = type;
         return result;
     };
     BulletML.dsl.speed = function(value, type) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
         if (value == undefined) throw new Error("value is required.");
         var result = new BulletML.Speed(value);
         if (type) result.type = type;
         return result;
     };
     BulletML.dsl.horizontal = function(value, type) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
         if (value == undefined) throw new Error("value is required.");
         var result = new BulletML.Horizontal(value);
         if (type) result.type = type;
         return result;
     };
     BulletML.dsl.vertical = function(value, type) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
         if (value == undefined) throw new Error("value is required.");
         var result = new BulletML.Vertical(value);
         if (type) result.type = type;

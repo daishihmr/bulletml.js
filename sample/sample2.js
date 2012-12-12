@@ -53,24 +53,62 @@ window.onload = function() {
         })();
         scene.addChild(playerCenter);
 
+        function bulletTexture() {
+            var sur = new Surface(8*3, 8);
+            var ctx = sur.context;
+            var g;
+            // red
+            g = ctx.createRadialGradient(8*0 + 4, 4, 0, 8*0 + 4, 4, 4);
+            g.addColorStop(0.0, "#ffffff");
+            g.addColorStop(0.5, "#ffffff");
+            g.addColorStop(0.9, "#ff0000");
+            g.addColorStop(1.0, "rgba(255,255,255,0)");
+            ctx.fillStyle = g;
+            ctx.fillRect(8*0, 0, 8, 8);
+            // green
+            g = ctx.createRadialGradient(8*1 + 4, 4, 0, 8*1 + 4, 4, 4);
+            g.addColorStop(0.0, "#ffffff");
+            g.addColorStop(0.5, "#ffffff");
+            g.addColorStop(0.9, "#00ff00");
+            g.addColorStop(1.0, "rgba(255,255,255,0)");
+            ctx.fillStyle = g;
+            ctx.fillRect(8*1, 0, 8, 8);
+            // blue
+            g = ctx.createRadialGradient(8*2 + 4, 4, 0, 8*2 + 4, 4, 4);
+            g.addColorStop(0.0, "#ffffff");
+            g.addColorStop(0.5, "#ffffff");
+            g.addColorStop(0.9, "#0000ff");
+            g.addColorStop(1.0, "rgba(255,255,255,0)");
+            ctx.fillStyle = g;
+            ctx.fillRect(8*2, 0, 8, 8);
+            return sur;
+        }
+
         // 弾プール
         var bulletPool = [];
         for ( var i = 0; i < 3000; i++) {
-            var bullet = new enchant.Sprite(8, 8);
-            bullet.image = enchant.bulletml.getDefaultImage();
+            var bullet = new Sprite(8, 8);
+            bullet.image = bulletTexture();
+            bullet.compositeOperation = "lighter";
             bullet.active = false;
             bullet.on("removed", function() {
                 this.active = false;
-                this.clearEventListener("enterframe");
+                this.removeDanmaku();
             });
-            bullet.compositeOperation = "lighter";
             bulletPool[i] = bullet;
         }
-        bulletPool.get = function() {
+        bulletPool.get = function(spec) {
             for ( var i = this.length; i--;) {
                 if (!this[i].active) {
                     this[i].active = true;
                     this[i].age = 0;
+                    if (spec.label == "green") {
+                        this[i].frame = 1;
+                    } else if (spec.label == "blue") {
+                        this[i].frame = 2;
+                    } else {
+                        this[i].frame = 0;
+                    }
                     return this[i];
                 }
             }
@@ -92,21 +130,13 @@ window.onload = function() {
         });
         scene.addChild(enemy);
 
-        // 攻撃パターン設定
+        // 攻撃パターンのデフォルト設定
         // 攻撃対象
         AttackPattern.defaultConfig.target = player;
         // 弾の生成関数
-        AttackPattern.defaultConfig.bulletFactory = function() {
-            return bulletPool.get();
+        AttackPattern.defaultConfig.bulletFactory = function(spec) {
+            return bulletPool.get(spec);
         };
-        // 弾の消去判定
-        AttackPattern.defaultConfig.testInWorld = function(b) {
-            return (b === enemy)
-                    || (b.age < 1200 && -50 < b.x && b.x < 50 + game.width
-                            && -100 < b.y && b.y < 50 + game.height);
-        };
-        // 難易度ランク
-        AttackPattern.defaultConfig.rank = 0.5;
         // 弾速
         AttackPattern.defaultConfig.speedRate = 1.2;
 
@@ -116,7 +146,10 @@ window.onload = function() {
         // 攻撃完了時の処理
         enemy.on("completeAttack", function() {
             console.log("攻撃完了");
-            this.moveTo((game.width - this.width) / 2, 64);
+            this.tl.moveTo((game.width - this.width) / 2, 64, 60, enchant.Easing.QUAD_EASEINOUT)
+                .then(function() {
+                    this.setDanmaku(new AttackPattern(pattern1));
+                });
         });
 
         // タッチ操作用パネル
@@ -173,24 +206,10 @@ window.onload = function() {
 
 BulletML.dsl();
 var pattern0 = new BulletML.Root({
-    top1 : action(
+    top : action(
         fire(bulletRef("parentbit", 1), direction(30, "aim")),
         fire(bulletRef("parentbit", -1), direction(-30, "aim")),
         wait(300)
-    ),
-    top2 : action(
-        fire(bullet()),
-        repeat(50, [
-            fire(bullet(direction(10, "sequence"))),
-            wait(5)
-        ])
-    ),
-    top3 : action(
-        fire(bullet()),
-        repeat(50, [
-            fire(bullet(direction(-10, "sequence"))),
-            wait(5)
-        ])
     ),
     parentbit : bullet(
         speed(2.0),
@@ -231,4 +250,18 @@ var pattern0 = new BulletML.Root({
             ])
         )
     )
+});
+var pattern1 = new BulletML.Root({
+    top : action(function() {
+        var commands = [];
+        commands[0] = changeSpeed(speed(0.2), 1);
+        commands[1] = changeDirection(direction(90, "absolute"), 1);
+        for (var i = 180; i < 210; i++) {
+            commands.push(fire(bullet(direction(5 + i*15, "absolute"), "red")));
+            commands.push(fire(bullet(direction(0 + i*15, "absolute"), "green")));
+            commands.push(fire(bullet(direction(-5 + i*15, "absolute"), "blue")));
+            commands.push(wait(15));
+        }
+        return commands;
+    })
 });
