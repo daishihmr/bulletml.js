@@ -381,7 +381,14 @@
                                 ticker, ticker._pattern);
                         break;
                     case "wait":
-                        ticker.waitTo = this.age + eval(cmd.value);
+                        var v = 0;
+                        if (typeof(cmd.value) === 'number') {
+                            ticker.waitTo = this.age + cmd.value;
+                        } else if ((v = ~~(cmd.value)) !== 0) {
+                            ticker.waitTo = this.age + v;
+                        } else {
+                            ticker.waitTo = this.age + eval(cmd.value);
+                        }
                         return;
                     case "changeDirection":
                         ticker._pattern._changeDirection.call(this,
