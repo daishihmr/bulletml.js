@@ -32,24 +32,24 @@
  * @namespace
  */
 var BulletML = {};
+BulletML.global = this;
 
 (function() {
     /**
      * BulletMLを解析し、JavaScriptオブジェクトツリーを生成する.
      * 
-     * @param {String|Document}
-     *            xml
+     * @param {String|Document|Object} data 弾幕定義
      * @return {BulletML.Root}
      */
-    BulletML.build = function(xml) {
+    BulletML.build = function(data) {
         var result;
-        if (typeof (xml) == "string") {
+        if (typeof (data) == "string") {
             var domParser = new DOMParser();
-            result = parse(domParser.parseFromString(xml, "application/xml"));
-        } else if (xml.getElementsByTagName("bulletml")) {
-            result = parse(xml);
+            result = parse(domParser.parseFromString(data, "application/xml"));
+        } else if (data.getElementsByTagName("bulletml")) {
+            result = parse(data);
         } else {
-            throw new Error("cannot build " + xml);
+            throw new Error("cannot build " + data);
         }
         return result;
     };
@@ -59,7 +59,7 @@ var BulletML = {};
      * 
      * @constructor
      */
-    BulletML.Root = function() {
+    BulletML.Root = function(data) {
         /**
          * @type {string}
          * @field
@@ -91,6 +91,20 @@ var BulletML = {};
          * @field
          */
         this.fires = [];
+
+        if (data) {
+            for (var prop in data) if (data.hasOwnProperty(prop)) {
+                data[prop].label = prop;
+                if (data[prop] instanceof BulletML.Action) {
+                    this.actions.push(data[prop]);
+                } else if (data[prop] instanceof BulletML.Bullet) {
+                    this.bullets.push(data[prop]);
+                } else if (data[prop] instanceof BulletML.Fire) {
+                    this.fires.push(data[prop]);
+                }
+            }
+            this.setRoot(this);
+        }
     };
     /**
      * find top level action element by label.
@@ -104,7 +118,24 @@ var BulletML = {};
         return search(this.actions, label);
     };
     /**
-     * find top level action element by label. throw error if action is undefined.
+     * find actions label starts with 'top'.
+     * 
+     * @returns Array.<BulletML.Action>
+     * @memberOf BulletML.Root.prototype
+     */
+    BulletML.Root.prototype.getTopActionLabels = function() {
+        var result = [];
+        for ( var i = 0, end = this.actions.length; i < end; i++) {
+            var action = this.actions[i];
+            if (action.label && action.label.indexOf("top") === 0) {
+                result[result.length] = action.label;
+            }
+        }
+        return result;
+    };
+    /**
+     * find top level action element by label. throw error if action is
+     * undefined.
      * 
      * @param {string}
      *            label label attribute value
@@ -131,7 +162,8 @@ var BulletML = {};
         return search(this.bullets, label);
     };
     /**
-     * find top level bullet element by label. throw error if bullet is undefined.
+     * find top level bullet element by label. throw error if bullet is
+     * undefined.
      * 
      * @param {string}
      *            label label attribute value
@@ -181,6 +213,17 @@ var BulletML = {};
             return w;
         }
     };
+    BulletML.Root.prototype.setRoot = function() {
+        for (var i = 0, end = this.actions.length; i < end; i++) {
+            this.actions[i].setRoot(this);
+        }
+        for (var i = 0, end = this.bullets.length; i < end; i++) {
+            this.bullets[i].setRoot(this);
+        }
+        for (var i = 0, end = this.fires.length; i < end; i++) {
+            this.fires[i].setRoot(this);
+        }
+    };
 
     BulletML.Walker = function(root, rank) {
         this._root = root;
@@ -220,7 +263,8 @@ var BulletML = {};
                 case "repeat":
                     this._localScope.loopCounter = 0;
                     this._localScope.loopEnd = this.eval(n.times);
-                    // console.log("repeat begin", this._localScope.loopCounter, this._localScope.loopEnd);
+                    // console.log("repeat begin", this._localScope.loopCounter,
+                    // this._localScope.loopEnd);
                     this.pushStack();
                     this._action = {
                         commandName : "action",
@@ -302,7 +346,8 @@ var BulletML = {};
                 }
                 n = this._action.commands[this._cursor];
                 if (n && n.commandName == "repeat") {
-                    // console.log("repeat end", this._localScope.loopCounter, this._localScope.loopEnd);
+                    // console.log("repeat end", this._localScope.loopCounter,
+                    // this._localScope.loopEnd);
                     this._localScope.loopCounter++;
                     if (this._localScope.loopCounter < this._localScope.loopEnd) {
                         this.pushStack();
@@ -380,9 +425,10 @@ var BulletML = {};
                 result["$" + (i + 1)] = this.eval(params[i]);
             }
         } else {
-            for ( var prop in this._localScope) if (this._localScope.hasOwnProperty(prop)) {
-                result[prop] = this._localScope[prop];
-            }
+            for ( var prop in this._localScope)
+                if (this._localScope.hasOwnProperty(prop)) {
+                    result[prop] = this._localScope[prop];
+                }
         }
         return result;
     };
@@ -445,6 +491,12 @@ var BulletML = {};
         c._localScope = walker._localScope;
         return c;
     };
+    BulletML.Bullet.prototype.setRoot = function(root) {
+        this.root = root;
+        for (var i = 0, end = this.actions.length; i < end; i++) {
+            this.actions[i].setRoot(root);
+        }
+    };
 
     /**
      * @constructor
@@ -468,6 +520,9 @@ var BulletML = {};
         walker._localScope = bkup;
         return b;
     };
+    BulletML.BulletRef.prototype.setRoot = function(root) {
+        this.root = root;
+    };
 
     // commandクラス --------------------------------------------
 
@@ -484,6 +539,9 @@ var BulletML = {};
          * @field
          */
         this.commandName = null;
+    };
+    BulletML.Command.prototype.setRoot = function(root) {
+        this.root = root;
     };
 
     /**
@@ -512,6 +570,12 @@ var BulletML = {};
         this.commands = [];
     };
     BulletML.Action.prototype = new BulletML.Command();
+    BulletML.Action.prototype.setRoot = function(root) {
+        this.root = root;
+        for (var i = 0, end = this.commands.length; i < end; i++) {
+            this.commands[i].setRoot(root);
+        }
+    };
 
     /**
      * @constructor
@@ -574,6 +638,11 @@ var BulletML = {};
         this.bullet = null;
     };
     BulletML.Fire.prototype = new BulletML.Command();
+    BulletML.Fire.prototype.setRoot = function(root) {
+        this.root = root;
+        // console.log("this.bullet = ", this.bullet);
+        if (this.bullet) this.bullet.setRoot(root);
+    };
 
     /**
      * @constructor
@@ -720,6 +789,10 @@ var BulletML = {};
         this.action = null;
     };
     BulletML.Repeat.prototype = new BulletML.Command();
+    BulletML.Repeat.prototype.setRoot = function(root) {
+        this.root = root;
+        if (this.action) this.action.setRoot(root);
+    };
 
     // valueクラス -----------------------------------------------
 
@@ -1104,6 +1177,248 @@ var BulletML = {};
         });
         return obj;
     }
+
+    // DSL -------------------------------------------------------
+
+    BulletML.dsl = function() {
+        for (var func in BulletML.dsl) if (BulletML.dsl.hasOwnProperty(func)) {
+            BulletML.global[func] = BulletML.dsl[func];
+        }
+    };
+    BulletML.dsl.action = function(commands) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
+        var result = new BulletML.Action();
+        if (commands instanceof Array) {
+            if (commands.some(function(c) {
+                return !(c instanceof BulletML.Command);
+            })) {
+                throw new Error("argument type error.");
+            }
+            result.commands = commands;
+        } else {
+            for (var i = 0, end = arguments.length; i < end; i++) {
+                if (arguments[i] instanceof BulletML.Command) {
+                    result.commands[i] = arguments[i];
+                } else {
+                    throw new Error("argument type error.");
+                }
+            }
+        }
+        return result;
+    };
+    BulletML.dsl.actionRef = function(label, args) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
+        if (label == undefined) throw new Error("label is required.");
+        var result = new BulletML.ActionRef();
+        result.label = "" + label;
+        if (args instanceof Array) {
+            result.params = args;
+        } else {
+            for (var i = 1; i < arguments.length; i++) {
+                result.params.push(arguments[i]);
+            }
+        }
+        return result;
+    };
+    BulletML.dsl.bullet = function(direction, speed, action, label) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
+        var result = new BulletML.Bullet();
+        for (var i = 0; i < arguments.length; i++) {
+            if (arguments[i] instanceof BulletML.Direction) {
+                result.direction = arguments[i];
+            } else if (arguments[i] instanceof BulletML.Speed) {
+                result.speed = arguments[i];
+            } else if (arguments[i] instanceof BulletML.Action) {
+                result.actions.push(arguments[i]);
+            } else if (arguments[i] instanceof BulletML.ActionRef) {
+                result.actions.push(arguments[i]);
+            } else if (typeof(arguments[i]) === "string") {
+                result.label = arguments[i];
+            }
+        }
+        return result;
+    };
+    BulletML.dsl.bulletRef = function(label, args) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
+        if (label == undefined) throw new Error("label is required.");
+        var result = new BulletML.BulletRef();
+        result.label = "" + label;
+        if (args instanceof Array) {
+            result.params = args;
+        } else {
+            for (var i = 1; i < arguments.length; i++) {
+                result.params.push(arguments[i]);
+            }
+        }
+        return result;
+    };
+    BulletML.dsl.fire = function(bullet, direction, speed) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
+        var result = new BulletML.Fire();
+        for (var i = 0; i < arguments.length; i++) {
+            if (arguments[i] instanceof BulletML.Direction) {
+                result.direction = arguments[i];
+            } else if (arguments[i] instanceof BulletML.Speed) {
+                result.speed = arguments[i];
+            } else if (arguments[i] instanceof BulletML.Bullet) {
+                result.bullet = arguments[i];
+            } else if (arguments[i] instanceof BulletML.BulletRef) {
+                result.bullet = arguments[i];
+            }
+        }
+        if (result.bullet == undefined)
+            throw new Error("bullet (or bulletRef) is required.");
+        return result;
+    };
+    BulletML.dsl.fireRef = function(label, args) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
+        if (label == undefined) throw new Error("label is required.");
+        var result = new BulletML.FireRef();
+        result.label = "" + label;
+        if (args instanceof Array) {
+            result.params = args;
+        } else {
+            for (var i = 1; i < arguments.length; i++) {
+                result.params.push(arguments[i]);
+            }
+        }
+        return result;
+    };
+    BulletML.dsl.changeDirection = function(direction, term) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
+        if (direction == undefined) throw new Error("direction is required.");
+        if (term == undefined) throw new Error("term is required.");
+        var result = new BulletML.ChangeDirection();
+        result.direction = direction;
+        result.term = term;
+        if (!(result.direction instanceof BulletML.Direction)) {
+            throw new Error("argument type error.");
+        }
+        return result;
+    };
+    BulletML.dsl.changeSpeed = function(speed, term) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
+        if (speed == undefined) throw new Error("speed is required.");
+        if (term == undefined) throw new Error("term is required.");
+        var result = new BulletML.ChangeSpeed();
+        result.speed = speed;
+        result.term = term;
+        if (!(result.speed instanceof BulletML.Speed)) {
+            throw new Error("argument type error.");
+        }
+        return result;
+    };
+    BulletML.dsl.accel = function(horizontal, vertical, term) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
+        var result = new BulletML.Accel();
+        for (var i = 0; i < arguments.length; i++) {
+            if (arguments[i] instanceof BulletML.Horizontal) {
+                result.horizontal = horizontal;
+            } else if (arguments[i] instanceof BulletML.Vertical) {
+                result.vertical = vertical;
+            } else {
+                result.term = arguments[i];
+            }
+        }
+        if (result.horizontal == undefined && result.vertical == undefined)
+            throw new Error("horizontal or vertical is required.");
+        if (result.term == undefined) throw new Error("term is required.");
+        return result;
+    };
+    BulletML.dsl.wait = function(value) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
+        if (value == undefined) throw new Error("value is required.");
+        return new BulletML.Wait(value);
+    };
+    BulletML.dsl.vanish = function() {
+        return new BulletML.Vanish();
+    };
+    BulletML.dsl.repeat = function(times, action) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
+        if (times == undefined) throw new Error("times is required.");
+        if (action == undefined) throw new Error("action is required.");
+        var result = new BulletML.Repeat();
+        result.times = times;
+        if (action instanceof BulletML.Action || action instanceof BulletML.ActionRef) {
+            result.action = action;
+        } else if (action instanceof Array) {
+            result.action = BulletML.dsl.action(action);
+        }
+        return result;
+    };
+    BulletML.dsl.direction = function(value, type) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
+        if (value == undefined) throw new Error("value is required.");
+        var result = new BulletML.Direction(value);
+        if (type) result.type = type;
+        return result;
+    };
+    BulletML.dsl.speed = function(value, type) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
+        if (value == undefined) throw new Error("value is required.");
+        var result = new BulletML.Speed(value);
+        if (type) result.type = type;
+        return result;
+    };
+    BulletML.dsl.horizontal = function(value, type) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
+        if (value == undefined) throw new Error("value is required.");
+        var result = new BulletML.Horizontal(value);
+        if (type) result.type = type;
+        return result;
+    };
+    BulletML.dsl.vertical = function(value, type) {
+        for (var i = 0, end = arguments.length; i < end; i++)
+            if (arguments[i] instanceof Function)
+                arguments[i] = arguments[i]();
+
+        if (value == undefined) throw new Error("value is required.");
+        var result = new BulletML.Vertical(value);
+        if (type) result.type = type;
+        return result;
+    };
 
     // utility ---------------------------------------------------
 

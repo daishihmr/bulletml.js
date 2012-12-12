@@ -1,5 +1,5 @@
 /*
- * bullet.js v0.3.1
+ * bullet.js v0.4
  * @author daishi@dev7.jp
  * @description
  * General-purpose parser BulletML.
