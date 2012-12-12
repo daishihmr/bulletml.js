@@ -476,13 +476,12 @@
                 case "relative":
                     return ticker.direction + dv;
                 case "sequence":
+                default:
                     // console.debug(ticker.lastDirection, dv);
                     return ticker.lastDirection + dv;
                 }
             };
-            bt.direction = calcDirection(cmd.direction
-                    || cmd.bullet.direction);
-            ticker.lastDirection = bt.direction;
+            ticker.lastDirection = bt.direction = calcDirection(cmd.direction || cmd.bullet.direction);
             // console.debug(bt.direction);
 
             var calcSpeed = function(s) {
@@ -496,8 +495,7 @@
                     return sv;
                 }
             };
-            bt.speed = calcSpeed(cmd.speed || cmd.bullet.speed);
-            ticker.lastSpeed = bt.speed;
+            ticker.lastSpeed = bt.speed = calcSpeed(cmd.speed || cmd.bullet.speed);
 
             b.x = this.x + ((this.width || 0) - (b.width || 0)) / 2;
             b.y = this.y + ((this.height || 0) - (b.height || 0)) / 2;

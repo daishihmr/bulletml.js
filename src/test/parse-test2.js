@@ -56,6 +56,12 @@ ParseTest2.prototype.testBuild = function() {
     assertEquals(sample.actions.length, 2);
     assertEquals(sample.bullets.length, 2);
     assertEquals(sample.fires.length, 0);
+
+    var walker = sample.getWalker("top");
+    var n;
+    while (n = walker.next()) {
+        console.log(n);
+    }
 };
 
 ParseTest2.prototype.testVanish = function() {
