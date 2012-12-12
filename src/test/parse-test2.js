@@ -107,6 +107,16 @@ ParseTest2.prototype.testChangeDirection = function() {
     assertEquals(n.term, 5);
 };
 
+ParseTest2.prototype.testChangeDirectionArgTypeCheck = function() {
+    try {
+        changeDirection("dir", 5);
+    } catch (e) {
+        assertEquals(e.message, "argument type error.");
+        return;
+    }
+    fail();
+};
+
 ParseTest2.prototype.testChangeSpeed = function() {
     var n = changeSpeed(speed(33, "sequence"), 15);
     assertTrue(n instanceof BulletML.ChangeSpeed);
@@ -115,11 +125,29 @@ ParseTest2.prototype.testChangeSpeed = function() {
     assertEquals(n.term, 15);
 };
 
+ParseTest2.prototype.testChangeSpeedArgTypeCheck = function() {
+    try {
+        changeSpeed("spd", 5);
+    } catch (e) {
+        assertEquals(e.message, "argument type error.");
+        return;
+    }
+    fail();
+};
+
 ParseTest2.prototype.testAccel = function() {
     var n = accel(horizontal(1), vertical(2), 3);
     assertTrue(n instanceof BulletML.Accel);
     assertEquals(n.horizontal.value, 1);
     assertEquals(n.vertical.value, 2);
+    assertEquals(n.term, 3);
+};
+
+ParseTest2.prototype.testAccel2 = function() {
+    var n = accel(horizontal(1), 3);
+    assertTrue(n instanceof BulletML.Accel);
+    assertEquals(n.horizontal.value, 1);
+    assertEquals(n.vertical, null);
     assertEquals(n.term, 3);
 };
 
@@ -141,11 +169,77 @@ ParseTest2.prototype.testBullet2 = function() {
     assertEquals(n.speed.type, "absolute");
 };
 
+ParseTest2.prototype.testBullet3 = function() {
+    var n = bullet(direction(5, "sequence"));
+    assertTrue(n instanceof BulletML.Bullet);
+    assertEquals(n.direction.value, 5);
+    assertEquals(n.direction.type, "sequence");
+    assertEquals(n.speed.value, 1);
+    assertEquals(n.speed.type, "absolute");
+};
+
+ParseTest2.prototype.testBullet4 = function() {
+    var n = bullet(speed(6, "relative"));
+    assertTrue(n instanceof BulletML.Bullet);
+    assertEquals(n.direction.value, 0);
+    assertEquals(n.direction.type, "aim");
+    assertEquals(n.speed.value, 6);
+    assertEquals(n.speed.type, "relative");
+};
+
+ParseTest2.prototype.testBullet5 = function() {
+    var n = bullet();
+    assertTrue(n instanceof BulletML.Bullet);
+    assertEquals(n.direction.value, 0);
+    assertEquals(n.direction.type, "aim");
+    assertEquals(n.speed.value, 1);
+    assertEquals(n.speed.type, "absolute");
+};
+
+ParseTest2.prototype.testBullet6 = function() {
+    var n = bullet(action([vanish()]));
+    assertTrue(n instanceof BulletML.Bullet);
+    assertEquals(n.direction.value, 0);
+    assertEquals(n.direction.type, "aim");
+    assertEquals(n.speed.value, 1);
+    assertEquals(n.speed.type, "absolute");
+    assertEquals(n.actions.length, 1);
+    assertEquals(n.actions[0].commands[0].commandName, "vanish");
+};
+
+ParseTest2.prototype.testBullet7 = function() {
+    var n = bullet(actionRef("a1"));
+    assertTrue(n instanceof BulletML.Bullet);
+    assertEquals(n.direction.value, 0);
+    assertEquals(n.direction.type, "aim");
+    assertEquals(n.speed.value, 1);
+    assertEquals(n.speed.type, "absolute");
+    assertEquals(n.actions.length, 1);
+    assertEquals(n.actions[0].label, "a1");
+};
+
 ParseTest2.prototype.testAction = function() {
     var n = action([wait(10), vanish()]);
     assertEquals(n.commands.length, 2);
     assertEquals(n.commands[0].commandName, "wait");
     assertEquals(n.commands[1].commandName, "vanish");
+};
+
+ParseTest2.prototype.testAction = function() {
+    var n = action([wait(10), vanish()]);
+    assertEquals(n.commands.length, 2);
+    assertEquals(n.commands[0].commandName, "wait");
+    assertEquals(n.commands[1].commandName, "vanish");
+};
+
+ParseTest2.prototype.testActionArgType = function() {
+    try {
+        var n = action([wait(10), "aaa"]);
+    } catch (e) {
+        assertEquals(e.message, "argument type error.");
+        return;
+    }
+    fail();
 };
 
 ParseTest2.prototype.testActionRef = function() {

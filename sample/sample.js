@@ -219,7 +219,7 @@ window.onload = function() {
                 this.active = false;
                 this.clearEventListener("enterframe");
             });
-            bullet.alphaBlending = "lighter";
+            bullet.compositeOperation = "lighter";
             bulletPool[i] = bullet;
         }
         bulletPool.get = function() {
@@ -311,7 +311,7 @@ window.onload = function() {
         // 爆発
         var explode = function(obj) {
             var e = new Sprite(32, 32);
-            e.alphaBlending = "lighter";
+            e.compositeOperation = "lighter";
             e.x = obj.x + obj.width / 2 - 16;
             e.y = obj.y + obj.height / 2 - 16;
             e.scale(2);

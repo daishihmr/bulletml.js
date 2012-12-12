@@ -73,6 +73,7 @@
      * 弾幕enterframeイベントリスナを設定する.
      */
     enchant.EventTarget.prototype.setDanmaku = function(attackPattern, config) {
+        if (attackPattern == undefined) throw new Error("AttackPattern is required.");
         this.removeDanmaku();
         this.on("enterframe", attackPattern.createTicker(config));
     };
