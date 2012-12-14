@@ -1310,11 +1310,12 @@ BulletML.global = this;
         if (direction == undefined) throw new Error("direction is required.");
         if (term == undefined) throw new Error("term is required.");
         var result = new BulletML.ChangeDirection();
-        result.direction = direction;
-        result.term = term;
-        if (!(result.direction instanceof BulletML.Direction)) {
-            throw new Error("argument type error.");
+        if (result.direction instanceof BulletML.Direction) {
+            result.direction = direction;
+        } else {
+            result.direction = new BulletML.Direction(direction);
         }
+        result.term = term;
         return result;
     };
     BulletML.dsl.changeSpeed = function(speed, term) {
@@ -1325,11 +1326,12 @@ BulletML.global = this;
         if (speed == undefined) throw new Error("speed is required.");
         if (term == undefined) throw new Error("term is required.");
         var result = new BulletML.ChangeSpeed();
-        result.speed = speed;
-        result.term = term;
-        if (!(result.speed instanceof BulletML.Speed)) {
-            throw new Error("argument type error.");
+        if (result.speed instanceof BulletML.Speed) {
+            result.speed = speed;
+        } else {
+            result.speed = new BulletML.Speed(speed);
         }
+        result.term = term;
         return result;
     };
     BulletML.dsl.accel = function(horizontal, vertical, term) {

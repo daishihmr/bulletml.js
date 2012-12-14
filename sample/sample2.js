@@ -254,7 +254,7 @@ var pattern0 = new BulletML.Root({
 var pattern1 = new BulletML.Root({
     top : action(function() {
         var commands = [];
-        commands[0] = changeSpeed(speed(0.2), 1);
+        commands[0] = changeSpeed(0.2, 1);
         commands[1] = changeDirection(direction(90, "absolute"), 1);
         for (var i = 180; i < 210; i++) {
             commands.push(fire(bullet(direction(5 + i*15, "absolute"), "red")));
