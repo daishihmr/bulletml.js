@@ -113,32 +113,12 @@ ParseTest2.prototype.testChangeDirection = function() {
     assertEquals(n.term, 5);
 };
 
-ParseTest2.prototype.testChangeDirectionArgTypeCheck = function() {
-    try {
-        changeDirection("dir", 5);
-    } catch (e) {
-        assertEquals(e.message, "argument type error.");
-        return;
-    }
-    fail();
-};
-
 ParseTest2.prototype.testChangeSpeed = function() {
     var n = changeSpeed(speed(33, "sequence"), 15);
     assertTrue(n instanceof BulletML.ChangeSpeed);
     assertEquals(n.speed.value, 33);
     assertEquals(n.speed.type, "sequence");
     assertEquals(n.term, 15);
-};
-
-ParseTest2.prototype.testChangeSpeedArgTypeCheck = function() {
-    try {
-        changeSpeed("spd", 5);
-    } catch (e) {
-        assertEquals(e.message, "argument type error.");
-        return;
-    }
-    fail();
 };
 
 ParseTest2.prototype.testAccel = function() {

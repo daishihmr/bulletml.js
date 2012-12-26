@@ -110,9 +110,15 @@ var xmlFiles = [ "[1943]_rolling_fire.xml", "[Bulletsmorph]_aba_1.xml",
         fileName) {
     return "sample-assets/" + fileName;
 });
-var c = 15;
+var c = 0;
 xmlFiles.next = function() {
-    var result = this[c];
+    var result = this[c++];
+    console.log(result);
+    fileName.text = result.replace("sample-assets/", "");
+    return result;
+};
+xmlFiles.prev = function() {
+    var result = this[c--];
     console.log(result);
     fileName.text = result.replace("sample-assets/", "");
     return result;
@@ -126,47 +132,14 @@ window.onload = function() {
             "sample-assets/explosion.png" ];
     game.preload(assets.concat(xmlFiles));
     game.onload = function() {
+        var enemyX = (320 - 32) / 2;
+
         var scene = game.rootScene;
         scene.backgroundColor = "#000033";
 
         fileName = new Label();
         fileName.color = "white";
         game.rootScene.addChild(fileName);
-
-        game.on("downbuttonup", function() {
-            enemy.removeDanmaku();
-            c += 1;
-            enemy.setDanmaku(game.assets[xmlFiles.next()]);
-            bulletPool.forEach(function(b) {
-                if (b.parentNode)
-                    b.parentNode.removeChild(b);
-            });
-        });
-        game.on("upbuttonup", function() {
-            enemy.removeDanmaku();
-            c -= 1;
-            enemy.setDanmaku(game.assets[xmlFiles.next()]);
-            bulletPool.forEach(function(b) {
-                if (b.parentNode)
-                    b.parentNode.removeChild(b);
-            });
-        });
-        game.on("rightbuttonup", function() {
-            enemy.removeDanmaku();
-            enemy.setDanmaku(game.assets[xmlFiles.next()]);
-            bulletPool.forEach(function(b) {
-                if (b.parentNode)
-                    b.parentNode.removeChild(b);
-            });
-        });
-        game.on("leftbuttonup", function() {
-            enemy.removeDanmaku();
-            enemy.setDanmaku(game.assets[xmlFiles.next()]);
-            bulletPool.forEach(function(b) {
-                if (b.parentNode)
-                    b.parentNode.removeChild(b);
-            });
-        });
 
         // 自機
         var player = new Sprite(32, 32);
@@ -238,7 +211,7 @@ window.onload = function() {
         enemy.image = game.assets["sample-assets/chara6.png"];
         enemy.frame = 3;
         enemy.frameCount = 0;
-        enemy.x = (game.width - enemy.width) / 2;
+        enemy.x = enemyX;
         enemy.y = 64;
         enemy.on("enterframe", function() {
             // テクテク歩く
@@ -262,7 +235,7 @@ window.onload = function() {
                             && -100 < b.y && b.y < 50 + game.height);
         };
         // 難易度ランク
-        AttackPattern.defaultConfig.rank = 0.5;
+        AttackPattern.defaultConfig.rank = 1.0;
         // 弾速
         AttackPattern.defaultConfig.speedRate = 1.2;
 
@@ -272,10 +245,10 @@ window.onload = function() {
         // 攻撃完了時の処理
         enemy.on("completeAttack", function() {
             console.log("攻撃完了");
-            this.moveTo((game.width - this.width) / 2, 64);
-            // 弾幕さしかえ
-            // this.removeDanmaku();
-            // this.setDanmaku(game.assets[xmlFiles.next()]);
+            this.tl.moveTo(enemyX, 64, 30, enchant.Easing.QUAD_EASEINOUT).then(function() {
+                // 弾幕さしかえ
+                this.setDanmaku(game.assets[xmlFiles.next()]);
+            });
         });
 
         // タッチ操作用パネル
@@ -307,6 +280,25 @@ window.onload = function() {
             }
         });
         game.rootScene.addChild(ctrlPanel);
+
+        game.on("downbuttonup", function() {
+            bulletPool.forEach(function(b) {
+                if (b.parentNode)
+                    b.parentNode.removeChild(b);
+            });
+            enemy.tl.moveTo(enemyX, 64, 30, enchant.Easing.QUAD_EASEINOUT).then(function() {
+                enemy.setDanmaku(game.assets[xmlFiles.next()]);
+            });
+        });
+        game.on("upbuttonup", function() {
+            bulletPool.forEach(function(b) {
+                if (b.parentNode)
+                    b.parentNode.removeChild(b);
+            });
+            enemy.tl.moveTo(enemyX, 64, 30, enchant.Easing.QUAD_EASEINOUT).then(function() {
+                enemy.setDanmaku(game.assets[xmlFiles.prev()]);
+            });
+        });
 
         // 爆発
         var explode = function(obj) {

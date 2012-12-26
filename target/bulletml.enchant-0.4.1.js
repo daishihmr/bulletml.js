@@ -1,14 +1,14 @@
 /**
  * @fileOverview bullet.enchant.js
- * @version 0.3.3
+ * @version 0.4.1
  * @require enchant.js v0.5.2+, bulletml-min.js v0.3.1
  * @author daishi_hmr
- * 
+ *
  * @description 弾幕記述言語BulletMLをenchant.jsで扱うためのプラグイン
- * 
+ *
  * @detail BulletMLのパースにはbulletml.jsを使用しています
  *      bulletml.js: https://github.com/daishihmr/bulletml.js
- * 
+ *
  * @example
  *      game.preload('boss.bml');
  *      ...
@@ -17,7 +17,7 @@
  *      var attackPattern = game.assets['boss.xml'];
  *      var ticker = attackPattern.createTicker(player);
  *      boss.addEventListener('enterframe', ticker);
- * 
+ *
  * @example
  *      game.preload('boss.bml');
  *      ...
@@ -95,16 +95,16 @@
 
     /**
      * plugin namespace object
-     * 
+     *
      * @type {Object}
      */
     enchant.bulletml = enchant.bulletml || {};
 
     /**
      * 弾の画像が指定されなかった場合に使用される.
-     * 
+     *
      * 8px x 8px.赤い球状の弾.
-     * 
+     *
      * @type {enchant.Surface}
      * @memberOf enchant.bulletml
      */
@@ -128,7 +128,7 @@
 
     /**
      * bulletFactory未指定時に使用される弾スプライトの生成関数.
-     * 
+     *
      * @returns {enchant.Sprite} 8px x 8px の大きさのスプライト
      * @type function
      * @memberOf enchant.bulletml
@@ -160,7 +160,7 @@
     enchant.bulletml.AttackPattern = enchant.Class.create({
         /**
          * 攻撃パターン.
-         * 
+         *
          * @constructs
          * @param {BulletML.Root}
          *            bulletml BulletMLデータ
@@ -198,8 +198,8 @@
          * enterframeイベントのリスナを作成する.<br>
          * <br>
          * 第1引数configで各種設定を行う. <br>
-         * 
-         * 
+         *
+         *
          * @param {Object|enchant.Node}
          *            [config] 発射される弾に関する設定.<br>
          *            <table border=1>
@@ -381,7 +381,14 @@
                                 ticker, ticker._pattern);
                         break;
                     case "wait":
-                        ticker.waitTo = this.age + eval(cmd.value);
+                        var v = 0;
+                        if (typeof(cmd.value) === 'number') {
+                            ticker.waitTo = this.age + cmd.value;
+                        } else if ((v = ~~(cmd.value)) !== 0) {
+                            ticker.waitTo = this.age + v;
+                        } else {
+                            ticker.waitTo = this.age + eval(cmd.value);
+                        }
                         return;
                     case "changeDirection":
                         ticker._pattern._changeDirection.call(this,
@@ -476,13 +483,12 @@
                 case "relative":
                     return ticker.direction + dv;
                 case "sequence":
+                default:
                     // console.debug(ticker.lastDirection, dv);
                     return ticker.lastDirection + dv;
                 }
             };
-            bt.direction = calcDirection(cmd.direction
-                    || cmd.bullet.direction);
-            ticker.lastDirection = bt.direction;
+            ticker.lastDirection = bt.direction = calcDirection(cmd.direction || cmd.bullet.direction);
             // console.debug(bt.direction);
 
             var calcSpeed = function(s) {
@@ -496,8 +502,7 @@
                     return sv;
                 }
             };
-            bt.speed = calcSpeed(cmd.speed || cmd.bullet.speed);
-            ticker.lastSpeed = bt.speed;
+            ticker.lastSpeed = bt.speed = calcSpeed(cmd.speed || cmd.bullet.speed);
 
             b.x = this.x + ((this.width || 0) - (b.width || 0)) / 2;
             b.y = this.y + ((this.height || 0) - (b.height || 0)) / 2;
@@ -600,10 +605,10 @@
         },
         /**
          * 攻撃パターンの元となるBulletML定義.
-         * 
+         *
          * 解析済みのBulletMLオブジェクト.<br>
          * 読み取り専用.
-         * 
+         *
          * @type BulletML.Root
          */
         bulletml : {
@@ -615,7 +620,7 @@
 
     /**
      * configのデフォルト値.
-     * 
+     *
      * @scope enchant.bulletml.AttackPattern
      */
     enchant.bulletml.AttackPattern.defaultConfig = {
@@ -652,7 +657,7 @@
     }
     /**
      * スプライトAから見たスプライトBの方向をラジアンで返す.
-     * 
+     *
      * @param {enchant.Node}
      *            a スプライトA
      * @param {enchant.Node}
