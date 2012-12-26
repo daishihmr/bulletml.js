@@ -229,7 +229,7 @@ window.onload = function() {
             return bulletPool.get();
         };
         // 弾の消去判定
-        AttackPattern.defaultConfig.testInWorld = function(b) {
+        AttackPattern.defaultConfig.isInsideOfWorld = function(b) {
             return (b === enemy)
                     || (b.age < 1200 && -50 < b.x && b.x < 50 + game.width
                             && -100 < b.y && b.y < 50 + game.height);
@@ -286,18 +286,18 @@ window.onload = function() {
                 if (b.parentNode)
                     b.parentNode.removeChild(b);
             });
-            enemy.tl.moveTo(enemyX, 64, 30, enchant.Easing.QUAD_EASEINOUT).then(function() {
-                enemy.setDanmaku(game.assets[xmlFiles.next()]);
-            });
+            enemy.x = enemyX;
+            enemy.y = 64;
+            enemy.setDanmaku(game.assets[xmlFiles.next()]);
         });
         game.on("upbuttonup", function() {
             bulletPool.forEach(function(b) {
                 if (b.parentNode)
                     b.parentNode.removeChild(b);
             });
-            enemy.tl.moveTo(enemyX, 64, 30, enchant.Easing.QUAD_EASEINOUT).then(function() {
-                enemy.setDanmaku(game.assets[xmlFiles.prev()]);
-            });
+            enemy.x = enemyX;
+            enemy.y = 64;
+            enemy.setDanmaku(game.assets[xmlFiles.prev()]);
         });
 
         // 爆発

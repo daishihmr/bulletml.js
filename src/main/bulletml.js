@@ -1222,7 +1222,7 @@ BulletML.global = this;
             if (arguments[i] instanceof Function)
                 arguments[i] = arguments[i]();
 
-        if (label == undefined) throw new Error("label is required.");
+        if (label === void 0) throw new Error("label is required.");
         var result = new BulletML.ActionRef();
         result.label = "" + label;
         if (args instanceof Array) {
@@ -1260,7 +1260,7 @@ BulletML.global = this;
             if (arguments[i] instanceof Function)
                 arguments[i] = arguments[i]();
 
-        if (label == undefined) throw new Error("label is required.");
+        if (label === void 0) throw new Error("label is required.");
         var result = new BulletML.BulletRef();
         result.label = "" + label;
         if (args instanceof Array) {
@@ -1289,7 +1289,7 @@ BulletML.global = this;
                 result.bullet = arguments[i];
             }
         }
-        if (result.bullet == undefined)
+        if (result.bullet === void 0)
             throw new Error("bullet (or bulletRef) is required.");
         return result;
     };
@@ -1298,7 +1298,7 @@ BulletML.global = this;
             if (arguments[i] instanceof Function)
                 arguments[i] = arguments[i]();
 
-        if (label == undefined) throw new Error("label is required.");
+        if (label === void 0) throw new Error("label is required.");
         var result = new BulletML.FireRef();
         result.label = "" + label;
         if (args instanceof Array) {
@@ -1315,8 +1315,8 @@ BulletML.global = this;
             if (arguments[i] instanceof Function)
                 arguments[i] = arguments[i]();
 
-        if (direction == undefined) throw new Error("direction is required.");
-        if (term == undefined) throw new Error("term is required.");
+        if (direction === void 0) throw new Error("direction is required.");
+        if (term === void 0) throw new Error("term is required.");
         var result = new BulletML.ChangeDirection();
         if (direction instanceof BulletML.Direction) {
             result.direction = direction;
@@ -1331,8 +1331,8 @@ BulletML.global = this;
             if (arguments[i] instanceof Function)
                 arguments[i] = arguments[i]();
 
-        if (speed == undefined) throw new Error("speed is required.");
-        if (term == undefined) throw new Error("term is required.");
+        if (speed === void 0) throw new Error("speed is required.");
+        if (term === void 0) throw new Error("term is required.");
         var result = new BulletML.ChangeSpeed();
         if (speed instanceof BulletML.Speed) {
             result.speed = speed;
@@ -1357,9 +1357,9 @@ BulletML.global = this;
                 result.term = arguments[i];
             }
         }
-        if (result.horizontal == undefined && result.vertical == undefined)
+        if (result.horizontal === void 0 && result.vertical === void 0)
             throw new Error("horizontal or vertical is required.");
-        if (result.term == undefined) throw new Error("term is required.");
+        if (result.term === void 0) throw new Error("term is required.");
         return result;
     };
     BulletML.dsl.wait = function(value) {
@@ -1367,7 +1367,7 @@ BulletML.global = this;
             if (arguments[i] instanceof Function)
                 arguments[i] = arguments[i]();
 
-        if (value == undefined) throw new Error("value is required.");
+        if (value === void 0) throw new Error("value is required.");
         return new BulletML.Wait(value);
     };
     BulletML.dsl.vanish = function() {
@@ -1378,8 +1378,8 @@ BulletML.global = this;
             if (arguments[i] instanceof Function)
                 arguments[i] = arguments[i]();
 
-        if (times == undefined) throw new Error("times is required.");
-        if (action == undefined) throw new Error("action is required.");
+        if (times === void 0) throw new Error("times is required.");
+        if (action === void 0) throw new Error("action is required.");
         var result = new BulletML.Repeat();
         result.times = times;
         if (action instanceof BulletML.Action || action instanceof BulletML.ActionRef) {
@@ -1394,7 +1394,7 @@ BulletML.global = this;
             if (arguments[i] instanceof Function)
                 arguments[i] = arguments[i]();
 
-        if (value == undefined) throw new Error("value is required.");
+        if (value === void 0) throw new Error("value is required.");
         var result = new BulletML.Direction(value);
         if (type) result.type = type;
         return result;
@@ -1404,7 +1404,7 @@ BulletML.global = this;
             if (arguments[i] instanceof Function)
                 arguments[i] = arguments[i]();
 
-        if (value == undefined) throw new Error("value is required.");
+        if (value === void 0) throw new Error("value is required.");
         var result = new BulletML.Speed(value);
         if (type) result.type = type;
         return result;
@@ -1414,7 +1414,7 @@ BulletML.global = this;
             if (arguments[i] instanceof Function)
                 arguments[i] = arguments[i]();
 
-        if (value == undefined) throw new Error("value is required.");
+        if (value === void 0) throw new Error("value is required.");
         var result = new BulletML.Horizontal(value);
         if (type) result.type = type;
         return result;
@@ -1424,7 +1424,7 @@ BulletML.global = this;
             if (arguments[i] instanceof Function)
                 arguments[i] = arguments[i]();
 
-        if (value == undefined) throw new Error("value is required.");
+        if (value === void 0) throw new Error("value is required.");
         var result = new BulletML.Vertical(value);
         if (type) result.type = type;
         return result;
@@ -1483,7 +1483,7 @@ BulletML.global = this;
     }
     function text(element, callback) {
         var result = element.textContent.trim();
-        if (result !== undefined) {
+        if (result !== void 0) {
             if (callback) {
                 callback(result);
             }
@@ -1493,7 +1493,7 @@ BulletML.global = this;
         // for IE
         if (element.childNodes[0]) {
             result = element.childNodes[0].nodeValue;
-            if (result !== undefined) {
+            if (result !== void 0) {
                 if (callback) {
                     callback(result);
                 }

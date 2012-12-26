@@ -138,9 +138,9 @@
 
     var _game = undefined;
     /**
-     * testInWorld未指定時に使用される関数.
+     * isInsideOfWorld未指定時に使用される関数.
      */
-    enchant.bulletml.defaultTestInWorld = function(bullet) {
+    enchant.bulletml.defaultIsInsideOfWorld = function(bullet) {
         if (_game === undefined) {
             _game = enchant.Game.instance;
         }
@@ -236,7 +236,7 @@
          *            <td></td>
          *            </tr>
          *            <tr>
-         *            <td>testInWorld</td>
+         *            <td>isInsideOfWorld</td>
          *            <td>function</td>
          *            <td>弾が画面内に存在することを判定する関数</td>
          *            <td>Gameインスタンスの大きさをベースにして判定する</td>
@@ -348,7 +348,7 @@
                 this.y += ticker.speedV * conf.speedRate;
 
                 // test out of world
-                if (!conf.testInWorld(this)) {
+                if (!conf.isInsideOfWorld(this)) {
                     this.parentNode.removeChild(this);
                     ticker.completed = true;
                     if (ticker.parentTicker) {
@@ -471,7 +471,7 @@
                 switch (d.type) {
                 case "aim":
                     if (config.target) {
-                        return radiusAtoB(attacker, config.target) + dv;
+                        return angleAtoB(attacker, config.target) + dv;
                     } else {
                         return dv - Math.PI / 2;
                     }
@@ -523,7 +523,7 @@
                 if (!tar) {
                     return;
                 }
-                ticker.dirFin = radiusAtoB(this, tar) + toRadian(d);
+                ticker.dirFin = angleAtoB(this, tar) + toRadian(d);
                 ticker.dirIncr = rel(ticker.dirFin - ticker.direction) / t;
                 break;
             case "absolute":
@@ -622,7 +622,7 @@
      */
     enchant.bulletml.AttackPattern.defaultConfig = {
         bulletFactory : enchant.bulletml.defaultBulletFactory,
-        testInWorld : enchant.bulletml.defaultTestInWorld,
+        isInsideOfWorld : enchant.bulletml.defaultIsInsideOfWorld,
         rank : 0,
         updateProperties : false,
         speedRate : 2
@@ -660,7 +660,7 @@
      * @param {enchant.Node}
      *            b スプライトB
      */
-    function radiusAtoB(a, b) {
+    function angleAtoB(a, b) {
         var ca = {
             x : a.x + (a.width || 0) / 2,
             y : a.y + (a.height || 0) / 2
