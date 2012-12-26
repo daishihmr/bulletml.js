@@ -70,7 +70,7 @@
      * 弾幕enterframeイベントリスナを設定する.
      */
     enchant.EventTarget.prototype.setDanmaku = function(attackPattern, config) {
-        if (attackPattern == undefined) throw new Error("AttackPattern is required.");
+        if (attackPattern === void 0) throw new Error("AttackPattern is required.");
         this.removeDanmaku();
         this.on("enterframe", attackPattern.createTicker(config));
     };
@@ -141,7 +141,7 @@
      * isInsideOfWorld未指定時に使用される関数.
      */
     enchant.bulletml.defaultIsInsideOfWorld = function(bullet) {
-        if (_game === undefined) {
+        if (_game === void 0) {
             _game = enchant.Game.instance;
         }
         var scw = _game.width;
@@ -264,7 +264,7 @@
          */
         createTicker : function(config, action) {
             var topLabels = this._bulletml.getTopActionLabels()
-            if (action === undefined && topLabels.length > 1) {
+            if (action === void 0 && topLabels.length > 1) {
                 // top***対応.
                 // actionラベルtop***が定義されていた場合、それらを同時に動かす.
                 var tickers = [];
@@ -416,7 +416,7 @@
                 }
             };
 
-            if (action === undefined) {
+            if (action === void 0) {
                 ticker.walker = this._bulletml.getWalker("top",
                         config.rank);
             } else if (typeof (action) === "string") {
