@@ -110,6 +110,7 @@ var xmlFiles = [ "[1943]_rolling_fire.xml", "[Bulletsmorph]_aba_1.xml",
         fileName) {
     return "sample-assets/" + fileName;
 });
+xmlFiles = ["sample-assets/[Daiouzyou]_hibachi_2.xml"];
 var c = 0;
 xmlFiles.next = function() {
     var result = this[c++];
@@ -243,11 +244,12 @@ window.onload = function() {
         enemy.setDanmaku(game.assets[xmlFiles.next()]);
 
         // 攻撃完了時の処理
-        enemy.on("completeAttack", function() {
+        enemy.on("completeattack", function() {
             console.log("攻撃完了");
             this.tl.moveTo(enemyX, 64, 30, enchant.Easing.QUAD_EASEINOUT).then(function() {
                 // 弾幕さしかえ
-                this.setDanmaku(game.assets[xmlFiles.next()]);
+                var pat = game.assets[xmlFiles.next()];
+                if (pat) this.setDanmaku(pat);
             });
         });
 
@@ -288,7 +290,8 @@ window.onload = function() {
             });
             enemy.x = enemyX;
             enemy.y = 64;
-            enemy.setDanmaku(game.assets[xmlFiles.next()]);
+            var pat = game.assets[xmlFiles.next()];
+            if (pat) enemy.setDanmaku(pat);
         });
         game.on("upbuttonup", function() {
             bulletPool.forEach(function(b) {
@@ -297,7 +300,8 @@ window.onload = function() {
             });
             enemy.x = enemyX;
             enemy.y = 64;
-            enemy.setDanmaku(game.assets[xmlFiles.prev()]);
+            var pat = game.assets[xmlFiles.prev()];
+            if (pat) enemy.setDanmaku(pat);
         });
 
         // 爆発

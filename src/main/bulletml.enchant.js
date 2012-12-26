@@ -27,6 +27,13 @@
  *      boss.setDanmaku(game.assets['boss.bml']);
  */
 
+/**
+ * plugin namespace object
+ *
+ * @type {Object}
+ */
+enchant.bulletml = enchant.bulletml || {};
+
 (function() {
 
     // BulletML(*.bml, *.xml)をpreloadで読み込めるようにする.
@@ -89,13 +96,6 @@
             this.removeEventListener("enterframe", remove[i]);
         }
     };
-
-    /**
-     * plugin namespace object
-     *
-     * @type {Object}
-     */
-    enchant.bulletml = enchant.bulletml || {};
 
     /**
      * 弾の画像が指定されなかった場合に使用される.
@@ -167,29 +167,6 @@
                 throw new Error("argument is invalid.", bulletml);
             }
             this._bulletml = bulletml;
-        },
-        _getConf : function(base) {
-            if (base instanceof enchant.Node) {
-                base = {
-                    target : base
-                };
-            }
-
-            var config = {};
-            var d = enchant.bulletml.AttackPattern.defaultConfig;
-            for ( var prop in d) {
-                if (d.hasOwnProperty(prop)) {
-                    config[prop] = d[prop];
-                }
-            }
-            if (base !== undefined) {
-                for ( var prop in base) {
-                    if (base.hasOwnProperty(prop)) {
-                        config[prop] = base[prop];
-                    }
-                }
-            }
-            return config;
         },
         /**
          * enterframeイベントのリスナを作成する.<br>
@@ -280,7 +257,7 @@
                     }
                     if (parentTicker.compChildCount == tickers.length) {
                         parentTicker.complete = true;
-                        this.dispatchEvent(new Event("completeAttack"));
+                        this.dispatchEvent(new Event("completeattack"));
                     }
                 };
                 for ( var i = tickers.length; i--;) {
@@ -303,18 +280,33 @@
             }
         },
         _createTicker : function(config, action) {
-            config = this._getConf(config);
+            config = (function(base) {
+                var result = {};
+                var def = enchant.bulletml.AttackPattern.defaultConfig;
+                for ( var prop in def) {
+                    if (def.hasOwnProperty(prop)) {
+                        if (base !== void 0) {
+                            result[prop] = base[prop] || def[prop];
+                        } else {
+                            result[prop] = def[prop];
+                        }
+                    }
+                }
+
+                return result;
+            })(config);
             if (!config.target) {
                 throw new Error("target is undefined in config.");
             }
 
             // var ticker = tickerPool.get();
             var ticker = function() {
-                if (!ticker._pattern) {
+                var conf = ticker.config;
+                var ptn = ticker._pattern;
+
+                if (!ptn) {
                     return;
                 }
-
-                var conf = ticker.config;
 
                 // update direction
                 if (this.age < ticker.chDirEnd) {
@@ -340,10 +332,8 @@
                 }
 
                 // move sprite
-                this.x += Math.cos(ticker.direction) * ticker.speed
-                        * conf.speedRate;
-                this.y += Math.sin(ticker.direction) * ticker.speed
-                        * conf.speedRate;
+                this.x += Math.cos(ticker.direction) * ticker.speed * conf.speedRate;
+                this.y += Math.sin(ticker.direction) * ticker.speed * conf.speedRate;
                 this.x += ticker.speedH * conf.speedRate;
                 this.y += ticker.speedV * conf.speedRate;
 
@@ -354,15 +344,14 @@
                     if (ticker.parentTicker) {
                         ticker.parentTicker.completeChild();
                     } else {
-                        this.dispatchEvent(new Event("completeAttack"));
+                        this.dispatchEvent(new Event("completeattack"));
                     }
                     return;
                 }
 
                 // set direction, speed to bullet
                 if (conf.updateProperties) {
-                    this.direction = toDegree(ticker.direction
-                            + Math.PI / 2);
+                    this.direction = (ticker.direction + Math.PI / 2) * RAD_TO_DEG;
                     this.speed = ticker.speed;
                 }
 
@@ -374,8 +363,8 @@
                 while (cmd = ticker.walker.next()) {
                     switch (cmd.commandName) {
                     case "fire":
-                        ticker._pattern._fire.call(this, cmd, conf,
-                                ticker, ticker._pattern);
+                        ptn._fire.call(this, cmd, conf,
+                                ticker, ptn);
                         break;
                     case "wait":
                         var v = 0;
@@ -388,15 +377,15 @@
                         }
                         return;
                     case "changeDirection":
-                        ticker._pattern._changeDirection.call(this,
+                        ptn._changeDirection.call(this,
                                 cmd, conf, ticker);
                         break;
                     case "changeSpeed":
-                        ticker._pattern._changeSpeed.call(this, cmd,
+                        ptn._changeSpeed.call(this, cmd,
                                 ticker);
                         break;
                     case "accel":
-                        ticker._pattern._accel.call(this, cmd, ticker);
+                        ptn._accel.call(this, cmd, ticker);
                         break;
                     case "vanish":
                         if (this.parentNode) {
@@ -412,7 +401,7 @@
                 if (ticker.parentTicker) {
                     ticker.parentTicker.completeChild();
                 } else {
-                    this.dispatchEvent(new Event("completeAttack"));
+                    this.dispatchEvent(new Event("completeattack"));
                 }
             };
 
@@ -466,7 +455,7 @@
 
             var attacker = this;
             var calcDirection = function(d) {
-                var dv = toRadian(eval(d.value));
+                var dv = eval(d.value) * DEG_TO_RAD;
                 // console.debug(d.type);
                 switch (d.type) {
                 case "aim":
@@ -515,7 +504,7 @@
             }
         },
         _changeDirection : function(cmd, config, ticker) {
-            var d = eval(cmd.direction.value);
+            var d = eval(cmd.direction.value) * DEG_TO_RAD;
             var t = eval(cmd.term);
             switch (cmd.direction.type) {
             case "aim":
@@ -523,19 +512,19 @@
                 if (!tar) {
                     return;
                 }
-                ticker.dirFin = angleAtoB(this, tar) + toRadian(d);
-                ticker.dirIncr = rel(ticker.dirFin - ticker.direction) / t;
+                ticker.dirFin = angleAtoB(this, tar) + d;
+                ticker.dirIncr = normalizeRadian(ticker.dirFin - ticker.direction) / t;
                 break;
             case "absolute":
-                ticker.dirFin = toRadian(d) - Math.PI / 2;
-                ticker.dirIncr = rel(ticker.dirFin - ticker.direction) / t;
+                ticker.dirFin = d - Math.PI / 2;
+                ticker.dirIncr = normalizeRadian(ticker.dirFin - ticker.direction) / t;
                 break;
             case "relative":
-                ticker.dirFin = ticker.direction + toRadian(d);
-                ticker.dirIncr = rel(ticker.dirFin - ticker.direction) / t;
+                ticker.dirFin = ticker.direction + d;
+                ticker.dirIncr = normalizeRadian(ticker.dirFin - ticker.direction) / t;
                 break;
             case "sequence":
-                ticker.dirIncr = toRadian(d);
+                ticker.dirIncr = d;
                 ticker.dirFin = ticker.direction + ticker.dirIncr * t;
                 break;
             }
@@ -628,22 +617,13 @@
         speedRate : 2
     };
 
-    /**
-     * ラジアンから度数に変換.
-     */
-    function toDegree(radian) {
-        return radian * 180 / Math.PI;
-    }
-    /**
-     * 度数からラジアンに変換.
-     */
-    function toRadian(degree) {
-        return degree * Math.PI / 180;
-    }
+    var RAD_TO_DEG = 180 / Math.PI;
+    var DEG_TO_RAD = Math.PI / 180;
+
     /**
      * ラジアンを -π<= rad < π の範囲に正規化する.
      */
-    function rel(radian) {
+    function normalizeRadian(radian) {
         while (radian <= -Math.PI) {
             radian += Math.PI * 2;
         }
