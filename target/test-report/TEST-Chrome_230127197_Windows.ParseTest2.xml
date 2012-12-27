@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Chrome_230127197_Windows.ParseTest2" errors="0" failures="0" tests="23" time="0.017">
+<testcase classname="Chrome_230127197_Windows.ParseTest2" name="testBuild" time="0.0040"/>
+<testcase classname="Chrome_230127197_Windows.ParseTest2" name="testVanish" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.ParseTest2" name="testWait" time="0.0"/>
+<testcase classname="Chrome_230127197_Windows.ParseTest2" name="testDirection" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.ParseTest2" name="testSpeed" time="0.0"/>
+<testcase classname="Chrome_230127197_Windows.ParseTest2" name="testHorizontal" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.ParseTest2" name="testVertical" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.ParseTest2" name="testChangeDirection" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.ParseTest2" name="testChangeSpeed" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.ParseTest2" name="testAccel" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.ParseTest2" name="testAccel2" time="0.0"/>
+<testcase classname="Chrome_230127197_Windows.ParseTest2" name="testBullet" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.ParseTest2" name="testBullet2" time="0.0"/>
+<testcase classname="Chrome_230127197_Windows.ParseTest2" name="testBullet3" time="0.0"/>
+<testcase classname="Chrome_230127197_Windows.ParseTest2" name="testBullet4" time="0.0"/>
+<testcase classname="Chrome_230127197_Windows.ParseTest2" name="testBullet5" time="0.0"/>
+<testcase classname="Chrome_230127197_Windows.ParseTest2" name="testBullet6" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.ParseTest2" name="testBullet7" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.ParseTest2" name="testAction" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.ParseTest2" name="testActionArgType" time="0.0"/>
+<testcase classname="Chrome_230127197_Windows.ParseTest2" name="testActionRef" time="0.0"/>
+<testcase classname="Chrome_230127197_Windows.ParseTest2" name="testBulletRef" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.ParseTest2" name="testFireRef" time="0.0010"/>
+</testsuite>

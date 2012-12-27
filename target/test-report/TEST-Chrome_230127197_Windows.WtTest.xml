@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Chrome_230127197_Windows.WtTest" errors="0" failures="0" tests="19" time="0.038000003">
+<testcase classname="Chrome_230127197_Windows.WtTest" name="testEval" time="0.0"/>
+<testcase classname="Chrome_230127197_Windows.WtTest" name="testBasic1" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.WtTest" name="testBasic2" time="0.0020"/>
+<testcase classname="Chrome_230127197_Windows.WtTest" name="testRepeatVariableTimes" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.WtTest" name="testActionRefReturn" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.WtTest" name="testChangeDirection" time="0.0"/>
+<testcase classname="Chrome_230127197_Windows.WtTest" name="testChangeSpeed" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.WtTest" name="testAccel" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.WtTest" name="testFireBullet" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.WtTest" name="testFireBullet2" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.WtTest" name="testFireBulletsWalker" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.WtTest" name="testFireBulletsWalkerVariable" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.WtTest" name="testFireBulletRef" time="0.0020"/>
+<testcase classname="Chrome_230127197_Windows.WtTest" name="testFireBulletRef2" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.WtTest" name="testFireBulletsRef3" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.WtTest" name="testFireBulletsRefDeep" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.WtTest" name="testFireRef" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.WtTest" name="testFireRef2" time="0.0010"/>
+<testcase classname="Chrome_230127197_Windows.WtTest" name="testXABossWinder" time="0.02"/>
+</testsuite>

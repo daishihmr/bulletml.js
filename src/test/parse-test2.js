@@ -211,7 +211,7 @@ ParseTest2.prototype.testAction = function() {
     assertEquals(n.commands[1].commandName, "vanish");
 };
 
-ParseTest2.prototype.testAction = function() {
+ParseTest2.prototype.testAction2 = function() {
     var n = action([wait(10), vanish()]);
     assertEquals(n.commands.length, 2);
     assertEquals(n.commands[0].commandName, "wait");
