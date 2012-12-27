@@ -28,9 +28,7 @@
  */
 
 /**
- * plugin namespace object
- *
- * @type {Object}
+ * @namespace
  */
 enchant.bulletml = enchant.bulletml || {};
 
@@ -75,6 +73,8 @@ enchant.bulletml = enchant.bulletml || {};
     // syntax sugar.
     /**
      * 弾幕enterframeイベントリスナを設定する.
+     *
+     * @scope enchant.EventTarget.prototype
      */
     enchant.EventTarget.prototype.setDanmaku = function(attackPattern, config) {
         if (attackPattern === void 0) throw new Error("AttackPattern is required.");
