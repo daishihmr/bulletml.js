@@ -110,16 +110,18 @@ var xmlFiles = [ "[1943]_rolling_fire.xml", "[Bulletsmorph]_aba_1.xml",
         fileName) {
     return "sample-assets/" + fileName;
 });
-xmlFiles = ["sample-assets/[Daiouzyou]_hibachi_2.xml"];
+// xmlFiles = ["sample-assets/[Daiouzyou]_hibachi_2.xml"];
 var c = 0;
 xmlFiles.next = function() {
     var result = this[c++];
+    if (!result) return;
     console.log(result);
     fileName.text = result.replace("sample-assets/", "");
     return result;
 };
 xmlFiles.prev = function() {
     var result = this[c--];
+    if (!result) return;
     console.log(result);
     fileName.text = result.replace("sample-assets/", "");
     return result;
@@ -133,6 +135,7 @@ window.onload = function() {
             "sample-assets/explosion.png" ];
     game.preload(assets.concat(xmlFiles));
     game.onload = function() {
+        console.log(game.assets["sample-assets/[Daiouzyou]_hibachi_2.xml"]);
         var enemyX = (320 - 32) / 2;
 
         var scene = game.rootScene;

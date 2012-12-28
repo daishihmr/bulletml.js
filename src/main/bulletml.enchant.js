@@ -124,34 +124,6 @@ enchant.bulletml = enchant.bulletml || {};
     };
 
     /**
-     * bulletFactory未指定時に使用される弾スプライトの生成関数.
-     *
-     * @returns {enchant.Sprite} 8px x 8px の大きさのスプライト
-     * @type function
-     * @memberOf enchant.bulletml
-     */
-    enchant.bulletml.defaultBulletFactory = function() {
-        var bullet = new enchant.Sprite(8, 8);
-        bullet.image = enchant.bulletml.getDefaultImage();
-        return bullet;
-    };
-
-    var _game = undefined;
-    /**
-     * isInsideOfWorld未指定時に使用される関数.
-     */
-    enchant.bulletml.defaultIsInsideOfWorld = function(bullet) {
-        if (_game === void 0) {
-            _game = enchant.Game.instance;
-        }
-        var scw = _game.width;
-        var sch = _game.height;
-        var w = bullet.width || 0;
-        var h = bullet.height || 0;
-        return (-w <= bullet.x && bullet.x < scw && -h <= bullet.y && bullet.y < sch);
-    };
-
-    /**
      * @scope enchant.bulletml.AttackPattern.prototype
      */
     enchant.bulletml.AttackPattern = enchant.Class.create({
@@ -271,7 +243,6 @@ enchant.bulletml = enchant.bulletml || {};
 
                 parentTicker.compChildCount = 0;
                 parentTicker.complete = false;
-
                 parentTicker.isDanmaku = true;
 
                 return parentTicker;
@@ -295,6 +266,7 @@ enchant.bulletml = enchant.bulletml || {};
 
                 return result;
             })(config);
+
             if (!config.target) {
                 throw new Error("target is undefined in config.");
             }
@@ -339,7 +311,7 @@ enchant.bulletml = enchant.bulletml || {};
 
                 // test out of world
                 if (!conf.isInsideOfWorld(this)) {
-                    this.parentNode.removeChild(this);
+                    if (this.parentNode) this.parentNode.removeChild(this);
                     ticker.completed = true;
                     if (ticker.parentTicker) {
                         ticker.parentTicker.completeChild();
@@ -363,8 +335,7 @@ enchant.bulletml = enchant.bulletml || {};
                 while (cmd = ticker.walker.next()) {
                     switch (cmd.commandName) {
                     case "fire":
-                        ptn._fire.call(this, cmd, conf,
-                                ticker, ptn);
+                        ptn._fire.call(this, cmd, conf, ticker, ptn);
                         break;
                     case "wait":
                         var v = 0;
@@ -377,21 +348,16 @@ enchant.bulletml = enchant.bulletml || {};
                         }
                         return;
                     case "changeDirection":
-                        ptn._changeDirection.call(this,
-                                cmd, conf, ticker);
+                        ptn._changeDirection.call(this, cmd, conf, ticker);
                         break;
                     case "changeSpeed":
-                        ptn._changeSpeed.call(this, cmd,
-                                ticker);
+                        ptn._changeSpeed.call(this, cmd, ticker);
                         break;
                     case "accel":
                         ptn._accel.call(this, cmd, ticker);
                         break;
                     case "vanish":
-                        if (this.parentNode) {
-                            this.parentNode.removeChild(this);
-                            // tickerPool.dispose(ticker);
-                        }
+                        if (this.parentNode) this.parentNode.removeChild(this);
                         break;
                     }
                 }
@@ -405,12 +371,9 @@ enchant.bulletml = enchant.bulletml || {};
                 }
             };
 
-            if (action === void 0) {
-                ticker.walker = this._bulletml.getWalker("top",
-                        config.rank);
-            } else if (typeof (action) === "string") {
-                ticker.walker = this._bulletml.getWalker(action,
-                        config.rank);
+            action = action || "top";
+            if (typeof (action) === "string") {
+                ticker.walker = this._bulletml.getWalker(action, config.rank);
             } else if (action instanceof BulletML.Bullet) {
                 ticker.walker = action.getWalker(config.rank);
             } else {
@@ -603,6 +566,34 @@ enchant.bulletml = enchant.bulletml || {};
             }
         }
     });
+
+    /**
+     * bulletFactory未指定時に使用される弾スプライトの生成関数.
+     *
+     * @returns {enchant.Sprite} 8px x 8px の大きさのスプライト
+     * @type function
+     * @memberOf enchant.bulletml
+     */
+    enchant.bulletml.defaultBulletFactory = function() {
+        var bullet = new enchant.Sprite(8, 8);
+        bullet.image = enchant.bulletml.getDefaultImage();
+        return bullet;
+    };
+
+    var _game = undefined;
+    /**
+     * isInsideOfWorld未指定時に使用される関数.
+     */
+    enchant.bulletml.defaultIsInsideOfWorld = function(bullet) {
+        if (_game === void 0) {
+            _game = enchant.Game.instance;
+        }
+        var scw = _game.width;
+        var sch = _game.height;
+        var w = bullet.width || 0;
+        var h = bullet.height || 0;
+        return (-w <= bullet.x && bullet.x < scw && -h <= bullet.y && bullet.y < sch);
+    };
 
     /**
      * configのデフォルト値.
