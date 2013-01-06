@@ -810,7 +810,7 @@ BulletML.global = this;
          * @field
          */
         this.type = "aim";
-        if (value) {
+        if (value !== void 0) {
             /**
              * @type {string}
              * @field
@@ -830,7 +830,7 @@ BulletML.global = this;
          * @field
          */
         this.type = "absolute";
-        if (value) {
+        if (value !== void 0) {
             /**
              * @type {string}
              * @field
@@ -850,7 +850,7 @@ BulletML.global = this;
          * @field
          */
         this.type = "absolute";
-        if (value) {
+        if (value !== void 0) {
             /**
              * @type {string}
              * @field
@@ -870,7 +870,7 @@ BulletML.global = this;
          * @field
          */
         this.type = "absolute";
-        if (value) {
+        if (value !== void 0) {
             /**
              * @type {string}
              * @field

@@ -221,13 +221,10 @@ enchant.bulletml = enchant.bulletml || {};
                     tickers[tickers.length] = this._createTicker(config, topLabels[i]);
                 }
                 var parentTicker = function() {
-                    if (parentTicker.complete) {
-                        return;
-                    }
                     for ( var i = tickers.length; i--;) {
                         tickers[i].call(this);
                     }
-                    if (parentTicker.compChildCount == tickers.length) {
+                    if (parentTicker.compChildCount === tickers.length) {
                         parentTicker.complete = true;
                         this.dispatchEvent(new Event("completeattack"));
                     }
@@ -283,14 +280,14 @@ enchant.bulletml = enchant.bulletml || {};
                 // update direction
                 if (this.age < ticker.chDirEnd) {
                     ticker.direction += ticker.dirIncr;
-                } else if (this.age == ticker.chDirEnd) {
+                } else if (this.age === ticker.chDirEnd) {
                     ticker.direction = ticker.dirFin;
                 }
 
                 // update speed
                 if (this.age < ticker.chSpdEnd) {
                     ticker.speed += ticker.spdIncr;
-                } else if (this.age == ticker.chSpdEnd) {
+                } else if (this.age === ticker.chSpdEnd) {
                     ticker.speed = ticker.spdFin;
                 }
 
@@ -298,7 +295,7 @@ enchant.bulletml = enchant.bulletml || {};
                 if (this.age < ticker.aclEnd) {
                     ticker.speedH += ticker.aclIncrH;
                     ticker.speedV += ticker.aclIncrV;
-                } else if (this.age == ticker.aclEnd) {
+                } else if (this.age === ticker.aclEnd) {
                     ticker.speedH = ticker.aclFinH;
                     ticker.speedV = ticker.aclFinV;
                 }
