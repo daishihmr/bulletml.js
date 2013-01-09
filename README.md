@@ -14,5 +14,3 @@ DEMO
 ----
 
 <a href="http://9leap.net/games/2877/"><img src="http://9leap.net/screenshots//140x140/2877_140"/></a>
-
-[http://static.dev7.jp/test/bulletml.js/](http://static.dev7.jp/test/bulletml.js/)
