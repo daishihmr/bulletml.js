@@ -14,3 +14,4 @@ DEMO
 ----
 
 <a href="http://9leap.net/games/2877/"><img src="http://9leap.net/screenshots//140x140/2877_140"/></a>
+<a href="http://9leap.net/games/2364/"><img src="http://9leap.net/screenshots//140x140/2364_140"/></a>
