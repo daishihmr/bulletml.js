@@ -288,7 +288,7 @@ bulletml["_temp"] = function() {};
                     return this.next();
                 } else if (n instanceof bulletml.ChangeDirection) {
                     var cd = new bulletml.ChangeDirection();
-                    cd.type = n.direction.type;
+                    cd.direction.type = n.direction.type;
                     cd.direction.value = this.evalParam(n.direction.value);
                     cd.term = this.evalParam(n.term);
                     return cd;
@@ -1316,7 +1316,7 @@ bulletml["_temp"] = function() {};
 
         if (value === undefined) throw new Error("value is required.");
         var result = new bulletml.Direction(value);
-        if (type) result.type = type;
+        if (type !== undefined) result.type = type;
         return result;
     };
     bulletml.dsl.speed = function(value, type) {
