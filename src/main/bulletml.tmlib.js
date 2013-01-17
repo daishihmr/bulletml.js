@@ -27,7 +27,7 @@ tm.bulletml = tm.bulletml || {};
     //  * 弾幕enterframeイベントリスナを設定する.
     //  */
     // enchant.EventTarget.prototype.setDanmaku = function(attackPattern, config) {
-    //     if (attackPattern === void 0) throw new Error("AttackPattern is required.");
+    //     if (attackPattern === undefined) throw new Error("AttackPattern is required.");
     //     this.removeDanmaku();
     //     this.on("enterframe", attackPattern.createTicker(config));
     // };
@@ -137,7 +137,7 @@ tm.bulletml = tm.bulletml || {};
          */
         createTicker: function(config, action) {
             var topLabels = this._bulletml.getTopActionLabels();
-            if (action === void 0 && topLabels.length > 0) {
+            if (action === undefined && topLabels.length > 0) {
                 // top***対応.
                 // actionラベルtop***が定義されていた場合、それらを同時に動かす.
                 var tickers = [];
@@ -179,7 +179,7 @@ tm.bulletml = tm.bulletml || {};
                 var def = tm.bulletml.AttackPattern.defaultConfig;
                 for ( var prop in def) {
                     if (def.hasOwnProperty(prop)) {
-                        if (base !== void 0) {
+                        if (base !== undefined) {
                             result[prop] = base[prop] || def[prop];
                         } else {
                             result[prop] = def[prop];

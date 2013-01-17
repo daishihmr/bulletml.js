@@ -47,7 +47,7 @@ enchant.bulletml = enchant.bulletml || {};
                 }
 
                 if (xhr.responseXML != null) {
-                    var bulletml = BulletML.build(xhr.responseXML);
+                    var bulletml = bulletml.build(xhr.responseXML);
                     if (bulletml) {
                         game.assets[src] = new enchant.bulletml.AttackPattern(
                                 bulletml);
@@ -77,7 +77,7 @@ enchant.bulletml = enchant.bulletml || {};
      * @scope enchant.EventTarget.prototype
      */
     enchant.EventTarget.prototype.setDanmaku = function(attackPattern, config) {
-        if (attackPattern === void 0) throw new Error("AttackPattern is required.");
+        if (attackPattern === undefined) throw new Error("AttackPattern is required.");
         this.removeDanmaku();
         this.on("enterframe", attackPattern.createTicker(config));
     };
@@ -103,7 +103,6 @@ enchant.bulletml = enchant.bulletml || {};
      * 8px x 8px.赤い球状の弾.
      *
      * @type {enchant.Surface}
-     * @memberOf enchant.bulletml
      */
     enchant.bulletml.getDefaultImage = function() {
         if (this.value) {
@@ -131,7 +130,7 @@ enchant.bulletml = enchant.bulletml || {};
          * 攻撃パターン.
          *
          * @constructs
-         * @param {BulletML.Root}
+         * @param {bulletml.Root}
          *            bulletml BulletMLデータ
          */
         initialize : function(bulletml) {
@@ -212,8 +211,13 @@ enchant.bulletml = enchant.bulletml || {};
          *            省略可.
          */
         createTicker : function(config, action) {
+            if (config instanceof enchant.Node) {
+                config = {
+                    target: config
+                };
+            }
             var topLabels = this._bulletml.getTopActionLabels()
-            if (action === void 0 && topLabels.length > 1) {
+            if (action === undefined && topLabels.length > 1) {
                 // top***対応.
                 // actionラベルtop***が定義されていた場合、それらを同時に動かす.
                 var tickers = [];
@@ -253,11 +257,12 @@ enchant.bulletml = enchant.bulletml || {};
                 var def = enchant.bulletml.AttackPattern.defaultConfig;
                 for ( var prop in def) {
                     if (def.hasOwnProperty(prop)) {
-                        if (base !== void 0) {
-                            result[prop] = base[prop] || def[prop];
-                        } else {
-                            result[prop] = def[prop];
-                        }
+                        result[prop] = def[prop];
+                    }
+                }
+                for ( var prop in base) {
+                    if (base.hasOwnProperty(prop)) {
+                        result[prop] = base[prop];
                     }
                 }
 
@@ -371,10 +376,10 @@ enchant.bulletml = enchant.bulletml || {};
             action = action || "top";
             if (typeof (action) === "string") {
                 ticker.walker = this._bulletml.getWalker(action, config.rank);
-            } else if (action instanceof BulletML.Bullet) {
+            } else if (action instanceof bulletml.Bullet) {
                 ticker.walker = action.getWalker(config.rank);
             } else {
-                console.error(config, action);
+                window.console.error(config, action);
                 throw new Error("引数が不正");
             }
 
@@ -555,7 +560,7 @@ enchant.bulletml = enchant.bulletml || {};
          * 解析済みのBulletMLオブジェクト.<br>
          * 読み取り専用.
          *
-         * @type BulletML.Root
+         * @type bulletml.Root
          */
         bulletml : {
             get : function() {
@@ -567,9 +572,7 @@ enchant.bulletml = enchant.bulletml || {};
     /**
      * bulletFactory未指定時に使用される弾スプライトの生成関数.
      *
-     * @returns {enchant.Sprite} 8px x 8px の大きさのスプライト
-     * @type function
-     * @memberOf enchant.bulletml
+     * @return {enchant.Sprite} 8px x 8px の大きさのスプライト
      */
     enchant.bulletml.defaultBulletFactory = function() {
         var bullet = new enchant.Sprite(8, 8);
@@ -582,7 +585,7 @@ enchant.bulletml = enchant.bulletml || {};
      * isInsideOfWorld未指定時に使用される関数.
      */
     enchant.bulletml.defaultIsInsideOfWorld = function(bullet) {
-        if (_game === void 0) {
+        if (_game === undefined) {
             _game = enchant.Game.instance;
         }
         var scw = _game.width;
