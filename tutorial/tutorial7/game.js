@@ -62,7 +62,7 @@ window.onload = function() {
                 });
                 return bullet;
             },
-            testInWorld : function(bullet) {
+            isInsideOfWorld : function(bullet) {
                 return bullet.y < game.height;
             }
         });

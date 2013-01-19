@@ -1,662 +1,771 @@
-<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
-	.KEYW {color: #933;}
-	.COMM {color: #bbb; font-style: italic;}
-	.NUMB {color: #393;}
-	.STRN {color: #393;}
-	.REGX {color: #339;}
-	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
-	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
-<span class='line'>  2</span>  * @fileOverview bullet.enchant.js
-<span class='line'>  3</span>  * @version 0.3.3
-<span class='line'>  4</span>  * @require enchant.js v0.5.2+, bulletml-min.js v0.3.1
-<span class='line'>  5</span>  * @author daishi_hmr
-<span class='line'>  6</span>  * 
-<span class='line'>  7</span>  * @description
-<span class='line'>  8</span>  * 弾幕記述言語BulletMLをenchant.jsで扱うためのプラグイン
-<span class='line'>  9</span>  * 
-<span class='line'> 10</span>  * @detail
-<span class='line'> 11</span>  * BulletMLのパースにはbulletml.jsを使用しています
-<span class='line'> 12</span>  * bulletml.js:
-<span class='line'> 13</span>  * https://github.com/daishihmr/bulletml.js
-<span class='line'> 14</span>  * 
-<span class='line'> 15</span>  * @example
-<span class='line'> 16</span>  * game.preload('boss.bml');
-<span class='line'> 17</span>  * ...
-<span class='line'> 18</span>  * var player = new Sprite(32, 32);
-<span class='line'> 19</span>  * var boss = new Sprite(32, 32);
-<span class='line'> 20</span>  * var attackPattern = game.assets['boss.xml'];
-<span class='line'> 21</span>  * var ticker = attackPattern.createTicker(player);
-<span class='line'> 22</span>  * boss.addEventListener('enterframe', ticker);
-<span class='line'> 23</span>  * 
-<span class='line'> 24</span>  * @example
-<span class='line'> 25</span>  * game.preload('boss.bml');
-<span class='line'> 26</span>  * ...
-<span class='line'> 27</span>  * var player = new Sprite(32, 32);
-<span class='line'> 28</span>  * AttackPattern.defaultConfig.target = player;
-<span class='line'> 29</span>  * var boss = new Sprite(32, 32);
-<span class='line'> 30</span>  * boss.setDanmaku(game.assets['boss.bml']);
-<span class='line'> 31</span>  */</span><span class="WHIT">
-<span class='line'> 32</span> 
-<span class='line'> 33</span> </span><span class="PUNC">(</span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 34</span> 
-<span class='line'> 35</span> </span><span class="WHIT">    </span><span class="COMM">// BulletML(*.bml)をpreloadで読み込めるようにする.</span><span class="WHIT">
-<span class='line'> 36</span> </span><span class="WHIT">    </span><span class="NAME">enchant.Game._loadFuncs</span><span class="PUNC">[</span><span class="STRN">"bml"</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">enchant.Game._loadFuncs</span><span class="PUNC">[</span><span class="STRN">"xml"</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="WHIT">
-<span class='line'> 37</span> </span><span class="WHIT">            </span><span class="NAME">src</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">callback</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 38</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">game</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 39</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">xhr</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">XMLHttpRequest</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 40</span> </span><span class="WHIT">        </span><span class="NAME">xhr.onreadystatechange</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 41</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">xhr.readyState</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NUMB">4</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 42</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">xhr.status</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="NUMB">200</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">xhr.status</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 43</span> </span><span class="WHIT">                    </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="NAME">xhr.status</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">': '</span><span class="WHIT">
-<span class='line'> 44</span> </span><span class="WHIT">                            </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'Cannot load an asset: '</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">src</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 45</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 46</span> 
-<span class='line'> 47</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">xhr.responseXML</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 48</span> </span><span class="WHIT">                    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">bulletml</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">BulletML.build</span><span class="PUNC">(</span><span class="NAME">xhr.responseXML</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 49</span> </span><span class="WHIT">                    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">bulletml</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 50</span> </span><span class="WHIT">                        </span><span class="NAME">game.assets</span><span class="PUNC">[</span><span class="NAME">src</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">enchant.bulletml.AttackPattern</span><span class="PUNC">(</span><span class="WHIT">
-<span class='line'> 51</span> </span><span class="WHIT">                                </span><span class="NAME">bulletml</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 52</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 53</span> </span><span class="WHIT">                        </span><span class="NAME">console.warn</span><span class="PUNC">(</span><span class="NAME">src</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">"は妥当なBulletMLではありません。"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 54</span> </span><span class="WHIT">                        </span><span class="NAME">game.assets</span><span class="PUNC">[</span><span class="NAME">src</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">xhr.responseXML</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 55</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 56</span> </span><span class="WHIT">                    </span><span class="NAME">callback</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 57</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">xhr.responseText</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 58</span> </span><span class="WHIT">                    </span><span class="NAME">game.assets</span><span class="PUNC">[</span><span class="NAME">src</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">BulletML.build</span><span class="PUNC">(</span><span class="NAME">xhr.responseText</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 59</span> </span><span class="WHIT">                    </span><span class="NAME">callback</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 60</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 61</span> </span><span class="WHIT">                    </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="NAME">xhr.status</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">': '</span><span class="WHIT">
-<span class='line'> 62</span> </span><span class="WHIT">                            </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'Cannot load an asset: '</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">src</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 63</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 64</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 65</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 66</span> 
-<span class='line'> 67</span> </span><span class="WHIT">        </span><span class="NAME">xhr.open</span><span class="PUNC">(</span><span class="STRN">'GET'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">src</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 68</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">xhr.overrideMimeType</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 69</span> </span><span class="WHIT">            </span><span class="NAME">xhr.overrideMimeType</span><span class="PUNC">(</span><span class="STRN">"application/xml"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 70</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 71</span> </span><span class="WHIT">        </span><span class="NAME">xhr.send</span><span class="PUNC">(</span><span class="KEYW">null</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 72</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 73</span> 
-<span class='line'> 74</span> </span><span class="WHIT">    </span><span class="COMM">// syntax sugar.</span><span class="WHIT">
-<span class='line'> 75</span> </span><span class="WHIT">    </span><span class="COMM">/**
-<span class='line'> 76</span>      * 弾幕enterframeイベントリスナを設定する.
-<span class='line'> 77</span>      */</span><span class="WHIT">
-<span class='line'> 78</span> </span><span class="WHIT">    </span><span class="NAME">enchant.EventTarget.prototype.setDanmaku</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">attackPattern</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">config</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 79</span> </span><span class="WHIT">        </span><span class="NAME">this.on</span><span class="PUNC">(</span><span class="STRN">"enterframe"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">attackPattern.createTicker</span><span class="PUNC">(</span><span class="NAME">config</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 80</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 81</span> </span><span class="WHIT">    </span><span class="NAME">enchant.EventTarget.prototype.removeDanmaku</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 82</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">remove</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 83</span> </span><span class="WHIT">        </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._listeners</span><span class="PUNC">[</span><span class="STRN">"enterframe"</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">--</span><span class="PUNC">;</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 84</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._listeners</span><span class="PUNC">[</span><span class="STRN">"enterframe"</span><span class="PUNC">]</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">isDanmaku</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 85</span> </span><span class="WHIT">                </span><span class="NAME">remove</span><span class="PUNC">[</span><span class="NAME">remove.length</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._listeners</span><span class="PUNC">[</span><span class="STRN">"enterframe"</span><span class="PUNC">]</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 86</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 87</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 88</span> </span><span class="WHIT">        </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">remove.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">--</span><span class="PUNC">;</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 89</span> </span><span class="WHIT">            </span><span class="NAME">this.removeEventListener</span><span class="PUNC">(</span><span class="STRN">"enterframe"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">remove</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 90</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 91</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 92</span> 
-<span class='line'> 93</span> </span><span class="WHIT">    </span><span class="COMM">/**
-<span class='line'> 94</span>      * plugin namespace object
-<span class='line'> 95</span>      * 
-<span class='line'> 96</span>      * @type {Object}
-<span class='line'> 97</span>      */</span><span class="WHIT">
-<span class='line'> 98</span> </span><span class="WHIT">    </span><span class="NAME">enchant.bulletml</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 99</span> 
-<span class='line'>100</span> </span><span class="WHIT">    </span><span class="COMM">/**
-<span class='line'>101</span>      * 弾の画像が指定されなかった場合に使用される.
-<span class='line'>102</span>      * 
-<span class='line'>103</span>      * 8px x 8px.赤い球状の弾.
-<span class='line'>104</span>      * 
-<span class='line'>105</span>      * @type {enchant.Surface}
-<span class='line'>106</span>      * @memberOf enchant.bulletml
-<span class='line'>107</span>      */</span><span class="WHIT">
-<span class='line'>108</span> </span><span class="WHIT">    </span><span class="NAME">enchant.bulletml.getDefaultImage</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>109</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.value</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>110</span> </span><span class="WHIT">            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.value</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>111</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>112</span> </span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">s</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">enchant.Surface</span><span class="PUNC">(</span><span class="NUMB">8</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">8</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>113</span> </span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">c</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">s.context</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>114</span> </span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">g</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">c.createRadialGradient</span><span class="PUNC">(</span><span class="NUMB">4</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">4</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">4</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">4</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">4</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>115</span> </span><span class="WHIT">            </span><span class="NAME">g.addColorStop</span><span class="PUNC">(</span><span class="NUMB">0.0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">"rgba(255,255,255,1.0)"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>116</span> </span><span class="WHIT">            </span><span class="NAME">g.addColorStop</span><span class="PUNC">(</span><span class="NUMB">0.5</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">"rgba(255,255,255,1.0)"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>117</span> </span><span class="WHIT">            </span><span class="NAME">g.addColorStop</span><span class="PUNC">(</span><span class="NUMB">0.8</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">"rgba(255,  0,  0,0.8)"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>118</span> </span><span class="WHIT">            </span><span class="NAME">g.addColorStop</span><span class="PUNC">(</span><span class="NUMB">1.0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">"rgba(255,  0,  0,0.0)"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>119</span> </span><span class="WHIT">            </span><span class="NAME">c.fillStyle</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">g</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>120</span> </span><span class="WHIT">            </span><span class="NAME">c.fillRect</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">8</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">8</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>121</span> </span><span class="WHIT">            </span><span class="NAME">this.value</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">s</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>122</span> </span><span class="WHIT">            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">s</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>123</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>124</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>125</span> 
-<span class='line'>126</span> </span><span class="WHIT">    </span><span class="COMM">/**
-<span class='line'>127</span>      * bulletFactory未指定時に使用される弾スプライトの生成関数.
-<span class='line'>128</span>      * 
-<span class='line'>129</span>      * @returns {enchant.Sprite} 8px x 8px の大きさのスプライト
-<span class='line'>130</span>      * @type function
-<span class='line'>131</span>      * @memberOf enchant.bulletml
-<span class='line'>132</span>      */</span><span class="WHIT">
-<span class='line'>133</span> </span><span class="WHIT">    </span><span class="NAME">enchant.bulletml.DEFAULT_BULLET_FACTORY</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>134</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">bullet</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">enchant.Sprite</span><span class="PUNC">(</span><span class="NUMB">8</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">8</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>135</span> </span><span class="WHIT">        </span><span class="NAME">bullet.image</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">enchant.bulletml.getDefaultImage</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>136</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">bullet</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>137</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>138</span> 
-<span class='line'>139</span> </span><span class="WHIT">    </span><span class="COMM">/**
-<span class='line'>140</span>      * @scope enchant.bulletml.AttackPattern.prototype
-<span class='line'>141</span>      */</span><span class="WHIT">
-<span class='line'>142</span> </span><span class="WHIT">    </span><span class="NAME">enchant.bulletml.AttackPattern</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">enchant.Class</span><span class="WHIT">
-<span class='line'>143</span> </span><span class="WHIT">            </span><span class="PUNC">.</span><span class="NAME">create</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>144</span> </span><span class="WHIT">                </span><span class="COMM">/**
-<span class='line'>145</span>                  * 攻撃パターン.
-<span class='line'>146</span>                  * 
-<span class='line'>147</span>                  * @constructs
-<span class='line'>148</span>                  * @param {BulletML.Root}
-<span class='line'>149</span>                  *            bulletml BulletMLデータ
-<span class='line'>150</span>                  */</span><span class="WHIT">
-<span class='line'>151</span> </span><span class="WHIT">                </span><span class="NAME">initialize</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">bulletml</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>152</span> </span><span class="WHIT">                    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">bulletml</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>153</span> </span><span class="WHIT">                        </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="STRN">"argument is invalid."</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">bulletml</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>154</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>155</span> </span><span class="WHIT">                    </span><span class="NAME">this._bulletml</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">bulletml</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>156</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>157</span> </span><span class="WHIT">                </span><span class="NAME">_getConf</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">base</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>158</span> </span><span class="WHIT">                    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">base</span><span class="WHIT"> </span><span class="KEYW">instanceof</span><span class="WHIT"> </span><span class="NAME">enchant.Node</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>159</span> </span><span class="WHIT">                        </span><span class="NAME">base</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>160</span> </span><span class="WHIT">                            </span><span class="NAME">target</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">base</span><span class="WHIT">
-<span class='line'>161</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>162</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>163</span> 
-<span class='line'>164</span> </span><span class="WHIT">                    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">config</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>165</span> </span><span class="WHIT">                    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">d</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">enchant.bulletml.AttackPattern.defaultConfig</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>166</span> </span><span class="WHIT">                    </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">prop</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">d</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>167</span> </span><span class="WHIT">                        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">d.hasOwnProperty</span><span class="PUNC">(</span><span class="NAME">prop</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>168</span> </span><span class="WHIT">                            </span><span class="NAME">config</span><span class="PUNC">[</span><span class="NAME">prop</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">d</span><span class="PUNC">[</span><span class="NAME">prop</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>169</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>170</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>171</span> </span><span class="WHIT">                    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">base</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>172</span> </span><span class="WHIT">                        </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">prop</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">base</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>173</span> </span><span class="WHIT">                            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">base.hasOwnProperty</span><span class="PUNC">(</span><span class="NAME">prop</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>174</span> </span><span class="WHIT">                                </span><span class="NAME">config</span><span class="PUNC">[</span><span class="NAME">prop</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">base</span><span class="PUNC">[</span><span class="NAME">prop</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>175</span> </span><span class="WHIT">                            </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>176</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>177</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>178</span> </span><span class="WHIT">                    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">config</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>179</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>180</span> </span><span class="WHIT">                </span><span class="COMM">/**
-<span class='line'>181</span>                  * enterframeイベントのリスナを作成する.&lt;br>
-<span class='line'>182</span>                  * &lt;br>
-<span class='line'>183</span>                  * 第1引数configで各種設定を行う. &lt;br>
-<span class='line'>184</span>                  * 
-<span class='line'>185</span>                  * 
-<span class='line'>186</span>                  * @param {Object|enchant.Node}
-<span class='line'>187</span>                  *            [config] 発射される弾に関する設定.&lt;br>
-<span class='line'>188</span>                  *            &lt;table border=1>
-<span class='line'>189</span>                  *            &lt;tr>
-<span class='line'>190</span>                  *            &lt;th>プロパティ名&lt;/th>
-<span class='line'>191</span>                  *            &lt;th>型&lt;/th>
-<span class='line'>192</span>                  *            &lt;th>設定内容&lt;/th>
-<span class='line'>193</span>                  *            &lt;th>デフォルト値&lt;/th>
-<span class='line'>194</span>                  *            &lt;th>必須&lt;/th>
-<span class='line'>195</span>                  *            &lt;/tr>
-<span class='line'>196</span>                  *            &lt;tr>
-<span class='line'>197</span>                  *            &lt;td>target&lt;/td>
-<span class='line'>198</span>                  *            &lt;td>enchant.Node&lt;/td>
-<span class='line'>199</span>                  *            &lt;td>攻撃の標的となるオブジェクト&lt;/td>
-<span class='line'>200</span>                  *            &lt;td>null&lt;/td>
-<span class='line'>201</span>                  *            &lt;td>○&lt;/td>
-<span class='line'>202</span>                  *            &lt;/tr>
-<span class='line'>203</span>                  *            &lt;tr>
-<span class='line'>204</span>                  *            &lt;td>addTarget&lt;/td>
-<span class='line'>205</span>                  *            &lt;td>enchant.Group&lt;/td>
-<span class='line'>206</span>                  *            &lt;td>生成した弾を追加するノード&lt;/td>
-<span class='line'>207</span>                  *            &lt;td>攻撃を実行するノードのparentNode&lt;/td>
-<span class='line'>208</span>                  *            &lt;td>&lt;/td>
-<span class='line'>209</span>                  *            &lt;/tr>
-<span class='line'>210</span>                  *            &lt;tr>
-<span class='line'>211</span>                  *            &lt;td>bulletFactory&lt;/td>
-<span class='line'>212</span>                  *            &lt;td>function&lt;/td>
-<span class='line'>213</span>                  *            &lt;td>弾ノードを生成する関数&lt;/td>
-<span class='line'>214</span>                  *            &lt;td>小さな赤い弾を生成&lt;/td>
-<span class='line'>215</span>                  *            &lt;td>&lt;/td>
-<span class='line'>216</span>                  *            &lt;/tr>
-<span class='line'>217</span>                  *            &lt;tr>
-<span class='line'>218</span>                  *            &lt;td>updateProperties&lt;/td>
-<span class='line'>219</span>                  *            &lt;td>boolean&lt;/td>
-<span class='line'>220</span>                  *            &lt;td>弾のプロパティ(direction, speed)を更新するかどうか&lt;/td>
-<span class='line'>221</span>                  *            &lt;td>false&lt;/td>
-<span class='line'>222</span>                  *            &lt;td>&lt;/td>
-<span class='line'>223</span>                  *            &lt;/tr>
-<span class='line'>224</span>                  *            &lt;tr>
-<span class='line'>225</span>                  *            &lt;td>testInWorld&lt;/td>
-<span class='line'>226</span>                  *            &lt;td>function&lt;/td>
-<span class='line'>227</span>                  *            &lt;td>弾が画面内に存在することを判定する関数&lt;/td>
-<span class='line'>228</span>                  *            &lt;td>Gameインスタンスの大きさをベースにして判定する&lt;/td>
-<span class='line'>229</span>                  *            &lt;td>&lt;/td>
-<span class='line'>230</span>                  *            &lt;/tr>
-<span class='line'>231</span>                  *            &lt;tr>
-<span class='line'>232</span>                  *            &lt;td>rank&lt;/td>
-<span class='line'>233</span>                  *            &lt;td>number&lt;/td>
-<span class='line'>234</span>                  *            &lt;td>弾幕ランク.BulletMLの$rankに対応する.0.0～1.0の範囲で指定.&lt;/td>
-<span class='line'>235</span>                  *            &lt;td>0&lt;/td>
-<span class='line'>236</span>                  *            &lt;td>&lt;/td>
-<span class='line'>237</span>                  *            &lt;/tr>
-<span class='line'>238</span>                  *            &lt;tr>
-<span class='line'>239</span>                  *            &lt;td>speedRate&lt;/td>
-<span class='line'>240</span>                  *            &lt;td>number&lt;/td>
-<span class='line'>241</span>                  *            &lt;td>弾速度の補正倍率.&lt;/td>
-<span class='line'>242</span>                  *            &lt;td>1&lt;/td>
-<span class='line'>243</span>                  *            &lt;td>&lt;/td>
-<span class='line'>244</span>                  *            &lt;/tr>
-<span class='line'>245</span>                  *            &lt;/table>
-<span class='line'>246</span>                  *            設定する項目がtargetのみの場合、標的オブジェクトを直接引数として渡すことが可能.
-<span class='line'>247</span>                  * @param {string}
-<span class='line'>248</span>                  *            [action] 最初に読み込むactionのラベル.&lt;br>
-<span class='line'>249</span>                  *            省略可.
-<span class='line'>250</span>                  * @returns {function} enterframeイベントのリスナ.&lt;br>
-<span class='line'>251</span>                  *          攻撃パターンを初めからやりなおすrestartメソッドを持つ.
-<span class='line'>252</span>                  */</span><span class="WHIT">
-<span class='line'>253</span> </span><span class="WHIT">                </span><span class="NAME">createTicker</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">config</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">action</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>254</span> </span><span class="WHIT">                    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">action</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">this._bulletml.findAction</span><span class="PUNC">(</span><span class="STRN">"top"</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>255</span> </span><span class="WHIT">                        </span><span class="COMM">// topN対応.actionがtop1～topNまで定義されていた場合、それらを同時に動かす.</span><span class="WHIT">
-<span class='line'>256</span> </span><span class="WHIT">                        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">tickers</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>257</span> </span><span class="WHIT">                        </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">this._bulletml.findAction</span><span class="PUNC">(</span><span class="STRN">"top"</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>258</span> </span><span class="WHIT">                            </span><span class="NAME">tickers</span><span class="PUNC">[</span><span class="NAME">tickers.length</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._createTicker</span><span class="PUNC">(</span><span class="WHIT">
-<span class='line'>259</span> </span><span class="WHIT">                                    </span><span class="NAME">config</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">"top"</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>260</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>261</span> </span><span class="WHIT">                        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">parentTicker</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>262</span> </span><span class="WHIT">                            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">parentTicker.complete</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>263</span> </span><span class="WHIT">                                </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>264</span> </span><span class="WHIT">                            </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>265</span> </span><span class="WHIT">                            </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">tickers.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">--</span><span class="PUNC">;</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>266</span> </span><span class="WHIT">                                </span><span class="NAME">tickers</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">call</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>267</span> </span><span class="WHIT">                            </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>268</span> </span><span class="WHIT">                            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">parentTicker.compChildCount</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">tickers.length</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>269</span> </span><span class="WHIT">                                </span><span class="NAME">parentTicker.complete</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>270</span> </span><span class="WHIT">                                </span><span class="NAME">this.dispatchEvent</span><span class="PUNC">(</span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Event</span><span class="PUNC">(</span><span class="STRN">"completeAttack"</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>271</span> </span><span class="WHIT">                            </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>272</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>273</span> </span><span class="WHIT">                        </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">tickers.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">--</span><span class="PUNC">;</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>274</span> </span><span class="WHIT">                            </span><span class="NAME">tickers</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">parentTicker</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">parentTicker</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>275</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>276</span> 
-<span class='line'>277</span> </span><span class="WHIT">                        </span><span class="NAME">parentTicker.compChildCount</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>278</span> </span><span class="WHIT">                        </span><span class="NAME">parentTicker.completeChild</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>279</span> </span><span class="WHIT">                            </span><span class="NAME">this.compChildCount</span><span class="PUNC">++</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>280</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>281</span> 
-<span class='line'>282</span> </span><span class="WHIT">                        </span><span class="NAME">parentTicker.restart</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>283</span> </span><span class="WHIT">                            </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">tickers.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">--</span><span class="PUNC">;</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>284</span> </span><span class="WHIT">                                </span><span class="NAME">tickers</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">restart</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>285</span> </span><span class="WHIT">                            </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>286</span> </span><span class="WHIT">                            </span><span class="NAME">this.compChildCount</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>287</span> </span><span class="WHIT">                            </span><span class="NAME">this.complete</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>288</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>289</span> </span><span class="WHIT">                        </span><span class="NAME">parentTicker.restart</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>290</span> </span><span class="WHIT">                        
-<span class='line'>291</span>                         </span><span class="NAME">parentTicker.isDanmaku</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>292</span> 
-<span class='line'>293</span> </span><span class="WHIT">                        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">parentTicker</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>294</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>295</span> </span><span class="WHIT">                        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._createTicker</span><span class="PUNC">(</span><span class="NAME">config</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">action</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>296</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>297</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>298</span> </span><span class="WHIT">                </span><span class="NAME">_createTicker</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">config</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">action</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>299</span> </span><span class="WHIT">                    </span><span class="NAME">config</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._getConf</span><span class="PUNC">(</span><span class="NAME">config</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>300</span> </span><span class="WHIT">                    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">config.target</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>301</span> </span><span class="WHIT">                        </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="STRN">"not set target in config."</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>302</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>303</span> 
-<span class='line'>304</span> </span><span class="WHIT">                    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">pattern</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>305</span> 
-<span class='line'>306</span> </span><span class="WHIT">                    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">ticker</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>307</span> </span><span class="WHIT">                        </span><span class="COMM">// change direction</span><span class="WHIT">
-<span class='line'>308</span> </span><span class="WHIT">                        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.age</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">ticker.chDirEnd</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>309</span> </span><span class="WHIT">                            </span><span class="NAME">ticker.direction</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ticker.dirIncr</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>310</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.age</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">ticker.chDirEnd</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>311</span> </span><span class="WHIT">                            </span><span class="NAME">ticker.direction</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ticker.dirFin</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>312</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>313</span> 
-<span class='line'>314</span> </span><span class="WHIT">                        </span><span class="COMM">// change speed</span><span class="WHIT">
-<span class='line'>315</span> </span><span class="WHIT">                        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.age</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">ticker.chSpdEnd</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>316</span> </span><span class="WHIT">                            </span><span class="NAME">ticker.speed</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ticker.spdIncr</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>317</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.age</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">ticker.chSpdEnd</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>318</span> </span><span class="WHIT">                            </span><span class="NAME">ticker.speed</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ticker.spdFin</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>319</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>320</span> 
-<span class='line'>321</span> </span><span class="WHIT">                        </span><span class="COMM">// accel</span><span class="WHIT">
-<span class='line'>322</span> </span><span class="WHIT">                        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.age</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">ticker.aclEnd</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>323</span> </span><span class="WHIT">                            </span><span class="NAME">ticker.speedH</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ticker.aclIncrH</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>324</span> </span><span class="WHIT">                            </span><span class="NAME">ticker.speedV</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ticker.aclIncrV</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>325</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.age</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">ticker.aclEnd</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>326</span> </span><span class="WHIT">                            </span><span class="NAME">ticker.speedH</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ticker.aclFinH</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>327</span> </span><span class="WHIT">                            </span><span class="NAME">ticker.speedV</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ticker.aclFinV</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>328</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>329</span> 
-<span class='line'>330</span> </span><span class="WHIT">                        </span><span class="COMM">// move</span><span class="WHIT">
-<span class='line'>331</span> </span><span class="WHIT">                        </span><span class="NAME">this.x</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Math.cos</span><span class="PUNC">(</span><span class="NAME">ticker.direction</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">ticker.speed</span><span class="WHIT">
-<span class='line'>332</span> </span><span class="WHIT">                                </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">config.speedRate</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>333</span> </span><span class="WHIT">                        </span><span class="NAME">this.y</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Math.sin</span><span class="PUNC">(</span><span class="NAME">ticker.direction</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">ticker.speed</span><span class="WHIT">
-<span class='line'>334</span> </span><span class="WHIT">                                </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">config.speedRate</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>335</span> </span><span class="WHIT">                        </span><span class="NAME">this.x</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ticker.speedH</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">config.speedRate</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>336</span> </span><span class="WHIT">                        </span><span class="NAME">this.y</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ticker.speedV</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">config.speedRate</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>337</span> 
-<span class='line'>338</span> </span><span class="WHIT">                        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">config.testInWorld</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>339</span> </span><span class="WHIT">                            </span><span class="NAME">this.parentNode.removeChild</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>340</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>341</span> 
-<span class='line'>342</span> </span><span class="WHIT">                        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">config.updateProperties</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>343</span> </span><span class="WHIT">                            </span><span class="NAME">this.direction</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">toDegree</span><span class="PUNC">(</span><span class="NAME">ticker.direction</span><span class="WHIT">
-<span class='line'>344</span> </span><span class="WHIT">                                    </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">Math.PI</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>345</span> </span><span class="WHIT">                            </span><span class="NAME">this.speed</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ticker.speed</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>346</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>347</span> 
-<span class='line'>348</span> </span><span class="WHIT">                        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.age</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">ticker.waitTo</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">ticker.completed</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>349</span> </span><span class="WHIT">                            </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>350</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>351</span> </span><span class="WHIT">                        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">cmd</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>352</span> </span><span class="WHIT">                        </span><span class="KEYW">while</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">cmd</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ticker.walker.next</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>353</span> </span><span class="WHIT">                            </span><span class="KEYW">switch</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">cmd.commandName</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>354</span> </span><span class="WHIT">                            </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"fire"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>355</span> </span><span class="WHIT">                                </span><span class="NAME">pattern._fire.call</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cmd</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">config</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">ticker</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>356</span> </span><span class="WHIT">                                        </span><span class="NAME">pattern</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>357</span> </span><span class="WHIT">                                </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>358</span> </span><span class="WHIT">                            </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"wait"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>359</span> </span><span class="WHIT">                                </span><span class="NAME">ticker.waitTo</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.age</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">eval</span><span class="PUNC">(</span><span class="NAME">cmd.value</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>360</span> </span><span class="WHIT">                                </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>361</span> </span><span class="WHIT">                            </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"changeDirection"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>362</span> </span><span class="WHIT">                                </span><span class="NAME">pattern._changeDirection.call</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cmd</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>363</span> </span><span class="WHIT">                                        </span><span class="NAME">config</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">ticker</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>364</span> </span><span class="WHIT">                                </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>365</span> </span><span class="WHIT">                            </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"changeSpeed"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>366</span> </span><span class="WHIT">                                </span><span class="NAME">pattern._changeSpeed.call</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cmd</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">ticker</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>367</span> </span><span class="WHIT">                                </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>368</span> </span><span class="WHIT">                            </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"accel"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>369</span> </span><span class="WHIT">                                </span><span class="NAME">pattern._accel.call</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cmd</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">ticker</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>370</span> </span><span class="WHIT">                                </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>371</span> </span><span class="WHIT">                            </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"vanish"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>372</span> </span><span class="WHIT">                                </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.parentNode</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>373</span> </span><span class="WHIT">                                    </span><span class="NAME">this.parentNode.removeChild</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>374</span> </span><span class="WHIT">                                </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>375</span> </span><span class="WHIT">                                </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>376</span> </span><span class="WHIT">                            </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>377</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>378</span> 
-<span class='line'>379</span> </span><span class="WHIT">                        </span><span class="NAME">ticker.completed</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>380</span> </span><span class="WHIT">                        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">ticker.parentTicker</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>381</span> </span><span class="WHIT">                            </span><span class="NAME">ticker.parentTicker.completeChild</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>382</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>383</span> </span><span class="WHIT">                            </span><span class="NAME">this.dispatchEvent</span><span class="PUNC">(</span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Event</span><span class="PUNC">(</span><span class="STRN">"completeAttack"</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>384</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>385</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>386</span> </span><span class="WHIT">                    </span><span class="NAME">ticker.restart</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>387</span> </span><span class="WHIT">                        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">action</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>388</span> </span><span class="WHIT">                            </span><span class="NAME">this.walker</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">pattern._bulletml.getWalker</span><span class="PUNC">(</span><span class="STRN">"top"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>389</span> </span><span class="WHIT">                                    </span><span class="NAME">config.rank</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>390</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">action</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">"string"</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>391</span> </span><span class="WHIT">                            </span><span class="NAME">this.walker</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">pattern._bulletml.getWalker</span><span class="PUNC">(</span><span class="NAME">action</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>392</span> </span><span class="WHIT">                                    </span><span class="NAME">config.rank</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>393</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">action</span><span class="WHIT"> </span><span class="KEYW">instanceof</span><span class="WHIT"> </span><span class="NAME">BulletML.Bullet</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>394</span> </span><span class="WHIT">                            </span><span class="NAME">this.walker</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">action.getWalker</span><span class="PUNC">(</span><span class="NAME">config.rank</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>395</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>396</span> </span><span class="WHIT">                            </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="STRN">"引数が不正"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">config</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">action</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>397</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>398</span> 
-<span class='line'>399</span> </span><span class="WHIT">                        </span><span class="NAME">this.waitTo</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>400</span> </span><span class="WHIT">                        </span><span class="NAME">this.completed</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>401</span> 
-<span class='line'>402</span> </span><span class="WHIT">                        </span><span class="NAME">this.direction</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>403</span> </span><span class="WHIT">                        </span><span class="NAME">this.lastDirection</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>404</span> </span><span class="WHIT">                        </span><span class="NAME">this.speed</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>405</span> </span><span class="WHIT">                        </span><span class="NAME">this.lastSpeed</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>406</span> </span><span class="WHIT">                        </span><span class="NAME">this.speedH</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>407</span> </span><span class="WHIT">                        </span><span class="NAME">this.speedV</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>408</span> 
-<span class='line'>409</span> </span><span class="WHIT">                        </span><span class="NAME">this.dirIncr</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>410</span> </span><span class="WHIT">                        </span><span class="NAME">this.dirFin</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>411</span> </span><span class="WHIT">                        </span><span class="NAME">this.chDirEnd</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>412</span> 
-<span class='line'>413</span> </span><span class="WHIT">                        </span><span class="NAME">this.spdIncr</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>414</span> </span><span class="WHIT">                        </span><span class="NAME">this.spdFin</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>415</span> </span><span class="WHIT">                        </span><span class="NAME">this.chSpdEnd</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>416</span> 
-<span class='line'>417</span> </span><span class="WHIT">                        </span><span class="NAME">this.aclIncrH</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>418</span> </span><span class="WHIT">                        </span><span class="NAME">this.aclFinH</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>419</span> </span><span class="WHIT">                        </span><span class="NAME">this.aclIncrV</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>420</span> </span><span class="WHIT">                        </span><span class="NAME">this.aclFinV</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>421</span> </span><span class="WHIT">                        </span><span class="NAME">this.aclEnd</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>422</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>423</span> </span><span class="WHIT">                    </span><span class="NAME">ticker.restart</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>424</span> 
-<span class='line'>425</span> </span><span class="WHIT">                    </span><span class="NAME">ticker.isDanmaku</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>426</span> </span><span class="WHIT">                    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">ticker</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>427</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>428</span> </span><span class="WHIT">                </span><span class="NAME">_fire</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">cmd</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">config</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">ticker</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">pattern</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>429</span> </span><span class="WHIT">                    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">b</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">config.bulletFactory</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>430</span> </span><span class="WHIT">                        </span><span class="NAME">label</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">cmd.bullet.label</span><span class="WHIT">
-<span class='line'>431</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>432</span> </span><span class="WHIT">                    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">b</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>433</span> </span><span class="WHIT">                        </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>434</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>435</span> 
-<span class='line'>436</span> </span><span class="WHIT">                    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">bt</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">pattern.createTicker</span><span class="PUNC">(</span><span class="NAME">config</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cmd.bullet</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>437</span> 
-<span class='line'>438</span> </span><span class="WHIT">                    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">attacker</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>439</span> </span><span class="WHIT">                    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">calcDirection</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">d</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>440</span> </span><span class="WHIT">                        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">dv</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">toRadian</span><span class="PUNC">(</span><span class="NAME">eval</span><span class="PUNC">(</span><span class="NAME">d.value</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>441</span> </span><span class="WHIT">                        </span><span class="COMM">// console.log(d.type);</span><span class="WHIT">
-<span class='line'>442</span> </span><span class="WHIT">                        </span><span class="KEYW">switch</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">d.type</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>443</span> </span><span class="WHIT">                        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"aim"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>444</span> </span><span class="WHIT">                            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">config.target</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>445</span> </span><span class="WHIT">                                </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">radiusAtoB</span><span class="PUNC">(</span><span class="NAME">attacker</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">config.target</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">dv</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>446</span> </span><span class="WHIT">                            </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>447</span> </span><span class="WHIT">                                </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">dv</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">Math.PI</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>448</span> </span><span class="WHIT">                            </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>449</span> </span><span class="WHIT">                        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"absolute"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>450</span> </span><span class="WHIT">                            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">dv</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">Math.PI</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// 真上が0度</span><span class="WHIT">
-<span class='line'>451</span> </span><span class="WHIT">                        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"relative"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>452</span> </span><span class="WHIT">                            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">ticker.direction</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">dv</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>453</span> </span><span class="WHIT">                        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"sequence"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>454</span> </span><span class="WHIT">                            </span><span class="COMM">// console.log(ticker.lastDirection, dv);</span><span class="WHIT">
-<span class='line'>455</span> </span><span class="WHIT">                            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">ticker.lastDirection</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">dv</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>456</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>457</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>458</span> </span><span class="WHIT">                    </span><span class="NAME">bt.direction</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">calcDirection</span><span class="PUNC">(</span><span class="NAME">cmd.direction</span><span class="WHIT">
-<span class='line'>459</span> </span><span class="WHIT">                            </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">cmd.bullet.direction</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>460</span> </span><span class="WHIT">                    </span><span class="NAME">ticker.lastDirection</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">bt.direction</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>461</span> </span><span class="WHIT">                    </span><span class="COMM">// console.log(bt.direction);</span><span class="WHIT">
-<span class='line'>462</span> 
-<span class='line'>463</span> </span><span class="WHIT">                    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">calcSpeed</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">s</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>464</span> </span><span class="WHIT">                        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">sv</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">eval</span><span class="PUNC">(</span><span class="NAME">s.value</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>465</span> </span><span class="WHIT">                        </span><span class="KEYW">switch</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">s.type</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>466</span> </span><span class="WHIT">                        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"relative"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>467</span> </span><span class="WHIT">                        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"sequence"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>468</span> </span><span class="WHIT">                            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">ticker.lastSpeed</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">sv</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>469</span> </span><span class="WHIT">                        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"absolute"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>470</span> </span><span class="WHIT">                        </span><span class="KEYW">default</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>471</span> </span><span class="WHIT">                            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">sv</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>472</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>473</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>474</span> </span><span class="WHIT">                    </span><span class="NAME">bt.speed</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">calcSpeed</span><span class="PUNC">(</span><span class="NAME">cmd.speed</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">cmd.bullet.speed</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>475</span> </span><span class="WHIT">                    </span><span class="NAME">ticker.lastSpeed</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">bt.speed</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>476</span> 
-<span class='line'>477</span> </span><span class="WHIT">                    </span><span class="NAME">b.x</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.x</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">(</span><span class="NAME">this.width</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">b.width</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>478</span> </span><span class="WHIT">                    </span><span class="NAME">b.y</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.y</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">(</span><span class="NAME">this.height</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">b.height</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>479</span> 
-<span class='line'>480</span> </span><span class="WHIT">                    </span><span class="NAME">b.addEventListener</span><span class="PUNC">(</span><span class="STRN">"enterframe"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">bt</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>481</span> </span><span class="WHIT">                    </span><span class="NAME">b.addEventListener</span><span class="PUNC">(</span><span class="STRN">"removed"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>482</span> </span><span class="WHIT">                        </span><span class="NAME">this.removeEventListener</span><span class="PUNC">(</span><span class="STRN">"enterframe"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">bt</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>483</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>484</span> </span><span class="WHIT">                    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">config.addTarget</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>485</span> </span><span class="WHIT">                        </span><span class="NAME">config.addTarget.addChild</span><span class="PUNC">(</span><span class="NAME">b</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>486</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.parentNode</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>487</span> </span><span class="WHIT">                        </span><span class="NAME">this.parentNode.addChild</span><span class="PUNC">(</span><span class="NAME">b</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>488</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>489</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>490</span> </span><span class="WHIT">                </span><span class="NAME">_changeDirection</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">cmd</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">config</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">ticker</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>491</span> </span><span class="WHIT">                    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">d</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">eval</span><span class="PUNC">(</span><span class="NAME">cmd.direction.value</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>492</span> </span><span class="WHIT">                    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">t</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">eval</span><span class="PUNC">(</span><span class="NAME">cmd.term</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>493</span> </span><span class="WHIT">                    </span><span class="KEYW">switch</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">cmd.direction.type</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>494</span> </span><span class="WHIT">                    </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"aim"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>495</span> </span><span class="WHIT">                        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">tar</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">config.target</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>496</span> </span><span class="WHIT">                        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">tar</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>497</span> </span><span class="WHIT">                            </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>498</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>499</span> </span><span class="WHIT">                        </span><span class="NAME">ticker.dirFin</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">radiusAtoB</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">tar</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">toRadian</span><span class="PUNC">(</span><span class="NAME">d</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>500</span> </span><span class="WHIT">                        </span><span class="NAME">ticker.dirIncr</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">rel</span><span class="PUNC">(</span><span class="NAME">ticker.dirFin</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">ticker.direction</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>501</span> </span><span class="WHIT">                                </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NAME">t</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>502</span> </span><span class="WHIT">                        </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>503</span> </span><span class="WHIT">                    </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"absolute"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>504</span> </span><span class="WHIT">                        </span><span class="NAME">ticker.dirFin</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">toRadian</span><span class="PUNC">(</span><span class="NAME">d</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">Math.PI</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>505</span> </span><span class="WHIT">                        </span><span class="NAME">ticker.dirIncr</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">rel</span><span class="PUNC">(</span><span class="NAME">ticker.dirFin</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">ticker.direction</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>506</span> </span><span class="WHIT">                                </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NAME">t</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>507</span> </span><span class="WHIT">                        </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>508</span> </span><span class="WHIT">                    </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"relative"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>509</span> </span><span class="WHIT">                        </span><span class="NAME">ticker.dirFin</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ticker.direction</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">toRadian</span><span class="PUNC">(</span><span class="NAME">d</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>510</span> </span><span class="WHIT">                        </span><span class="NAME">ticker.dirIncr</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">rel</span><span class="PUNC">(</span><span class="NAME">ticker.dirFin</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">ticker.direction</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>511</span> </span><span class="WHIT">                                </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NAME">t</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>512</span> </span><span class="WHIT">                        </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>513</span> </span><span class="WHIT">                    </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"sequence"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>514</span> </span><span class="WHIT">                        </span><span class="NAME">ticker.dirIncr</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">toRadian</span><span class="PUNC">(</span><span class="NAME">d</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>515</span> </span><span class="WHIT">                        </span><span class="NAME">ticker.dirFin</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ticker.direction</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">ticker.dirIncr</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">t</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>516</span> </span><span class="WHIT">                        </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>517</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>518</span> </span><span class="WHIT">                    </span><span class="NAME">ticker.chDirEnd</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.age</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">t</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>519</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>520</span> </span><span class="WHIT">                </span><span class="NAME">_changeSpeed</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">cmd</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">ticker</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>521</span> </span><span class="WHIT">                    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">s</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">eval</span><span class="PUNC">(</span><span class="NAME">cmd.speed.value</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>522</span> </span><span class="WHIT">                    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">t</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">eval</span><span class="PUNC">(</span><span class="NAME">cmd.term</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>523</span> </span><span class="WHIT">                    </span><span class="KEYW">switch</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">cmd.speed.type</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>524</span> </span><span class="WHIT">                    </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"absolute"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>525</span> </span><span class="WHIT">                        </span><span class="NAME">ticker.spdFin</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">s</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>526</span> </span><span class="WHIT">                        </span><span class="NAME">ticker.spdIncr</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">ticker.spdFin</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">ticker.speed</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NAME">t</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>527</span> </span><span class="WHIT">                        </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>528</span> </span><span class="WHIT">                    </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"relative"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>529</span> </span><span class="WHIT">                        </span><span class="NAME">ticker.spdFin</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">s</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">ticker.speed</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>530</span> </span><span class="WHIT">                        </span><span class="NAME">ticker.spdIncr</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">ticker.spdFin</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">ticker.speed</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NAME">t</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>531</span> </span><span class="WHIT">                        </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>532</span> </span><span class="WHIT">                    </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"sequence"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>533</span> </span><span class="WHIT">                        </span><span class="NAME">ticker.spdIncr</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">s</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>534</span> </span><span class="WHIT">                        </span><span class="NAME">ticker.spdFin</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ticker.speed</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">ticker.spdIncr</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">t</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>535</span> </span><span class="WHIT">                        </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>536</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>537</span> </span><span class="WHIT">                    </span><span class="NAME">ticker.chSpdEnd</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.age</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">t</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>538</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>539</span> </span><span class="WHIT">                </span><span class="NAME">_accel</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">cmd</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">ticker</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>540</span> </span><span class="WHIT">                    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">t</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">eval</span><span class="PUNC">(</span><span class="NAME">cmd.term</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>541</span> </span><span class="WHIT">                    </span><span class="NAME">ticker.aclEnd</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.age</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">t</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>542</span> 
-<span class='line'>543</span> </span><span class="WHIT">                    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">cmd.horizontal</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>544</span> </span><span class="WHIT">                        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">h</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">eval</span><span class="PUNC">(</span><span class="NAME">cmd.horizontal.value</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>545</span> </span><span class="WHIT">                        </span><span class="KEYW">switch</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">cmd.horizontal.type</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>546</span> </span><span class="WHIT">                        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"absolute"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>547</span> </span><span class="WHIT">                        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"sequence"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>548</span> </span><span class="WHIT">                            </span><span class="NAME">ticker.aclIncrH</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">h</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">ticker.speedH</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NAME">t</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>549</span> </span><span class="WHIT">                            </span><span class="NAME">ticker.aclFinH</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">h</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>550</span> </span><span class="WHIT">                            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>551</span> </span><span class="WHIT">                        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"relative"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>552</span> </span><span class="WHIT">                            </span><span class="NAME">ticker.aclIncrH</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">h</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>553</span> </span><span class="WHIT">                            </span><span class="NAME">ticker.aclFinH</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">h</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">ticker.speedH</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">t</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>554</span> </span><span class="WHIT">                            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>555</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>556</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>557</span> </span><span class="WHIT">                        </span><span class="NAME">ticker.aclIncrH</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>558</span> </span><span class="WHIT">                        </span><span class="NAME">ticker.aclFinH</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ticker.speedH</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>559</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>560</span> 
-<span class='line'>561</span> </span><span class="WHIT">                    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">cmd.vertical</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>562</span> </span><span class="WHIT">                        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">v</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">eval</span><span class="PUNC">(</span><span class="NAME">cmd.vertical.value</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>563</span> </span><span class="WHIT">                        </span><span class="KEYW">switch</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">cmd.vertical.type</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>564</span> </span><span class="WHIT">                        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"absolute"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>565</span> </span><span class="WHIT">                        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"sequence"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>566</span> </span><span class="WHIT">                            </span><span class="NAME">ticker.aclIncrV</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">v</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">ticker.speedV</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NAME">t</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>567</span> </span><span class="WHIT">                            </span><span class="NAME">ticker.aclFinV</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">v</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>568</span> </span><span class="WHIT">                            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>569</span> </span><span class="WHIT">                        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"relative"</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>570</span> </span><span class="WHIT">                            </span><span class="NAME">ticker.aclIncrV</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">v</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>571</span> </span><span class="WHIT">                            </span><span class="NAME">ticker.aclFinV</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">v</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">ticker.speedV</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">t</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>572</span> </span><span class="WHIT">                            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>573</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>574</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>575</span> </span><span class="WHIT">                        </span><span class="NAME">ticker.aclIncrV</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>576</span> </span><span class="WHIT">                        </span><span class="NAME">ticker.aclFinV</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ticker.speedV</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>577</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>578</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>579</span> </span><span class="WHIT">                </span><span class="COMM">/**
-<span class='line'>580</span>                  * 攻撃パターンの元となるBulletML定義.
-<span class='line'>581</span>                  * 
-<span class='line'>582</span>                  * 解析済みのBulletMLオブジェクト.&lt;br>
-<span class='line'>583</span>                  * 読み取り専用.
-<span class='line'>584</span>                  * 
-<span class='line'>585</span>                  * @type BulletML.Root
-<span class='line'>586</span>                  */</span><span class="WHIT">
-<span class='line'>587</span> </span><span class="WHIT">                </span><span class="NAME">bulletml</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>588</span> </span><span class="WHIT">                    </span><span class="NAME">get</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>589</span> </span><span class="WHIT">                        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._bulletml</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>590</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>591</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>592</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>593</span> </span><span class="WHIT">    </span><span class="COMM">/**
-<span class='line'>594</span>      * configのデフォルト値.
-<span class='line'>595</span>      */</span><span class="WHIT">
-<span class='line'>596</span> </span><span class="WHIT">    </span><span class="NAME">enchant.bulletml.AttackPattern.defaultConfig</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>597</span> </span><span class="WHIT">        </span><span class="NAME">bulletFactory</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">enchant.bulletml.DEFAULT_BULLET_FACTORY</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>598</span> </span><span class="WHIT">        </span><span class="NAME">testInWorld</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">bullet</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>599</span> </span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">scw</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">enchant.Game.instance.width</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>600</span> </span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">sch</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">enchant.Game.instance.height</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>601</span> </span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">w</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">bullet.width</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>602</span> </span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">h</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">bullet.height</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>603</span> </span><span class="WHIT">            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">-</span><span class="NAME">w</span><span class="WHIT"> </span><span class="PUNC">&lt;=</span><span class="WHIT"> </span><span class="NAME">bullet.x</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">bullet.x</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">scw</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="NAME">h</span><span class="WHIT"> </span><span class="PUNC">&lt;=</span><span class="WHIT"> </span><span class="NAME">bullet.y</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">bullet.y</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">sch</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>604</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>605</span> </span><span class="WHIT">        </span><span class="NAME">rank</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>606</span> </span><span class="WHIT">        </span><span class="NAME">updateProperties</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>607</span> </span><span class="WHIT">        </span><span class="NAME">speedRate</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="WHIT">
-<span class='line'>608</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>609</span> 
-<span class='line'>610</span> </span><span class="WHIT">    </span><span class="COMM">/**
-<span class='line'>611</span>      * ラジアンから度数に変換.
-<span class='line'>612</span>      */</span><span class="WHIT">
-<span class='line'>613</span> </span><span class="WHIT">    </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">toDegree</span><span class="PUNC">(</span><span class="NAME">radian</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>614</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">radian</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NUMB">180</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NAME">Math.PI</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>615</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>616</span> </span><span class="WHIT">    </span><span class="COMM">/**
-<span class='line'>617</span>      * 度数からラジアンに変換.
-<span class='line'>618</span>      */</span><span class="WHIT">
-<span class='line'>619</span> </span><span class="WHIT">    </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">toRadian</span><span class="PUNC">(</span><span class="NAME">degree</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>620</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">degree</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">Math.PI</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">180</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>621</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>622</span> </span><span class="WHIT">    </span><span class="COMM">/**
-<span class='line'>623</span>      * ラジアンを -π&lt;= rad &lt; π の範囲に正規化する.
-<span class='line'>624</span>      */</span><span class="WHIT">
-<span class='line'>625</span> </span><span class="WHIT">    </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">rel</span><span class="PUNC">(</span><span class="NAME">radian</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>626</span> </span><span class="WHIT">        </span><span class="KEYW">while</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">radian</span><span class="WHIT"> </span><span class="PUNC">&lt;=</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="NAME">Math.PI</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>627</span> </span><span class="WHIT">            </span><span class="NAME">radian</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Math.PI</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>628</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>629</span> </span><span class="WHIT">        </span><span class="KEYW">while</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">Math.PI</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">radian</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>630</span> </span><span class="WHIT">            </span><span class="NAME">radian</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Math.PI</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>631</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>632</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">radian</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>633</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>634</span> </span><span class="WHIT">    </span><span class="COMM">/**
-<span class='line'>635</span>      * スプライトAから見たスプライトBの方向をラジアンで返す.
-<span class='line'>636</span>      * 
-<span class='line'>637</span>      * @param {enchant.Node}
-<span class='line'>638</span>      *            a スプライトA
-<span class='line'>639</span>      * @param {enchant.Node}
-<span class='line'>640</span>      *            b スプライトB
-<span class='line'>641</span>      */</span><span class="WHIT">
-<span class='line'>642</span> </span><span class="WHIT">    </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">radiusAtoB</span><span class="PUNC">(</span><span class="NAME">a</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">b</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>643</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">ca</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>644</span> </span><span class="WHIT">            </span><span class="NAME">x</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">a.x</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">a.width</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>645</span> </span><span class="WHIT">            </span><span class="NAME">y</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">a.y</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">a.height</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="WHIT">
-<span class='line'>646</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>647</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">cb</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>648</span> </span><span class="WHIT">            </span><span class="NAME">x</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">b.x</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">b.width</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>649</span> </span><span class="WHIT">            </span><span class="NAME">y</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">b.y</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">b.height</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="WHIT">
-<span class='line'>650</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>651</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">Math.atan2</span><span class="PUNC">(</span><span class="NAME">cb.y</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">ca.y</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cb.x</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">ca.x</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>652</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>653</span> 
-<span class='line'>654</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>655</span> </span></pre></body></html>
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<title>Source - src\main\bulletml.enchant.js</title>
+	<meta name="generator" content="JsDoc Toolkit" />
+
+	<link media="all" rel="stylesheet" href="../../css/common.css" type="text/css" />
+	<link media="all" rel="stylesheet" href="../../css/bootstrap.min.css" type="text/css" />
+	<link media="all" rel="stylesheet" href="../../css/prettify.css" type="text/css" />
+	<link media="print" rel="stylesheet" href="../../css/print.css" type="text/css" />
+	<style type="text/css">
+		.icon-jsdoc {
+			background: url("../../img/classicons.png") no-repeat;
+		}
+	</style>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+	<script src="../../js/prettify.js" type="text/javascript"></script>
+	<script src="../../js/bootstrap.min.js" type="text/javascript"></script>
+</head>
+<body><div class="container-fluid">
+<!-- ============================== header ================================= -->
+	<!-- begin static/header.html -->
+	<header class="header navbar navbar-fixed-top">
+		<div class="navbar-inner">
+			<div class="container-fluid">
+				<a class="brand" href="#"><strong>JsDoc</strong> Reference</a>
+				<ul id="class-file-selector" class="nav">
+					<li><a href="../../index.html">Class Index</a></li>
+					<li><a href="../../files.html">File Index</a></li>
+				</ul>
+			</div>
+		</div>
+	</header>
+	<!-- end static/header.html -->
+
+<!-- ============================== classes index ============================ -->
+	<div class="row-fluid">
+		<div id="index" class="span3">
+			<!-- begin publish.classesIndex -->
+			<div class="well" id="class-list">
+	<ul class="nav nav-list">
+		<li class="nav-header">Classes</li>
+		
+			<li><a href="../../symbols/BulletML.html"><span class="indent" style="padding-left:0px;"><i class="icon-jsdoc icon-jsdoc-namespace"></i><span class="jsdoc-class-index">BulletML</span></span></a></li>
+		
+			<li><a href="../../symbols/BulletML.Accel.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Accel</span></span></a></li>
+		
+			<li><a href="../../symbols/BulletML.Action.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Action</span></span></a></li>
+		
+			<li><a href="../../symbols/BulletML.ActionRef.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">ActionRef</span></span></a></li>
+		
+			<li><a href="../../symbols/BulletML.Bullet.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Bullet</span></span></a></li>
+		
+			<li><a href="../../symbols/BulletML.BulletRef.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">BulletRef</span></span></a></li>
+		
+			<li><a href="../../symbols/BulletML.ChangeDirection.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">ChangeDirection</span></span></a></li>
+		
+			<li><a href="../../symbols/BulletML.ChangeSpeed.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">ChangeSpeed</span></span></a></li>
+		
+			<li><a href="../../symbols/BulletML.Command.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Command</span></span></a></li>
+		
+			<li><a href="../../symbols/BulletML.Direction.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Direction</span></span></a></li>
+		
+			<li><a href="../../symbols/BulletML.Fire.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Fire</span></span></a></li>
+		
+			<li><a href="../../symbols/BulletML.FireRef.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">FireRef</span></span></a></li>
+		
+			<li><a href="../../symbols/BulletML.Horizontal.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Horizontal</span></span></a></li>
+		
+			<li><a href="../../symbols/BulletML.Repeat.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Repeat</span></span></a></li>
+		
+			<li><a href="../../symbols/BulletML.Root.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Root</span></span></a></li>
+		
+			<li><a href="../../symbols/BulletML.Speed.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Speed</span></span></a></li>
+		
+			<li><a href="../../symbols/BulletML.Vanish.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Vanish</span></span></a></li>
+		
+			<li><a href="../../symbols/BulletML.Vertical.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Vertical</span></span></a></li>
+		
+			<li><a href="../../symbols/BulletML.Wait.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Wait</span></span></a></li>
+		
+			<li><a href="../../symbols/_global_.html"><span class="indent" style="padding-left:0px;"><i class="icon-jsdoc icon-jsdoc-namespace"></i><span class="jsdoc-class-index">_global_</span></span></a></li>
+		
+			<li><a href="../../symbols/enchant.bulletml.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-namespace"></i><span class="jsdoc-class-index">bulletml</span></span></a></li>
+		
+			<li><a href="../../symbols/enchant.bulletml.AttackPattern.html"><span class="indent" style="padding-left:28px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">AttackPattern</span></span></a></li>
+		
+	</ul>
+</div>
+
+			<!-- end publish.classesIndex -->
+		</div>
+
+		<div id="content" class="span9">
+<!-- ============================== source code ============================ -->
+
+			<pre id="source-code" class="prettyprint linenums">/**
+ * @fileOverview bullet.enchant.js
+ * @version 0.4.1
+ * @require enchant.js v0.5.2+, bulletml-min.js v0.3.1
+ * @author daishi_hmr
+ *
+ * @description 弾幕記述言語BulletMLをenchant.jsで扱うためのプラグイン
+ *
+ * @detail BulletMLのパースにはbulletml.jsを使用しています
+ *      bulletml.js: https://github.com/daishihmr/bulletml.js
+ *
+ * @example
+ *      game.preload('boss.bml');
+ *      ...
+ *      var player = new Sprite(32, 32);
+ *      var boss = new Sprite(32, 32);
+ *      var attackPattern = game.assets['boss.xml'];
+ *      var ticker = attackPattern.createTicker(player);
+ *      boss.addEventListener('enterframe', ticker);
+ *
+ * @example
+ *      game.preload('boss.bml');
+ *      ...
+ *      var player = new Sprite(32, 32);
+ *      AttackPattern.defaultConfig.target = player;
+ *      var boss = new Sprite(32, 32);
+ *      boss.setDanmaku(game.assets['boss.bml']);
+ */
+
+/**
+ * @namespace
+ */
+enchant.bulletml = enchant.bulletml || {};
+
+(function() {
+
+    // BulletML(*.bml, *.xml)をpreloadで読み込めるようにする.
+    enchant.Game._loadFuncs["bml"] = enchant.Game._loadFuncs["xml"] = function(
+            src, callback) {
+        var game = this;
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function(e) {
+            if (xhr.readyState === 4) {
+                if (xhr.status !== 200 &amp;&amp; xhr.status !== 0) {
+                    throw new Error(xhr.status + ': '
+                            + 'Cannot load an asset: ' + src);
+                }
+
+                if (xhr.responseXML != null) {
+                    var bulletml = BulletML.build(xhr.responseXML);
+                    if (bulletml) {
+                        game.assets[src] = new enchant.bulletml.AttackPattern(
+                                bulletml);
+                    } else {
+                        alert(src + "は妥当なBulletMLではありません。");
+                        game.assets[src] = xhr.responseXML;
+                    }
+                    callback();
+                } else {
+                    throw new Error(xhr.status + ': '
+                            + 'Cannot load an asset: ' + src);
+                }
+            }
+        };
+
+        xhr.open('GET', src, true);
+        if (xhr.overrideMimeType) {
+            xhr.overrideMimeType("application/xml");
+        }
+        xhr.send(null);
+    };
+
+    // syntax sugar.
+    /**
+     * 弾幕enterframeイベントリスナを設定する.
+     *
+     * @scope enchant.EventTarget.prototype
+     */
+    enchant.EventTarget.prototype.setDanmaku = function(attackPattern, config) {
+        if (attackPattern === void 0) throw new Error("AttackPattern is required.");
+        this.removeDanmaku();
+        this.on("enterframe", attackPattern.createTicker(config));
+    };
+    enchant.EventTarget.prototype.removeDanmaku = function() {
+        if (!this._listeners["enterframe"]
+                || this._listeners["enterframe"].length === 0) {
+            return;
+        }
+        var remove = [];
+        for ( var i = this._listeners["enterframe"].length; i--;) {
+            if (this._listeners["enterframe"][i].isDanmaku) {
+                remove[remove.length] = this._listeners["enterframe"][i];
+            }
+        }
+        for ( var i = remove.length; i--;) {
+            this.removeEventListener("enterframe", remove[i]);
+        }
+    };
+
+    /**
+     * 弾の画像が指定されなかった場合に使用される.
+     *
+     * 8px x 8px.赤い球状の弾.
+     *
+     * @type {enchant.Surface}
+     * @memberOf enchant.bulletml
+     */
+    enchant.bulletml.getDefaultImage = function() {
+        if (this.value) {
+            return this.value;
+        } else {
+            var s = new enchant.Surface(8, 8);
+            var c = s.context;
+            var g = c.createRadialGradient(4, 4, 0, 4, 4, 4);
+            g.addColorStop(0.0, "rgba(255,255,255,1.0)");
+            g.addColorStop(0.5, "rgba(255,255,255,1.0)");
+            g.addColorStop(0.8, "rgba(255,  0,  0,0.8)");
+            g.addColorStop(1.0, "rgba(255,  0,  0,0.0)");
+            c.fillStyle = g;
+            c.fillRect(0, 0, 8, 8);
+            this.value = s;
+            return s;
+        }
+    };
+
+    /**
+     * bulletFactory未指定時に使用される弾スプライトの生成関数.
+     *
+     * @returns {enchant.Sprite} 8px x 8px の大きさのスプライト
+     * @type function
+     * @memberOf enchant.bulletml
+     */
+    enchant.bulletml.defaultBulletFactory = function() {
+        var bullet = new enchant.Sprite(8, 8);
+        bullet.image = enchant.bulletml.getDefaultImage();
+        return bullet;
+    };
+
+    var _game = undefined;
+    /**
+     * isInsideOfWorld未指定時に使用される関数.
+     */
+    enchant.bulletml.defaultIsInsideOfWorld = function(bullet) {
+        if (_game === void 0) {
+            _game = enchant.Game.instance;
+        }
+        var scw = _game.width;
+        var sch = _game.height;
+        var w = bullet.width || 0;
+        var h = bullet.height || 0;
+        return (-w &lt;= bullet.x &amp;&amp; bullet.x &lt; scw &amp;&amp; -h &lt;= bullet.y &amp;&amp; bullet.y &lt; sch);
+    };
+
+    /**
+     * @scope enchant.bulletml.AttackPattern.prototype
+     */
+    enchant.bulletml.AttackPattern = enchant.Class.create({
+        /**
+         * 攻撃パターン.
+         *
+         * @constructs
+         * @param {BulletML.Root}
+         *            bulletml BulletMLデータ
+         */
+        initialize : function(bulletml) {
+            if (!bulletml) {
+                throw new Error("argument is invalid.", bulletml);
+            }
+            this._bulletml = bulletml;
+        },
+        /**
+         * enterframeイベントのリスナを作成する.&lt;br&gt;
+         * &lt;br&gt;
+         * 第1引数configで各種設定を行う. &lt;br&gt;
+         *
+         *
+         * @param {Object|enchant.Node}
+         *            [config] 発射される弾に関する設定.&lt;br&gt;
+         *            &lt;table border=1&gt;
+         *            &lt;tr&gt;
+         *            &lt;th&gt;プロパティ名&lt;/th&gt;
+         *            &lt;th&gt;型&lt;/th&gt;
+         *            &lt;th&gt;設定内容&lt;/th&gt;
+         *            &lt;th&gt;デフォルト値&lt;/th&gt;
+         *            &lt;th&gt;必須&lt;/th&gt;
+         *            &lt;/tr&gt;
+         *            &lt;tr&gt;
+         *            &lt;td&gt;target&lt;/td&gt;
+         *            &lt;td&gt;enchant.Node&lt;/td&gt;
+         *            &lt;td&gt;攻撃の標的となるオブジェクト&lt;/td&gt;
+         *            &lt;td&gt;null&lt;/td&gt;
+         *            &lt;td&gt;○&lt;/td&gt;
+         *            &lt;/tr&gt;
+         *            &lt;tr&gt;
+         *            &lt;td&gt;addTarget&lt;/td&gt;
+         *            &lt;td&gt;enchant.Group&lt;/td&gt;
+         *            &lt;td&gt;生成した弾を追加するノード&lt;/td&gt;
+         *            &lt;td&gt;攻撃を実行するノードのparentNode&lt;/td&gt;
+         *            &lt;td&gt;&lt;/td&gt;
+         *            &lt;/tr&gt;
+         *            &lt;tr&gt;
+         *            &lt;td&gt;bulletFactory&lt;/td&gt;
+         *            &lt;td&gt;function&lt;/td&gt;
+         *            &lt;td&gt;弾ノードを生成する関数&lt;/td&gt;
+         *            &lt;td&gt;小さな赤い弾を生成&lt;/td&gt;
+         *            &lt;td&gt;&lt;/td&gt;
+         *            &lt;/tr&gt;
+         *            &lt;tr&gt;
+         *            &lt;td&gt;updateProperties&lt;/td&gt;
+         *            &lt;td&gt;boolean&lt;/td&gt;
+         *            &lt;td&gt;弾のプロパティ(direction, speed)を更新するかどうか&lt;/td&gt;
+         *            &lt;td&gt;false&lt;/td&gt;
+         *            &lt;td&gt;&lt;/td&gt;
+         *            &lt;/tr&gt;
+         *            &lt;tr&gt;
+         *            &lt;td&gt;isInsideOfWorld&lt;/td&gt;
+         *            &lt;td&gt;function&lt;/td&gt;
+         *            &lt;td&gt;弾が画面内に存在することを判定する関数&lt;/td&gt;
+         *            &lt;td&gt;Gameインスタンスの大きさをベースにして判定する&lt;/td&gt;
+         *            &lt;td&gt;&lt;/td&gt;
+         *            &lt;/tr&gt;
+         *            &lt;tr&gt;
+         *            &lt;td&gt;rank&lt;/td&gt;
+         *            &lt;td&gt;number&lt;/td&gt;
+         *            &lt;td&gt;弾幕ランク.BulletMLの$rankに対応する.0.0～1.0の範囲で指定.&lt;/td&gt;
+         *            &lt;td&gt;0&lt;/td&gt;
+         *            &lt;td&gt;&lt;/td&gt;
+         *            &lt;/tr&gt;
+         *            &lt;tr&gt;
+         *            &lt;td&gt;speedRate&lt;/td&gt;
+         *            &lt;td&gt;number&lt;/td&gt;
+         *            &lt;td&gt;弾速度の補正倍率.&lt;/td&gt;
+         *            &lt;td&gt;1&lt;/td&gt;
+         *            &lt;td&gt;&lt;/td&gt;
+         *            &lt;/tr&gt;
+         *            &lt;/table&gt;
+         *            設定する項目がtargetのみの場合、標的オブジェクトを直接引数として渡すことが可能.
+         * @param {string}
+         *            [action] 最初に読み込むactionのラベル.&lt;br&gt;
+         *            省略可.
+         */
+        createTicker : function(config, action) {
+            var topLabels = this._bulletml.getTopActionLabels()
+            if (action === void 0 &amp;&amp; topLabels.length &gt; 1) {
+                // top***対応.
+                // actionラベルtop***が定義されていた場合、それらを同時に動かす.
+                var tickers = [];
+                for ( var i = 0, end = topLabels.length; i &lt; end; i++) {
+                    tickers[tickers.length] = this._createTicker(config, topLabels[i]);
+                }
+                var parentTicker = function() {
+                    if (parentTicker.complete) {
+                        return;
+                    }
+                    for ( var i = tickers.length; i--;) {
+                        tickers[i].call(this);
+                    }
+                    if (parentTicker.compChildCount == tickers.length) {
+                        parentTicker.complete = true;
+                        this.dispatchEvent(new Event("completeattack"));
+                    }
+                };
+                for ( var i = tickers.length; i--;) {
+                    tickers[i].parentTicker = parentTicker;
+                }
+
+                parentTicker.compChildCount = 0;
+                parentTicker.completeChild = function() {
+                    this.compChildCount++;
+                };
+
+                parentTicker.compChildCount = 0;
+                parentTicker.complete = false;
+
+                parentTicker.isDanmaku = true;
+
+                return parentTicker;
+            } else {
+                return this._createTicker(config, action);
+            }
+        },
+        _createTicker : function(config, action) {
+            config = (function(base) {
+                var result = {};
+                var def = enchant.bulletml.AttackPattern.defaultConfig;
+                for ( var prop in def) {
+                    if (def.hasOwnProperty(prop)) {
+                        if (base !== void 0) {
+                            result[prop] = base[prop] || def[prop];
+                        } else {
+                            result[prop] = def[prop];
+                        }
+                    }
+                }
+
+                return result;
+            })(config);
+            if (!config.target) {
+                throw new Error("target is undefined in config.");
+            }
+
+            // var ticker = tickerPool.get();
+            var ticker = function() {
+                var conf = ticker.config;
+                var ptn = ticker._pattern;
+
+                if (!ptn) {
+                    return;
+                }
+
+                // update direction
+                if (this.age &lt; ticker.chDirEnd) {
+                    ticker.direction += ticker.dirIncr;
+                } else if (this.age == ticker.chDirEnd) {
+                    ticker.direction = ticker.dirFin;
+                }
+
+                // update speed
+                if (this.age &lt; ticker.chSpdEnd) {
+                    ticker.speed += ticker.spdIncr;
+                } else if (this.age == ticker.chSpdEnd) {
+                    ticker.speed = ticker.spdFin;
+                }
+
+                // update accel
+                if (this.age &lt; ticker.aclEnd) {
+                    ticker.speedH += ticker.aclIncrH;
+                    ticker.speedV += ticker.aclIncrV;
+                } else if (this.age == ticker.aclEnd) {
+                    ticker.speedH = ticker.aclFinH;
+                    ticker.speedV = ticker.aclFinV;
+                }
+
+                // move sprite
+                this.x += Math.cos(ticker.direction) * ticker.speed * conf.speedRate;
+                this.y += Math.sin(ticker.direction) * ticker.speed * conf.speedRate;
+                this.x += ticker.speedH * conf.speedRate;
+                this.y += ticker.speedV * conf.speedRate;
+
+                // test out of world
+                if (!conf.isInsideOfWorld(this)) {
+                    this.parentNode.removeChild(this);
+                    ticker.completed = true;
+                    if (ticker.parentTicker) {
+                        ticker.parentTicker.completeChild();
+                    } else {
+                        this.dispatchEvent(new Event("completeattack"));
+                    }
+                    return;
+                }
+
+                // set direction, speed to bullet
+                if (conf.updateProperties) {
+                    this.direction = (ticker.direction + Math.PI / 2) * RAD_TO_DEG;
+                    this.speed = ticker.speed;
+                }
+
+                // proccess walker
+                if (this.age &lt; ticker.waitTo || ticker.completed) {
+                    return;
+                }
+                var cmd;
+                while (cmd = ticker.walker.next()) {
+                    switch (cmd.commandName) {
+                    case "fire":
+                        ptn._fire.call(this, cmd, conf,
+                                ticker, ptn);
+                        break;
+                    case "wait":
+                        var v = 0;
+                        if (typeof(cmd.value) === 'number') {
+                            ticker.waitTo = this.age + cmd.value;
+                        } else if ((v = ~~(cmd.value)) !== 0) {
+                            ticker.waitTo = this.age + v;
+                        } else {
+                            ticker.waitTo = this.age + eval(cmd.value);
+                        }
+                        return;
+                    case "changeDirection":
+                        ptn._changeDirection.call(this,
+                                cmd, conf, ticker);
+                        break;
+                    case "changeSpeed":
+                        ptn._changeSpeed.call(this, cmd,
+                                ticker);
+                        break;
+                    case "accel":
+                        ptn._accel.call(this, cmd, ticker);
+                        break;
+                    case "vanish":
+                        if (this.parentNode) {
+                            this.parentNode.removeChild(this);
+                            // tickerPool.dispose(ticker);
+                        }
+                        break;
+                    }
+                }
+
+                // complete
+                ticker.completed = true;
+                if (ticker.parentTicker) {
+                    ticker.parentTicker.completeChild();
+                } else {
+                    this.dispatchEvent(new Event("completeattack"));
+                }
+            };
+
+            if (action === void 0) {
+                ticker.walker = this._bulletml.getWalker("top",
+                        config.rank);
+            } else if (typeof (action) === "string") {
+                ticker.walker = this._bulletml.getWalker(action,
+                        config.rank);
+            } else if (action instanceof BulletML.Bullet) {
+                ticker.walker = action.getWalker(config.rank);
+            } else {
+                console.error(config, action);
+                throw new Error("引数が不正");
+            }
+
+            ticker._pattern = this;
+            ticker.config = config;
+            ticker.waitTo = -1;
+            ticker.completed = false;
+            ticker.direction = 0;
+            ticker.lastDirection = 0;
+            ticker.speed = 0;
+            ticker.lastSpeed = 0;
+            ticker.speedH = 0;
+            ticker.speedV = 0;
+            ticker.dirIncr = 0;
+            ticker.dirFin = 0;
+            ticker.chDirEnd = -1;
+            ticker.spdIncr = 0;
+            ticker.spdFin = 0;
+            ticker.chSpdEnd = -1;
+            ticker.aclIncrH = 0;
+            ticker.aclFinH = 0;
+            ticker.aclIncrV = 0;
+            ticker.aclFinV = 0;
+            ticker.aclEnd = -1;
+
+            ticker.isDanmaku = true;
+            return ticker;
+        },
+        _fire : function(cmd, config, ticker, pattern) {
+            var b = config.bulletFactory({
+                label : cmd.bullet.label
+            });
+            if (!b) {
+                return;
+            }
+
+            var bt = pattern.createTicker(config, cmd.bullet);
+
+            var attacker = this;
+            var calcDirection = function(d) {
+                var dv = eval(d.value) * DEG_TO_RAD;
+                // console.debug(d.type);
+                switch (d.type) {
+                case "aim":
+                    if (config.target) {
+                        return angleAtoB(attacker, config.target) + dv;
+                    } else {
+                        return dv - Math.PI / 2;
+                    }
+                case "absolute":
+                    return dv - Math.PI / 2; // 真上が0度
+                case "relative":
+                    return ticker.direction + dv;
+                case "sequence":
+                default:
+                    // console.debug(ticker.lastDirection, dv);
+                    return ticker.lastDirection + dv;
+                }
+            };
+            ticker.lastDirection = bt.direction = calcDirection(cmd.direction || cmd.bullet.direction);
+            // console.debug(bt.direction);
+
+            var calcSpeed = function(s) {
+                var sv = eval(s.value);
+                switch (s.type) {
+                case "relative":
+                case "sequence":
+                    return ticker.lastSpeed + sv;
+                case "absolute":
+                default:
+                    return sv;
+                }
+            };
+            ticker.lastSpeed = bt.speed = calcSpeed(cmd.speed || cmd.bullet.speed);
+
+            b.x = this.x + ((this.width || 0) - (b.width || 0)) / 2;
+            b.y = this.y + ((this.height || 0) - (b.height || 0)) / 2;
+
+            b.addEventListener("enterframe", bt);
+            b.addEventListener("removed", function() {
+                this.removeEventListener("enterframe", bt);
+            });
+            if (config.addTarget) {
+                config.addTarget.addChild(b);
+            } else if (this.parentNode) {
+                this.parentNode.addChild(b);
+            }
+        },
+        _changeDirection : function(cmd, config, ticker) {
+            var d = eval(cmd.direction.value) * DEG_TO_RAD;
+            var t = eval(cmd.term);
+            switch (cmd.direction.type) {
+            case "aim":
+                var tar = config.target;
+                if (!tar) {
+                    return;
+                }
+                ticker.dirFin = angleAtoB(this, tar) + d;
+                ticker.dirIncr = normalizeRadian(ticker.dirFin - ticker.direction) / t;
+                break;
+            case "absolute":
+                ticker.dirFin = d - Math.PI / 2;
+                ticker.dirIncr = normalizeRadian(ticker.dirFin - ticker.direction) / t;
+                break;
+            case "relative":
+                ticker.dirFin = ticker.direction + d;
+                ticker.dirIncr = normalizeRadian(ticker.dirFin - ticker.direction) / t;
+                break;
+            case "sequence":
+                ticker.dirIncr = d;
+                ticker.dirFin = ticker.direction + ticker.dirIncr * t;
+                break;
+            }
+            ticker.chDirEnd = this.age + t;
+        },
+        _changeSpeed : function(cmd, ticker) {
+            var s = eval(cmd.speed.value);
+            var t = eval(cmd.term);
+            switch (cmd.speed.type) {
+            case "absolute":
+                ticker.spdFin = s;
+                ticker.spdIncr = (ticker.spdFin - ticker.speed) / t;
+                break;
+            case "relative":
+                ticker.spdFin = s + ticker.speed;
+                ticker.spdIncr = (ticker.spdFin - ticker.speed) / t;
+                break;
+            case "sequence":
+                ticker.spdIncr = s;
+                ticker.spdFin = ticker.speed + ticker.spdIncr * t;
+                break;
+            }
+            ticker.chSpdEnd = this.age + t;
+        },
+        _accel : function(cmd, ticker) {
+            var t = eval(cmd.term);
+            ticker.aclEnd = this.age + t;
+
+            if (cmd.horizontal) {
+                var h = eval(cmd.horizontal.value);
+                switch (cmd.horizontal.type) {
+                case "absolute":
+                case "sequence":
+                    ticker.aclIncrH = (h - ticker.speedH) / t;
+                    ticker.aclFinH = h;
+                    break;
+                case "relative":
+                    ticker.aclIncrH = h;
+                    ticker.aclFinH = (h - ticker.speedH) * t;
+                    break;
+                }
+            } else {
+                ticker.aclIncrH = 0;
+                ticker.aclFinH = ticker.speedH;
+            }
+
+            if (cmd.vertical) {
+                var v = eval(cmd.vertical.value);
+                switch (cmd.vertical.type) {
+                case "absolute":
+                case "sequence":
+                    ticker.aclIncrV = (v - ticker.speedV) / t;
+                    ticker.aclFinV = v;
+                    break;
+                case "relative":
+                    ticker.aclIncrV = v;
+                    ticker.aclFinV = (v - ticker.speedV) * t;
+                    break;
+                }
+            } else {
+                ticker.aclIncrV = 0;
+                ticker.aclFinV = ticker.speedV;
+            }
+        },
+        /**
+         * 攻撃パターンの元となるBulletML定義.
+         *
+         * 解析済みのBulletMLオブジェクト.&lt;br&gt;
+         * 読み取り専用.
+         *
+         * @type BulletML.Root
+         */
+        bulletml : {
+            get : function() {
+                return this._bulletml;
+            }
+        }
+    });
+
+    /**
+     * configのデフォルト値.
+     *
+     * @scope enchant.bulletml.AttackPattern
+     */
+    enchant.bulletml.AttackPattern.defaultConfig = {
+        bulletFactory : enchant.bulletml.defaultBulletFactory,
+        isInsideOfWorld : enchant.bulletml.defaultIsInsideOfWorld,
+        rank : 0,
+        updateProperties : false,
+        speedRate : 2
+    };
+
+    var RAD_TO_DEG = 180 / Math.PI;
+    var DEG_TO_RAD = Math.PI / 180;
+
+    /**
+     * ラジアンを -π&lt;= rad &lt; π の範囲に正規化する.
+     */
+    function normalizeRadian(radian) {
+        while (radian &lt;= -Math.PI) {
+            radian += Math.PI * 2;
+        }
+        while (Math.PI &lt; radian) {
+            radian -= Math.PI * 2;
+        }
+        return radian;
+    }
+    /**
+     * スプライトAから見たスプライトBの方向をラジアンで返す.
+     *
+     * @param {enchant.Node}
+     *            a スプライトA
+     * @param {enchant.Node}
+     *            b スプライトB
+     */
+    function angleAtoB(a, b) {
+        var ca = {
+            x : a.x + (a.width || 0) / 2,
+            y : a.y + (a.height || 0) / 2
+        };
+        var cb = {
+            x : b.x + (b.width || 0) / 2,
+            y : b.y + (b.height || 0) / 2
+        };
+        return Math.atan2(cb.y - ca.y, cb.x - ca.x);
+    }
+
+})();
+</pre>
+		</div>
+	</div>
+
+<!-- ============================== footer ================================= -->
+	<footer class="footer">
+		
+		<p>Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blankt">JsDoc Toolkit</a> 2.4.0 on Thu Dec 27 2012 15:09:57 GMT+0900 (JST)</p>
+	</footer>
+</div>
+<script type="text/javascript">
+	prettyPrint();
+	var i = 1;
+	$('#source-code li').each(function() {
+		$(this).attr({ id: 'line' + (i++) });
+	});
+</script>
+</body>
+</html>
