@@ -276,7 +276,7 @@ bulletml["_temp"] = function() {};
                     }
                     if (n.speed !== null) {
                         f.speed = new bulletml.Speed(this.evalParam(n.speed.value));
-                        f.type = n.speed.type;
+                        f.speed.type = n.speed.type;
                     }
                     return f;
                 } else if (n instanceof bulletml.FireRef) {
