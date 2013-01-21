@@ -9,3 +9,8 @@ bulletml.enchant.js
 enchant.jsでBulletMLを利用するためのプラグイン。
 
 使い方は[wiki](https://github.com/daishihmr/bulletml.js/wiki)を参照。
+
+bulletml.tmlib.js
+===================
+
+tmlib.jsでBulletMLを利用するためのプラグイン。
