@@ -491,7 +491,7 @@ enchant.bulletml = enchant.bulletml || {};
                 break;
             case "sequence":
                 ticker.dirIncr = d;
-                ticker.dirFin = ticker.direction + ticker.dirIncr * t;
+                ticker.dirFin = ticker.direction + ticker.dirIncr * (t-1);
                 break;
             }
             ticker.chDirEnd = this.age + t;
