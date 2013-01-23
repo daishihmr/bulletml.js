@@ -778,7 +778,7 @@ bulletml["_temp"] = function() {};
         /**
          * @type {(string|number)}
          */
-        this.value = value || 1;
+        this.value = (value === undefined) ? 1 : value;
     };
 
     /**

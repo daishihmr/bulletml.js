@@ -409,6 +409,7 @@ enchant.bulletml = enchant.bulletml || {};
             return ticker;
         },
         _fire : function(cmd, config, ticker, pattern) {
+            console.log(cmd.speed)
             var b = config.bulletFactory({
                 label : cmd.bullet.label
             });
@@ -446,6 +447,7 @@ enchant.bulletml = enchant.bulletml || {};
                 var sv = eval(s.value);
                 switch (s.type) {
                 case "relative":
+                    return ticker.speed + sv;
                 case "sequence":
                     return ticker.lastSpeed + sv;
                 case "absolute":
