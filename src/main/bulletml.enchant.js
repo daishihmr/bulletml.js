@@ -409,7 +409,6 @@ enchant.bulletml = enchant.bulletml || {};
             return ticker;
         },
         _fire : function(cmd, config, ticker, pattern) {
-            console.log(cmd.speed)
             var b = config.bulletFactory({
                 label : cmd.bullet.label
             });
