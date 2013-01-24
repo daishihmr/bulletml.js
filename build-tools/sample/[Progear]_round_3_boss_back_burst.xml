@@ -1,0 +1,49 @@
+<?xml version="1.0" ?>
+<!DOCTYPE bulletml SYSTEM "http://www.asahi-net.or.jp/~cs8k-cyu/bulletml/bulletml.dtd">
+
+<bulletml type="horizontal"
+          xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
+
+<action label="top">
+<repeat> <times>100</times>
+<action>
+ <fire>
+  <direction type="absolute">220+$rand*100</direction>
+  <bulletRef label="backBurst"/>
+ </fire>
+ <wait>6-$rank*2</wait>
+</action>
+</repeat>
+</action>
+
+<bullet label="backBurst">
+<speed>1.2</speed>
+<action>
+<changeSpeed>
+ <speed>0</speed>
+ <term>80</term>
+</changeSpeed>
+<wait>60+$rand*20</wait>
+<repeat> <times>2</times>
+<action>
+ <fire>
+ <direction type="absolute">50+$rand*80</direction>
+ <bulletRef label="downAccel"/>
+ </fire>
+</action>
+</repeat>
+<vanish/>
+</action>
+</bullet>
+
+<bullet label="downAccel">
+<speed>1.8</speed>
+<action>
+<accel>
+ <horizontal>-7</horizontal>
+ <term>250</term>
+</accel>
+</action>
+</bullet>
+
+</bulletml>
