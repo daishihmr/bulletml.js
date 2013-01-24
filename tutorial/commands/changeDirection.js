@@ -39,6 +39,7 @@ window.onload = function() {
                 bulletFactory: function() {
                     var b = enchant.bulletml.defaultBulletFactory();
                     bullets.push(b);
+                    b.scale(2, 0.5);
                     return b;
                 },
                 isInsideOfWorld: function() { return true },

@@ -114,6 +114,85 @@
 </bulletml>
 </script>
 
+<script id="bml5" type="text/x-bulletml" name="発射速度指定（絶対値）">
+<bulletml>
+    <action label="top">
+        <fire>
+            <speed type="absolute">1</speed>
+            <bullet />
+        </fire>
+        <fire>
+            <speed type="absolute">4</speed>
+            <bullet />
+        </fire>
+        <fire>
+            <speed type="absolute">7</speed>
+            <bullet />
+        </fire>
+    </action>
+</bulletml>
+</script>
+
+<script id="bml6" type="text/x-bulletml" name="発射速度指定（前回相対値）">
+<bulletml>
+    <action label="top">
+        <fire>
+            <speed type="absolute">1.0</speed>
+            <bullet />
+        </fire>
+        <wait>10</wait>
+        <fire>
+            <speed type="sequence">0.4</speed>
+            <bullet />
+        </fire>
+        <wait>10</wait>
+        <fire>
+            <speed type="sequence">0.4</speed>
+            <bullet />
+        </fire>
+        <wait>10</wait>
+        <fire>
+            <speed type="sequence">0.4</speed>
+            <bullet />
+        </fire>
+        <wait>10</wait>
+        <fire>
+            <speed type="sequence">0.4</speed>
+            <bullet />
+        </fire>
+        <wait>10</wait>
+    </action>
+</bulletml>
+</script>
+
+<script id="bml7" type="text/x-bulletml" name="発射速度指定（相対値）">
+<bulletml>
+    <action label="top">
+        <changeDirection>
+            <direction>0</direction>
+            <term>1</term>
+        </changeDirection>
+        <changeSpeed>
+            <term>10</term>
+            <speed>2</speed>
+        </changeSpeed>
+        <wait>10</wait>
+        <fire>
+            <speed type="relative">-2</speed>
+            <bullet />
+        </fire>
+        <fire>
+            <speed type="relative">0</speed>
+            <bullet />
+        </fire>
+        <fire>
+            <speed type="relative">2</speed>
+            <bullet />
+        </fire>
+    </action>
+</bulletml>
+</script>
+
 </head>
 <body>
     <div id="enchant-stage" style="border:1px solid black;float:left"></div>
