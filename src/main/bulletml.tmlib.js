@@ -475,7 +475,7 @@ tm.bulletml = tm.bulletml || {};
      */
     tm.bulletml.defaultBulletFactory = function(spec) {
         var bullet = tm.app.CircleShape(8, 8, {
-            strokeStyle: "none",
+            strokeStyle: "rgba(0,0,0,0)",
             fillStyle: gra.toStyle()
         });
         bullet.blendMode = "lighter";
