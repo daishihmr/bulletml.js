@@ -246,26 +246,21 @@ bulletml["_temp"] = function() {};
             var n = this._action.commands[this._cursor];
 
             if (n !== undefined) {
-                // console.log(n.commandName);
+                // console.log(n.commandName, n.label, this._localScope);
                 if (n instanceof bulletml.Action) {
                     this.pushStack();
                     this._action = n;
-                    this._localScope = this.newScope(n.params);
                     return this.next();
                 } else if (n instanceof bulletml.ActionRef) {
-                    // console.log("    label = " + n.label);
                     this.pushStack();
                     this._action = this._root.findActionOrThrow(n.label);
                     this._localScope = this.newScope(n.params);
                     return this.next();
                 } else if (n instanceof bulletml.Repeat) {
-                    // console.log("    times = " + n.times);
                     this._localScope.loopCounter = 0;
                     this._localScope.loopEnd = this.evalParam(n.times);
-                    // console.log("          = " + this._localScope.loopEnd);
                     this.pushStack();
                     this._action = n.action.clone();
-                    this._localScope = this.newScope(n.params);
                     return this.next();
                 } else if (n instanceof bulletml.Fire) {
                     var f = new bulletml.Fire();
@@ -280,7 +275,6 @@ bulletml["_temp"] = function() {};
                     }
                     return f;
                 } else if (n instanceof bulletml.FireRef) {
-                    // console.log("    label = " + n.label);
                     this.pushStack();
                     this._action = new bulletml.Action();
                     this._action.commands = [ this._root.findFireOrThrow(n.label) ];
@@ -318,13 +312,10 @@ bulletml["_temp"] = function() {};
                 }
                 n = this._action.commands[this._cursor];
                 if (n && n.commandName == "repeat") {
-                    // console.log("repeat end", this._localScope.loopCounter,
-                    // this._localScope.loopEnd);
                     this._localScope.loopCounter++;
                     if (this._localScope.loopCounter < this._localScope.loopEnd) {
                         this.pushStack();
                         this._action = n.action.clone();
-                        this._localScope = this.newScope(n.params);
                         return this.next();
                     } else {
                         return this.next();
@@ -338,6 +329,7 @@ bulletml["_temp"] = function() {};
         }
     };
     bulletml.Walker.prototype.pushStack = function() {
+        // console.log("pushStack");
         this._stack.push({
             action : this._action,
             cursor : this._cursor,
@@ -346,6 +338,7 @@ bulletml["_temp"] = function() {};
         this._cursor = -1;
     };
     bulletml.Walker.prototype.popStack = function() {
+        // console.log("popStack");
         var p = this._stack.pop();
         if (p) {
             this._cursor = p.cursor;
@@ -577,6 +570,12 @@ bulletml["_temp"] = function() {};
         this.params = [];
     };
     bulletml.ActionRef.prototype = new bulletml.Command();
+    bulletml.ActionRef.prototype.clone = function() {
+        var c = new bulletml.Action();
+        c.root = this.root;
+        c.commands.push(this);
+        return c;
+    };
 
     /**
      * @constructor
