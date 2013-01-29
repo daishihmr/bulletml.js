@@ -22,31 +22,6 @@ tm.bulletml = tm.bulletml || {};
 
 (function() {
 
-    // syntax sugar.
-    // /**
-    //  * 弾幕enterframeイベントリスナを設定する.
-    //  */
-    // enchant.EventTarget.prototype.setDanmaku = function(attackPattern, config) {
-    //     if (attackPattern === undefined) throw new Error("AttackPattern is required.");
-    //     this.removeDanmaku();
-    //     this.on("enterframe", attackPattern.createTicker(config));
-    // };
-    // enchant.EventTarget.prototype.removeDanmaku = function() {
-    //     if (!this._listeners["enterframe"]
-    //             || this._listeners["enterframe"].length === 0) {
-    //         return;
-    //     }
-    //     var remove = [];
-    //     for ( var i = this._listeners["enterframe"].length; i--;) {
-    //         if (this._listeners["enterframe"][i].isDanmaku) {
-    //             remove[remove.length] = this._listeners["enterframe"][i];
-    //         }
-    //     }
-    //     for ( var i = remove.length; i--;) {
-    //         this.removeEventListener("enterframe", remove[i]);
-    //     }
-    // };
-
     /**
      * @scope enchant.bulletml.AttackPattern.prototype
      */
@@ -55,7 +30,7 @@ tm.bulletml = tm.bulletml || {};
          * 攻撃パターン.
          *
          * @constructs
-         * @param {BulletML.Root}
+         * @param {bulletml.Root}
          *            bulletml BulletMLデータ
          */
         init: function(bulletml) {
@@ -145,8 +120,6 @@ tm.bulletml = tm.bulletml || {};
                     tickers[tickers.length] = this._createTicker(config, topLabels[i]);
                 }
                 var parentTicker = function() {
-                    if (parentTicker.completed) return;
-
                     for ( var i = tickers.length; i--; ) {
                         tickers[i].call(this);
                     }
@@ -179,11 +152,12 @@ tm.bulletml = tm.bulletml || {};
                 var def = tm.bulletml.AttackPattern.defaultConfig;
                 for ( var prop in def) {
                     if (def.hasOwnProperty(prop)) {
-                        if (base !== undefined) {
-                            result[prop] = base[prop] || def[prop];
-                        } else {
-                            result[prop] = def[prop];
-                        }
+                        result[prop] = def[prop];
+                    }
+                }
+                for ( var prop in base) {
+                    if (base.hasOwnProperty(prop)) {
+                        result[prop] = base[prop];
                     }
                 }
 
@@ -208,14 +182,14 @@ tm.bulletml = tm.bulletml || {};
                 // update direction
                 if (ticker.age < ticker.chDirEnd) {
                     ticker.direction += ticker.dirIncr;
-                } else if (ticker.age == ticker.chDirEnd) {
+                } else if (ticker.age === ticker.chDirEnd) {
                     ticker.direction = ticker.dirFin;
                 }
 
                 // update speed
                 if (ticker.age < ticker.chSpdEnd) {
                     ticker.speed += ticker.spdIncr;
-                } else if (ticker.age == ticker.chSpdEnd) {
+                } else if (ticker.age === ticker.chSpdEnd) {
                     ticker.speed = ticker.spdFin;
                 }
 
@@ -223,7 +197,7 @@ tm.bulletml = tm.bulletml || {};
                 if (ticker.age < ticker.aclEnd) {
                     ticker.speedH += ticker.aclIncrH;
                     ticker.speedV += ticker.aclIncrV;
-                } else if (ticker.age == ticker.aclEnd) {
+                } else if (ticker.age === ticker.aclEnd) {
                     ticker.speedH = ticker.aclFinH;
                     ticker.speedV = ticker.aclFinV;
                 }
@@ -236,7 +210,6 @@ tm.bulletml = tm.bulletml || {};
 
                 // test out of world
                 if (!conf.isInsideOfWorld(this)) {
-                    // console.log("outside");
                     this.remove();
                     ticker.completed = true;
                     if (ticker.parentTicker) {
@@ -301,10 +274,10 @@ tm.bulletml = tm.bulletml || {};
             action = action || "top";
             if (typeof (action) === "string") {
                 ticker.walker = this._bulletml.getWalker(action, config.rank);
-            } else if (action instanceof BulletML.Bullet) {
+            } else if (action instanceof bulletml.Bullet) {
                 ticker.walker = action.getWalker(config.rank);
             } else {
-                console.error(config, action);
+                window.console.error(config, action);
                 throw new Error("引数が不正");
             }
 
@@ -372,6 +345,7 @@ tm.bulletml = tm.bulletml || {};
                 var sv = eval(s.value);
                 switch (s.type) {
                 case "relative":
+                    return ticker.speed + sv;
                 case "sequence":
                     return ticker.lastSpeed + sv;
                 case "absolute":
@@ -416,7 +390,7 @@ tm.bulletml = tm.bulletml || {};
                 break;
             case "sequence":
                 ticker.dirIncr = d;
-                ticker.dirFin = ticker.direction + ticker.dirIncr * t;
+                ticker.dirFin = ticker.direction + ticker.dirIncr * (t-1);
                 break;
             }
             ticker.chDirEnd = ticker.age + t;
@@ -501,7 +475,7 @@ tm.bulletml = tm.bulletml || {};
      */
     tm.bulletml.defaultBulletFactory = function(spec) {
         var bullet = tm.app.CircleShape(8, 8, {
-            strokeStyle: "none",
+            strokeStyle: "rgba(0,0,0,0)",
             fillStyle: gra.toStyle()
         });
         bullet.blendMode = "lighter";

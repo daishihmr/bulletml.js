@@ -1,0 +1,61 @@
+<html>
+<head>
+<meta charset=UTF-8>
+
+<script id="bml0" type="text/x-bulletml" name="パラメータを指定してactionを呼び出す">
+<bulletml>
+    <action label="top">
+        <repeat>
+            <times>10</times>
+            <action>
+                <actionRef label="attack1">
+                    <param>$rand*360</param>
+                </actionRef>
+                <wait>10</wait>
+            </action>
+        </repeat>
+    </action>
+    <action label="attack1">
+        <repeat>
+            <times>5</times>
+            <actionRef label="attack2">
+                <param>$1+$rand*30-15</param>
+            </actionRef>
+        </repeat>
+    </action>
+    <action label="attack2">
+        <repeat>
+            <times>5</times>
+            <action>
+                <fire>
+                    <direction>$1</direction>
+                    <bullet />
+                </fire>
+                <wait>2</wait>
+            </action>
+        </repeat>
+    </action>
+</bulletml>
+</script>
+
+</head>
+<body>
+    <div id="enchant-stage" style="border:1px solid black;float:left"></div>
+    <div>
+        <div>
+            <select id="menu"></select>
+        </div>
+        <div>
+            <textarea id="text" rows="20" cols="80"></textarea>
+        </div>
+        <div>
+            <button id="start-button">攻撃開始！</button>
+        </div>
+    <div>
+
+    <script src="../../lib/enchant.js"></script>
+    <script src="../../src/main/bulletml.js"></script>
+    <script src="../../src/main/bulletml.enchant.js"></script>
+    <script src="actionRef.js"></script>
+</body>
+</html>
