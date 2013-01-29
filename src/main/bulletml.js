@@ -276,7 +276,7 @@ bulletml["_temp"] = function() {};
                     }
                     if (n.speed !== null) {
                         f.speed = new bulletml.Speed(this.evalParam(n.speed.value));
-                        f.type = n.speed.type;
+                        f.speed.type = n.speed.type;
                     }
                     return f;
                 } else if (n instanceof bulletml.FireRef) {
@@ -778,7 +778,7 @@ bulletml["_temp"] = function() {};
         /**
          * @type {(string|number)}
          */
-        this.value = value || 1;
+        this.value = (value === undefined) ? 1 : value;
     };
 
     /**

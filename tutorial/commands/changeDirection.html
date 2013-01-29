@@ -1,0 +1,120 @@
+<html>
+<head>
+<meta charset=UTF-8>
+
+<script id="bml0" type="text/x-bulletml" name="aim">
+<bulletml>
+    <action label="top">
+        <fire>
+            <direction type="absolute">180</direction>
+            <bullet>
+                <action>
+                    <wait>30</wait>
+                    <changeDirection>
+                        <direction type="aim">0</direction>
+                        <term>30</term>
+                    </changeDirection>
+                </action>
+            </bullet>
+        </fire>
+    </action>
+</bulletml>
+</script>
+
+<script id="bml1" type="text/x-bulletml" name="absolute">
+<bulletml>
+    <action label="top">
+        <fire>
+            <direction type="absolute">180</direction>
+            <bullet>
+                <action>
+                    <wait>30</wait>
+                    <changeDirection>
+                        <direction type="absolute">10</direction>
+                        <term>30</term>
+                    </changeDirection>
+                </action>
+            </bullet>
+        </fire>
+    </action>
+</bulletml>
+</script>
+
+<script id="bml2" type="text/x-bulletml" name="relative">
+<bulletml>
+    <action label="top">
+        <fire>
+            <direction type="absolute">180</direction>
+            <bullet>
+                <action>
+                    <wait>30</wait>
+                    <changeDirection>
+                        <direction type="relative">30</direction>
+                        <term>30</term>
+                    </changeDirection>
+                </action>
+            </bullet>
+        </fire>
+    </action>
+</bulletml>
+</script>
+
+<script id="bml3" type="text/x-bulletml" name="termを長く">
+<bulletml>
+    <action label="top">
+        <fire>
+            <direction type="absolute">180</direction>
+            <bullet>
+                <action>
+                    <wait>20</wait>
+                    <changeDirection>
+                        <direction>0</direction>
+                        <term>120</term>
+                    </changeDirection>
+                </action>
+            </bullet>
+        </fire>
+    </action>
+</bulletml>
+</script>
+
+<script id="bml4" type="text/x-bulletml" name="termを短く">
+<bulletml>
+    <action label="top">
+        <fire>
+            <direction type="absolute">180</direction>
+            <bullet>
+                <action>
+                    <wait>20</wait>
+                    <changeDirection>
+                        <direction>0</direction>
+                        <term>10</term>
+                    </changeDirection>
+                </action>
+            </bullet>
+        </fire>
+    </action>
+</bulletml>
+</script>
+
+</head>
+<body>
+    <div id="enchant-stage" style="border:1px solid black;float:left"></div>
+    <div>
+        <div>
+            <select id="menu"></select>
+        </div>
+        <div>
+            <textarea id="text" rows="20" cols="80"></textarea>
+        </div>
+        <div>
+            <button id="start-button">攻撃開始！</button>
+        </div>
+    <div>
+
+    <script src="../../lib/enchant.js"></script>
+    <script src="../../src/main/bulletml.js"></script>
+    <script src="../../src/main/bulletml.enchant.js"></script>
+    <script src="changeDirection.js"></script>
+</body>
+</html>
