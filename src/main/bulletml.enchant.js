@@ -273,7 +273,6 @@ enchant.bulletml = enchant.bulletml || {};
                 throw new Error("target is undefined in config.");
             }
 
-            // var ticker = tickerPool.get();
             var ticker = function() {
                 var conf = ticker.config;
                 var ptn = ticker._pattern;
