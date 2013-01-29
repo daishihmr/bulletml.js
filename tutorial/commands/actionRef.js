@@ -51,14 +51,14 @@ window.onload = function() {
 
 var setupPlayer = function(game) {
     var player = new Sprite(32, 32);
-    // player.image = game.assets["chara1.png"];
+    player.image = game.assets["chara1.png"];
     player.moveTo(194, 256);
     game.rootScene.addChild(player);
     return player;
 };
 var setupEnemy = function(game) {
     var enemy = new Sprite(32, 32);
-    // enemy.image = game.assets["chara1.png"];
+    enemy.image = game.assets["chara1.png"];
     enemy.frame = 6;
     enemy.moveTo(94, 32);
     game.rootScene.addChild(enemy);
