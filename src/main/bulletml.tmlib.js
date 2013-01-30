@@ -456,14 +456,18 @@ tm.bulletml = tm.bulletml || {};
         }
     });
 
-    var gra = (function(){
-        var r = tm.graphics.RadialGradient(4, 4, 0, 4, 4, 4);
-        r.addColorStopList([
-            { offset: 0.0, color: "rgba(255, 255, 255, 1.0)" },
-            { offset: 0.5, color: "rgba(255, 255, 255, 1.0)" },
-            { offset: 0.8, color: "rgba(255,   0,   0, 0.8)" },
-            { offset: 1.0, color: "rgba(255,   0,   0, 0.0)" }
-        ]);
+    var DEFAULT_BULLET_IMAGE = (function(){
+        var r = tm.graphics.Canvas();
+        r.resize(8, 8);
+        r.setTransformCenter();
+        r.setLineStyle(0).setStrokeStyle("rgba(0,0,0,0)");
+        r.setFillStyle(
+            tm.graphics.RadialGradient(0,0,0,0,0,4).addColorStopList([
+                { offset: 0.0, color: "white" },
+                { offset: 0.5, color: "white" },
+                { offset: 1.0, color: "red" },
+            ]).toStyle()
+        ).fillCircle(0, 0, 4);
         return r;
     })();
     /**
@@ -474,11 +478,7 @@ tm.bulletml = tm.bulletml || {};
      * @memberOf enchant.bulletml
      */
     tm.bulletml.defaultBulletFactory = function(spec) {
-        var bullet = tm.app.CircleShape(8, 8, {
-            strokeStyle: "rgba(0,0,0,0)",
-            fillStyle: gra.toStyle()
-        });
-        bullet.blendMode = "lighter";
+        var bullet = tm.app.Sprite(8, 8, DEFAULT_BULLET_IMAGE);
         bullet.label = spec.label;
         return bullet;
     };
