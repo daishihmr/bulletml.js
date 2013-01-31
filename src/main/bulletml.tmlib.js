@@ -361,6 +361,7 @@ tm.bulletml = tm.bulletml || {};
             b.addEventListener("enterframe", bt);
             b.addEventListener("removed", function() {
                 this.removeEventListener("enterframe", bt);
+                this.removeEventListener("removed", arguments.callee);
             });
             if (config.addTarget) {
                 config.addTarget.addChild(b);
