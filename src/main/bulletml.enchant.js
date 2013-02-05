@@ -1,33 +1,4 @@
 /**
- * @fileOverview bullet.enchant.js
- * @version 0.4.1
- * @require enchant.js v0.5.2+, bulletml-min.js v0.3.1
- * @author daishi_hmr
- *
- * @description 弾幕記述言語BulletMLをenchant.jsで扱うためのプラグイン
- *
- * @detail BulletMLのパースにはbulletml.jsを使用しています
- *      bulletml.js: https://github.com/daishihmr/bulletml.js
- *
- * @example
- *      game.preload('boss.bml');
- *      ...
- *      var player = new Sprite(32, 32);
- *      var boss = new Sprite(32, 32);
- *      var attackPattern = game.assets['boss.xml'];
- *      var ticker = attackPattern.createTicker(player);
- *      boss.addEventListener('enterframe', ticker);
- *
- * @example
- *      game.preload('boss.bml');
- *      ...
- *      var player = new Sprite(32, 32);
- *      AttackPattern.defaultConfig.target = player;
- *      var boss = new Sprite(32, 32);
- *      boss.setDanmaku(game.assets['boss.bml']);
- */
-
-/**
  * @namespace
  */
 enchant.bulletml = enchant.bulletml || {};

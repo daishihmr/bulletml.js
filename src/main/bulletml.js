@@ -1,6 +1,8 @@
 /**
- * @preserve The MIT License (MIT)
- * Copyright (c) 2012 dev7.jp
+ * @preserve bulletml.js v0.5.0-SNAPSHOT
+ *
+ * The MIT License (MIT)
+ * Copyright (c) 2012-2013 daishi@dev7.jp All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -275,6 +277,7 @@ bulletml["_temp"] = function() {};
                         f.speed = new bulletml.Speed(this.evalParam(n.speed.value));
                         f.speed.type = n.speed.type;
                     }
+                    f.option = n.option;
                     return f;
                 } else if (n instanceof bulletml.FireRef) {
                     this.pushStack();
@@ -385,6 +388,7 @@ bulletml["_temp"] = function() {};
             }
         }
         scope.$rand = Math.random();
+        scope.$index = this._localScope.loopCounter;
         // console.log(scope);
         // console.log("bulletml._temp = function() { return " + exp.split("$").join("this.$") + "}");
         return eval(
@@ -617,6 +621,10 @@ bulletml["_temp"] = function() {};
          * @type {(bulletml.Bullet|bulletml.BulletRef)}
          */
         this.bullet = null;
+        /**
+         * @type {bulletml.FireOption}
+         */
+        this.option = new bulletml.FireOption();
     };
     bulletml.Fire.prototype = new bulletml.Command();
     /** @inheritDoc */
@@ -819,6 +827,27 @@ bulletml["_temp"] = function() {};
          * @type {(string|number)}
          */
         this.value = value || 0;
+    };
+
+    /**
+     * @constructor
+     * @param {Object=} params
+     */
+    bulletml.FireOption = function(params) {
+        params = params || {};
+
+        /**
+         * @type {number}
+         */
+        this.offsetX = params.offsetX || 0;
+        /**
+         * @type {number}
+         */
+        this.offsetY = params.offsetY || 0;
+        /**
+         * @type {boolean}
+         */
+        this.autonomy = !!params.autonomy;
     };
 
     // parse関数 -----------------------------------------------
@@ -1123,10 +1152,35 @@ bulletml["_temp"] = function() {};
             bulletml.GLOBAL[func] = bulletml.dsl[func];
         }
     };
+
+    /**
+     * @typedef {function():bulletml.Command}
+     */
+    var ReturnCommandFunc;
+
+    /**
+     * Action要素を作る.
+     *
+     * 引数は,
+     * <ol>
+     *   <li>1個または複数のCommand（可変長引数）.
+     *   <li>Commandの配列.
+     * </ol>
+     */
     bulletml.dsl.action = function(commands) {
-        for (var i = 0, end = arguments.length; i < end; i++)
-            if (arguments[i] instanceof Function)
-                arguments[i] = arguments[i]();
+        if (arguments.length > 1) {
+            for (var i = 0, end = arguments.length; i < end; i++) {
+                if (arguments[i] instanceof Function) {
+                    arguments[i] = arguments[i]();
+                }
+            }
+        } else {
+            for (var i = 0, end = commands.length; i < end; i++) {
+                if (commands[i] instanceof Function) {
+                    commands[i] = commands[i]();
+                }
+            }
+        }
 
         var result = new bulletml.Action();
         if (commands instanceof Array) {
@@ -1147,10 +1201,18 @@ bulletml["_temp"] = function() {};
         }
         return result;
     };
+    /**
+     * ActionRef要素を作る.
+     *
+     * @param {string} label ラベル
+     * @param {Array.<(string|number)>} args
+     */
     bulletml.dsl.actionRef = function(label, args) {
-        for (var i = 0, end = arguments.length; i < end; i++)
-            if (arguments[i] instanceof Function)
+        for (var i = 0, end = arguments.length; i < end; i++) {
+            if (arguments[i] instanceof Function) {
                 arguments[i] = arguments[i]();
+            }
+        }
 
         if (label === undefined) throw new Error("label is required.");
         var result = new bulletml.ActionRef();
@@ -1165,9 +1227,11 @@ bulletml["_temp"] = function() {};
         return result;
     };
     bulletml.dsl.bullet = function(direction, speed, action, label) {
-        for (var i = 0, end = arguments.length; i < end; i++)
-            if (arguments[i] instanceof Function)
+        for (var i = 0, end = arguments.length; i < end; i++) {
+            if (arguments[i] instanceof Function) {
                 arguments[i] = arguments[i]();
+            }
+        }
 
         var result = new bulletml.Bullet();
         for (var i = 0; i < arguments.length; i++) {
@@ -1186,9 +1250,11 @@ bulletml["_temp"] = function() {};
         return result;
     };
     bulletml.dsl.bulletRef = function(label, args) {
-        for (var i = 0, end = arguments.length; i < end; i++)
-            if (arguments[i] instanceof Function)
+        for (var i = 0, end = arguments.length; i < end; i++) {
+            if (arguments[i] instanceof Function) {
                 arguments[i] = arguments[i]();
+            }
+        }
 
         if (label === undefined) throw new Error("label is required.");
         var result = new bulletml.BulletRef();
@@ -1203,9 +1269,11 @@ bulletml["_temp"] = function() {};
         return result;
     };
     bulletml.dsl.fire = function(bullet, direction, speed) {
-        for (var i = 0, end = arguments.length; i < end; i++)
-            if (arguments[i] instanceof Function)
+        for (var i = 0, end = arguments.length; i < end; i++) {
+            if (arguments[i] instanceof Function) {
                 arguments[i] = arguments[i]();
+            }
+        }
 
         var result = new bulletml.Fire();
         for (var i = 0; i < arguments.length; i++) {
@@ -1217,6 +1285,8 @@ bulletml["_temp"] = function() {};
                 result.bullet = arguments[i];
             } else if (arguments[i] instanceof bulletml.BulletRef) {
                 result.bullet = arguments[i];
+            } else if (arguments[i] instanceof bulletml.FireOption) {
+                result.option = arguments[i];
             }
         }
         if (result.bullet === undefined)
@@ -1224,9 +1294,11 @@ bulletml["_temp"] = function() {};
         return result;
     };
     bulletml.dsl.fireRef = function(label, args) {
-        for (var i = 0, end = arguments.length; i < end; i++)
-            if (arguments[i] instanceof Function)
+        for (var i = 0, end = arguments.length; i < end; i++) {
+            if (arguments[i] instanceof Function) {
                 arguments[i] = arguments[i]();
+            }
+        }
 
         if (label === undefined) throw new Error("label is required.");
         var result = new bulletml.FireRef();
@@ -1241,9 +1313,11 @@ bulletml["_temp"] = function() {};
         return result;
     };
     bulletml.dsl.changeDirection = function(direction, term) {
-        for (var i = 0, end = arguments.length; i < end; i++)
-            if (arguments[i] instanceof Function)
+        for (var i = 0, end = arguments.length; i < end; i++) {
+            if (arguments[i] instanceof Function) {
                 arguments[i] = arguments[i]();
+            }
+        }
 
         if (direction === undefined) throw new Error("direction is required.");
         if (term === undefined) throw new Error("term is required.");
@@ -1257,9 +1331,11 @@ bulletml["_temp"] = function() {};
         return result;
     };
     bulletml.dsl.changeSpeed = function(speed, term) {
-        for (var i = 0, end = arguments.length; i < end; i++)
-            if (arguments[i] instanceof Function)
+        for (var i = 0, end = arguments.length; i < end; i++) {
+            if (arguments[i] instanceof Function) {
                 arguments[i] = arguments[i]();
+            }
+        }
 
         if (speed === undefined) throw new Error("speed is required.");
         if (term === undefined) throw new Error("term is required.");
@@ -1273,9 +1349,11 @@ bulletml["_temp"] = function() {};
         return result;
     };
     bulletml.dsl.accel = function(horizontal, vertical, term) {
-        for (var i = 0, end = arguments.length; i < end; i++)
-            if (arguments[i] instanceof Function)
+        for (var i = 0, end = arguments.length; i < end; i++) {
+            if (arguments[i] instanceof Function) {
                 arguments[i] = arguments[i]();
+            }
+        }
 
         var result = new bulletml.Accel();
         for (var i = 0; i < arguments.length; i++) {
@@ -1293,9 +1371,11 @@ bulletml["_temp"] = function() {};
         return result;
     };
     bulletml.dsl.wait = function(value) {
-        for (var i = 0, end = arguments.length; i < end; i++)
-            if (arguments[i] instanceof Function)
+        for (var i = 0, end = arguments.length; i < end; i++) {
+            if (arguments[i] instanceof Function) {
                 arguments[i] = arguments[i]();
+            }
+        }
 
         if (value === undefined) throw new Error("value is required.");
         return new bulletml.Wait(value);
@@ -1304,9 +1384,11 @@ bulletml["_temp"] = function() {};
         return new bulletml.Vanish();
     };
     bulletml.dsl.repeat = function(times, action) {
-        for (var i = 0, end = arguments.length; i < end; i++)
-            if (arguments[i] instanceof Function)
+        for (var i = 0, end = arguments.length; i < end; i++) {
+            if (arguments[i] instanceof Function) {
                 arguments[i] = arguments[i]();
+            }
+        }
 
         if (times === undefined) throw new Error("times is required.");
         if (action === undefined) throw new Error("action is required.");
@@ -1316,13 +1398,21 @@ bulletml["_temp"] = function() {};
             result.action = action;
         } else if (action instanceof Array) {
             result.action = bulletml.dsl.action(action);
+        } else {
+            var commands = [];
+            for (var i = 1; i < arguments.length; i++) {
+                commands.push(arguments[i]);
+            }
+            result.action = bulletml.dsl.action(commands);
         }
         return result;
     };
     bulletml.dsl.direction = function(value, type) {
-        for (var i = 0, end = arguments.length; i < end; i++)
-            if (arguments[i] instanceof Function)
+        for (var i = 0, end = arguments.length; i < end; i++) {
+            if (arguments[i] instanceof Function) {
                 arguments[i] = arguments[i]();
+            }
+        }
 
         if (value === undefined) throw new Error("value is required.");
         var result = new bulletml.Direction(value);
@@ -1330,9 +1420,11 @@ bulletml["_temp"] = function() {};
         return result;
     };
     bulletml.dsl.speed = function(value, type) {
-        for (var i = 0, end = arguments.length; i < end; i++)
-            if (arguments[i] instanceof Function)
+        for (var i = 0, end = arguments.length; i < end; i++) {
+            if (arguments[i] instanceof Function) {
                 arguments[i] = arguments[i]();
+            }
+        }
 
         if (value === undefined) throw new Error("value is required.");
         var result = new bulletml.Speed(value);
@@ -1340,9 +1432,11 @@ bulletml["_temp"] = function() {};
         return result;
     };
     bulletml.dsl.horizontal = function(value, type) {
-        for (var i = 0, end = arguments.length; i < end; i++)
-            if (arguments[i] instanceof Function)
+        for (var i = 0, end = arguments.length; i < end; i++) {
+            if (arguments[i] instanceof Function) {
                 arguments[i] = arguments[i]();
+            }
+        }
 
         if (value === undefined) throw new Error("value is required.");
         var result = new bulletml.Horizontal(value);
@@ -1350,14 +1444,19 @@ bulletml["_temp"] = function() {};
         return result;
     };
     bulletml.dsl.vertical = function(value, type) {
-        for (var i = 0, end = arguments.length; i < end; i++)
-            if (arguments[i] instanceof Function)
+        for (var i = 0, end = arguments.length; i < end; i++) {
+            if (arguments[i] instanceof Function) {
                 arguments[i] = arguments[i]();
+            }
+        }
 
         if (value === undefined) throw new Error("value is required.");
         var result = new bulletml.Vertical(value);
         if (type) result.type = type;
         return result;
+    };
+    bulletml.dsl.fireOption = function(params) {
+        return new bulletml.FireOption(params);
     };
 
     // utility ---------------------------------------------------

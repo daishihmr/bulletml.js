@@ -1,19 +1,4 @@
 /**
- * @fileOverview bullet.tmlib.js
- * @version 0.4.1
- * @require tmlib.js
- * @author daishi_hmr
- *
- * @description 弾幕記述言語BulletMLをtmlib.jsで扱うためのプラグイン
- *
- * @detail BulletMLのパースにはbulletml.jsを使用しています
- *      bulletml.js: https://github.com/daishihmr/bulletml.js
- *
- * @example
- *
- */
-
-/**
  * plugin namespace object
  *
  * @type {Object}
@@ -317,14 +302,23 @@ tm.bulletml = tm.bulletml || {};
 
             var bt = pattern.createTicker(config, cmd.bullet);
 
-            var attacker = this;
+            var attcker = this;
+            var gunPosition = {
+                x: this.x + cmd.option.offsetX,
+                y: this.y + cmd.option.offsetY
+            };
+
             var calcDirection = function(d) {
                 var dv = eval(d.value) * Math.DEG_TO_RAD;
                 // console.debug(d.type);
                 switch(d.type) {
                 case "aim":
                     if (config.target) {
-                        return angleAtoB(attacker, config.target) + dv;
+                        if (cmd.option.autonomy) {
+                            return angleAtoB(gunPosition, config.target) + dv;
+                        } else {
+                            return angleAtoB(attcker, config.target) + dv;
+                        }
                     } else {
                         return dv - Math.PI / 2;
                     }
@@ -355,8 +349,8 @@ tm.bulletml = tm.bulletml || {};
             };
             ticker.lastSpeed = bt.speed = calcSpeed(cmd.speed || cmd.bullet.speed);
 
-            b.x = this.x;
-            b.y = this.y;
+            b.x = gunPosition.x;
+            b.y = gunPosition.y;
 
             b.addEventListener("enterframe", bt);
             b.addEventListener("removed", function() {
