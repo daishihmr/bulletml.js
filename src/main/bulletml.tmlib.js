@@ -293,9 +293,12 @@ tm.bulletml = tm.bulletml || {};
             return ticker;
         },
         _fire: function(cmd, config, ticker, pattern) {
-            var b = config.bulletFactory({
-                label: cmd.bullet.label
-            });
+            var spec = { label: cmd.bullet.label };
+            for (var key in cmd.bullet.option) {
+                spec[key] = cmd.bullet.option[key];
+            }
+
+            var b = config.bulletFactory(spec);
             if (!b) {
                 return;
             }
@@ -351,6 +354,11 @@ tm.bulletml = tm.bulletml || {};
 
             b.x = gunPosition.x;
             b.y = gunPosition.y;
+            // set direction, speed to bullet
+            if (config.updateProperties) {
+                b.rotation = (ticker.direction + Math.PI * 0.5) * Math.RAD_TO_DEG;
+                b.speed = ticker.speed;
+            }
 
             b.addEventListener("enterframe", bt);
             b.addEventListener("removed", function() {
@@ -391,6 +399,7 @@ tm.bulletml = tm.bulletml || {};
             ticker.chDirEnd = ticker.age + t;
         },
         _changeSpeed: function(cmd, ticker) {
+            console.log("changeSpeed")
             var s = eval(cmd.speed.value);
             var t = eval(cmd.term);
             switch (cmd.speed.type) {

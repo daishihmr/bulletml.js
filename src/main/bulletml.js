@@ -388,7 +388,12 @@ bulletml["_temp"] = function() {};
             }
         }
         scope.$rand = Math.random();
-        scope.$index = this._localScope.loopCounter;
+        scope.$loop = {
+            index: this._localScope.loopCounter,
+            count: this._localScope.loopCounter + 1,
+            first: this._localScope.loopCounter === 0,
+            last: this._localScope.loopCounter === this._localScope.loopEnd - 1,
+        };
         // console.log(scope);
         // console.log("bulletml._temp = function() { return " + exp.split("$").join("this.$") + "}");
         return eval(
@@ -444,6 +449,10 @@ bulletml["_temp"] = function() {};
          * @type {Array.<bulletml.Command>}
          */
         this.actions = [];
+        /**
+         * @type {Object}
+         */
+        this.option = {};
         this._localScope = {};
     };
     bulletml.Bullet.prototype.getWalker = function(rank) {
@@ -464,6 +473,7 @@ bulletml["_temp"] = function() {};
         c.direction.type = this.direction.type;
         c.speed = new bulletml.Speed(walker.evalParam(this.speed.value));
         c.speed.type = this.speed.type;
+        c.option = this.option;
         c._localScope = walker._localScope;
         return c;
     };
@@ -850,6 +860,28 @@ bulletml["_temp"] = function() {};
         this.autonomy = !!params.autonomy;
     };
 
+    /**
+     * @constructor
+     * @param {number=} value
+     */
+    bulletml.OffsetX = function(value) {
+        this.value = value || 0;
+    };
+    /**
+     * @constructor
+     * @param {number=} value
+     */
+    bulletml.OffsetY = function(value) {
+        this.value = value || 0;
+    };
+    /**
+     * @constructor
+     * @param {boolean=} value
+     */
+    bulletml.Autonomy = function(value) {
+        this.value = !!value;
+    };
+
     // parse関数 -----------------------------------------------
 
     function parse(element) {
@@ -1147,21 +1179,17 @@ bulletml["_temp"] = function() {};
 
     // DSL -------------------------------------------------------
 
-    bulletml.dsl = function() {
+    bulletml.dsl = function(prefix) {
+        prefix = prefix || "";
         for (var func in bulletml.dsl) if (bulletml.dsl.hasOwnProperty(func)) {
-            bulletml.GLOBAL[func] = bulletml.dsl[func];
+            bulletml.GLOBAL[prefix + func] = bulletml.dsl[func];
         }
     };
 
     /**
-     * @typedef {function():bulletml.Command}
-     */
-    var ReturnCommandFunc;
-
-    /**
      * Action要素を作る.
      *
-     * 引数は,
+     * @param {...(bulletml.Command|Array.<bulletml.Command>)} commands
      * <ol>
      *   <li>1個または複数のCommand（可変長引数）.
      *   <li>Commandの配列.
@@ -1203,9 +1231,6 @@ bulletml["_temp"] = function() {};
     };
     /**
      * ActionRef要素を作る.
-     *
-     * @param {string} label ラベル
-     * @param {Array.<(string|number)>} args
      */
     bulletml.dsl.actionRef = function(label, args) {
         for (var i = 0, end = arguments.length; i < end; i++) {
@@ -1243,6 +1268,10 @@ bulletml["_temp"] = function() {};
                 result.actions.push(arguments[i]);
             } else if (arguments[i] instanceof bulletml.ActionRef) {
                 result.actions.push(arguments[i]);
+            } else if (arguments[i] instanceof Array) {
+                result.actions.push(bulletml.dsl.action(arguments[i]));
+            } else if (arguments[i] instanceof Object) {
+                result.option = arguments[i];
             } else if (typeof(arguments[i]) === "string") {
                 result.label = arguments[i];
             }
@@ -1268,7 +1297,7 @@ bulletml["_temp"] = function() {};
         }
         return result;
     };
-    bulletml.dsl.fire = function(bullet, direction, speed) {
+    bulletml.dsl.fire = function(bullet, direction, speed, fireOption) {
         for (var i = 0, end = arguments.length; i < end; i++) {
             if (arguments[i] instanceof Function) {
                 arguments[i] = arguments[i]();
@@ -1287,6 +1316,12 @@ bulletml["_temp"] = function() {};
                 result.bullet = arguments[i];
             } else if (arguments[i] instanceof bulletml.FireOption) {
                 result.option = arguments[i];
+            } else if (arguments[i] instanceof bulletml.OffsetX) {
+                result.option.offsetX = arguments[i].value;
+            } else if (arguments[i] instanceof bulletml.OffsetY) {
+                result.option.offsetY = arguments[i].value;
+            } else if (arguments[i] instanceof bulletml.Autonomy) {
+                result.option.autonomy = arguments[i].value;
             }
         }
         if (result.bullet === undefined)
@@ -1457,6 +1492,15 @@ bulletml["_temp"] = function() {};
     };
     bulletml.dsl.fireOption = function(params) {
         return new bulletml.FireOption(params);
+    };
+    bulletml.dsl.offsetX = function(x) {
+        return new bulletml.OffsetX(x);
+    };
+    bulletml.dsl.offsetY = function(y) {
+        return new bulletml.OffsetY(y);
+    };
+    bulletml.dsl.autonomy = function(autonomy) {
+        return new bulletml.Autonomy(autonomy);
     };
 
     // utility ---------------------------------------------------
