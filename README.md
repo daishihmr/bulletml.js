@@ -35,7 +35,7 @@ FEATURES
 Parser
 ------
 
-従来型の、XMLで記述されたBulletMLをロードして実行できる
+従来型の、XMLで記述されたBulletMLをロードして実行することができます
 
 ~~~~javascript
 // enchant.js
@@ -50,12 +50,13 @@ game.start();
 DSL
 ---
 
-JavaScriptによるDSLでBulletMLを記述できる
+JavaScriptによるDSLで弾幕定義を記述することができます
 
-XML
+XMLで書くとこんな弾幕も…
 ~~~~xml
 <?xml version="1.0" encoding="UTF-8"?>
-<bulletml>
+<!DOCTYPE bulletml SYSTEM "http://www.asahi-net.or.jp/~cs8k-cyu/bulletml/bulletml.dtd">
+<bulletml xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
     <action label="top">
         <repeat>
             <times>10</times>
@@ -71,7 +72,7 @@ XML
 </bulletml>
 ~~~~
 
-JavaScript DSL
+DSLで書くとこんなにスッキリ！
 ~~~~javascript
 var spec = new bulletml.Root({
     top: action([
