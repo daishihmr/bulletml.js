@@ -790,6 +790,8 @@ bulletml["_temp"] = function() {};
     /**
      * @constructor
      * @extends {bulletml.Command}
+     * @param {string} variable
+     * @param {(string|number)} expression
      */
     bulletml.Bind = function(variable, expression) {
         /**
@@ -1516,19 +1518,40 @@ bulletml["_temp"] = function() {};
         if (type) result.type = type;
         return result;
     };
+    /**
+     * @param {Object.<string,*>} params
+     * @return {bulletml.FireOption}
+     */
     bulletml.dsl.fireOption = function(params) {
         return new bulletml.FireOption(params);
     };
+    /**
+     * @param {number} x
+     * @return {bulletml.OffsetX}
+     */
     bulletml.dsl.offsetX = function(x) {
         return new bulletml.OffsetX(x);
     };
+    /**
+     * @param {number} y
+     * @return {bulletml.OffsetY}
+     */
     bulletml.dsl.offsetY = function(y) {
         return new bulletml.OffsetY(y);
     };
+    /**
+     * @param {boolean} autonomy
+     * @return {bulletml.Autonomy}
+     */
     bulletml.dsl.autonomy = function(autonomy) {
         return new bulletml.Autonomy(autonomy);
     };
-    bulletml.dsl.bind = function(variable, expression) {
+    /**
+     * @param {string} variable
+     * @param {(string|number)} expression
+     * @return {bulletml.Bind}
+     */
+    bulletml.dsl.bindVar = function(variable, expression) {
         return new bulletml.Bind(variable, expression);
     }
 

@@ -26,7 +26,7 @@ tm.preload(function() {
 
                 // 4way or 3way
                 $.fire($.direction(-30), $.bulletRef("normalBullet"), $.offsetY(-10)),
-                $.bind("i", "(($loop.index%2) ? 4 : 3) - 1"),
+                $.bindVar("i", "(($loop.index%2) ? 4 : 3) - 1"),
                 $.repeat("$i", [
                     $.fire($.direction("60 / $i", "sequence"), $.bulletRef("normalBullet"), $.offsetY(-10)),
                 ]),
