@@ -307,6 +307,11 @@ bulletml["_temp"] = function() {};
                     return a;
                 } else if (n instanceof bulletml.Wait) {
                     return new bulletml.Wait(this.evalParam(n.value));
+                } else if (n instanceof bulletml.Bind) {
+                    // console.log("bind " + n.variable + " <- " + n.expression);
+                    this._localScope["$" + n.variable] = this.evalParam(n.expression);
+                    // console.log("    = " + this._localScope["$" + n.variable]);
+                    return bulletml.DummyCommand;
                 } else {
                     return null;
                 }
@@ -388,17 +393,22 @@ bulletml["_temp"] = function() {};
             }
         }
         scope.$rand = Math.random();
-        scope.$loop = {
-            index: this._localScope.loopCounter,
-            count: this._localScope.loopCounter + 1,
-            first: this._localScope.loopCounter === 0,
-            last: this._localScope.loopCounter === this._localScope.loopEnd - 1,
-        };
+        var upperScope = this._stack[this._stack.length - 1];
+        if (upperScope) {
+            scope.$loop = {
+                index: upperScope.scope.loopCounter,
+                count: upperScope.scope.loopCounter + 1,
+                first: upperScope.scope.loopCounter === 0,
+                last: upperScope.scope.loopCounter === upperScope.scope.loopEnd - 1,
+            };
+        }
         // console.log(scope);
         // console.log("bulletml._temp = function() { return " + exp.split("$").join("this.$") + "}");
-        return eval(
+        var result = eval(
                 "bulletml._temp = function() { return "
                         + exp.split("$").join("this.$") + "}").bind(scope)();
+        // console.log(result);
+        return result;
     };
     bulletml.Walker.prototype.newScope = function(params) {
         var result = {};
@@ -776,6 +786,18 @@ bulletml["_temp"] = function() {};
         this.root = root;
         if (this.action) this.action.setRoot(root);
     };
+
+    bulletml.Bind = function(variable, expression) {
+        /**
+         * @type {string}
+         */
+        this.commandName = "bind";
+        this.variable = variable;
+        this.expression = expression;
+    };
+    bulletml.Bind.prototype = new bulletml.Command();
+
+    bulletml.DummyCommand = new bulletml.Command();
 
     // valueクラス -----------------------------------------------
 
@@ -1502,6 +1524,9 @@ bulletml["_temp"] = function() {};
     bulletml.dsl.autonomy = function(autonomy) {
         return new bulletml.Autonomy(autonomy);
     };
+    bulletml.dsl.bind = function(variable, expression) {
+        return new bulletml.Bind(variable, expression);
+    }
 
     // utility ---------------------------------------------------
 

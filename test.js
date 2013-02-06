@@ -24,10 +24,11 @@ tm.preload(function() {
                     $.fire($.direction(13, "sequence"), $.bulletRef("accelNeedle"), $.offsetX( 30)),
                 ]),
 
-                // 5way
-                $.fire($.direction(-10), $.bulletRef("normalBullet"), $.offsetY(-10)),
-                $.repeat(4, [
-                    $.fire($.direction(5, "sequence"), $.bulletRef("normalBullet"), $.offsetY(-10)),
+                // 4way or 3way
+                $.fire($.direction(-30), $.bulletRef("normalBullet"), $.offsetY(-10)),
+                $.bind("i", "(($loop.index%2) ? 4 : 3) - 1"),
+                $.repeat("$i", [
+                    $.fire($.direction("60 / $i", "sequence"), $.bulletRef("normalBullet"), $.offsetY(-10)),
                 ]),
 
                 $.wait(30),
@@ -100,9 +101,11 @@ var Player = tm.createClass({
 var Enemy = tm.createClass({
     superClass: tm.app.CircleShape,
     init: function(x, y) {
-        this.superInit(16, 16, {
+        this.superInit(32, 32, {
             fillStyle: "red"
         });
         this.setPosition(x, y);
+        this.scale.x = 1;
+        this.scale.y = 3;
     }
 });
