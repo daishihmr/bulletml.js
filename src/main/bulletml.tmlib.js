@@ -399,7 +399,7 @@ tm.bulletml = tm.bulletml || {};
             ticker.chDirEnd = ticker.age + t;
         },
         _changeSpeed: function(cmd, ticker) {
-            console.log("changeSpeed")
+            // console.log("changeSpeed")
             var s = eval(cmd.speed.value);
             var t = eval(cmd.term);
             switch (cmd.speed.type) {

@@ -787,6 +787,10 @@ bulletml["_temp"] = function() {};
         if (this.action) this.action.setRoot(root);
     };
 
+    /**
+     * @constructor
+     * @extends {bulletml.Command}
+     */
     bulletml.Bind = function(variable, expression) {
         /**
          * @type {string}

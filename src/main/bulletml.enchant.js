@@ -379,9 +379,12 @@ enchant.bulletml = enchant.bulletml || {};
             return ticker;
         },
         _fire : function(cmd, config, ticker, pattern) {
-            var b = config.bulletFactory({
-                label : cmd.bullet.label
-            });
+            var spec = { label: cmd.bullet.label };
+            for (var key in cmd.bullet.option) {
+                spec[key] = cmd.bullet.option[key];
+            }
+
+            var b = config.bulletFactory(spec);
             if (!b) {
                 return;
             }
@@ -428,6 +431,10 @@ enchant.bulletml = enchant.bulletml || {};
 
             b.x = this.x + ((this.width || 0) - (b.width || 0)) / 2;
             b.y = this.y + ((this.height || 0) - (b.height || 0)) / 2;
+            if (config.updateProperties) {
+                b.rotation = (ticker.direction) * RAD_TO_DEG;
+                b.speed = ticker.speed;
+            }
 
             b.addEventListener("enterframe", bt);
             b.addEventListener("removed", function() {
