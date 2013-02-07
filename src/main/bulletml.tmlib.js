@@ -350,7 +350,9 @@ tm.bulletml = tm.bulletml || {};
             }
 
             // 等速直進弾?
-            var bt = (cmd.bullet.actions.length === 0) ? (
+            var uniformLinearBullet = cmd.bullet.actions.length;
+
+            var bt = uniformLinearBullet ? (
                 pattern._createSimpleTicker(config)
             ) : (
                 pattern.createTicker(config, cmd.bullet)
@@ -406,7 +408,7 @@ tm.bulletml = tm.bulletml || {};
             b.x = gunPosition.x;
             b.y = gunPosition.y;
 
-            if (cmd.bullet.actions.length === 0) {
+            if (uniformLinearBullet) {
                 bt.deltaX = Math.cos(bt.direction) * bt.speed * config.speedRate;
                 bt.deltaY = Math.sin(bt.direction) * bt.speed * config.speedRate;
             }
