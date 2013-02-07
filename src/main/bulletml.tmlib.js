@@ -206,7 +206,7 @@ tm.bulletml = tm.bulletml || {};
                 }
 
                 // set direction, speed to bullet
-                if (conf.updateProperties) {
+                if (conf.updateProperties || this.updateProperties) {
                     this.rotation = (ticker.direction + Math.PI * 0.5) * Math.RAD_TO_DEG;
                     this.speed = ticker.speed;
                 }
@@ -354,8 +354,10 @@ tm.bulletml = tm.bulletml || {};
 
             b.x = gunPosition.x;
             b.y = gunPosition.y;
+
             // set direction, speed to bullet
-            if (config.updateProperties) {
+            this.updateProperties = !!this.updateProperties;
+            if (config.updateProperties || this.updateProperties) {
                 b.rotation = (ticker.direction + Math.PI * 0.5) * Math.RAD_TO_DEG;
                 b.speed = ticker.speed;
             }

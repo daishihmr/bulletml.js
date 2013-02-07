@@ -1,6 +1,6 @@
 var PATTERNS = {};
 tm.preload(function() {
-    tm.graphics.TextureManager.add("redBullet", "images/bullet_red.png");
+    tm.graphics.TextureManager.add("redBullet", "images/bullet3_red.png");
     tm.graphics.TextureManager.add("blueBullet", "images/bullet_blue.png");
 
     var createPattern = function(bml) {
@@ -9,6 +9,7 @@ tm.preload(function() {
 
     var $ = bulletml.dsl;
     PATTERNS["p1"] = createPattern({
+
         top: $.action([
             $.repeat(999, [
 
@@ -34,11 +35,15 @@ tm.preload(function() {
                 $.wait(30),
             ]),
         ]),
+
         normalBullet: $.bullet({
             image: "redBullet",
-            scaleX: 1.0,
-            scaleY: 1.0,
+            scaleX: 1.5,
+            scaleY: 1.5,
+            updateProperties: false,
+            rotate: true,
         }),
+
         accelNeedle: $.bullet([
             $.wait(10),
             $.changeSpeed($.speed(2), 60),
@@ -46,7 +51,9 @@ tm.preload(function() {
             image: "blueBullet",
             scaleX: 0.5,
             scaleY: 2.0,
+            updateProperties: true,
         }),
+
     });
 });
 
@@ -75,14 +82,19 @@ var setupPatternConfig = function(app, player) {
     conf.bulletFactory = function(spec) {
         var b = tm.app.Sprite(16, 16, tm.graphics.TextureManager.get(spec.image));
         b.setFrameIndex(0, 64, 64);
-        b.scaleX = spec.scaleX;
-        b.scaleY = spec.scaleY;
+        b.scaleX = spec.scaleX || 1;
+        b.scaleY = spec.scaleY || 1;
+        b.updateProperties = !!spec.updateProperties;
+        if (spec.rotate) {
+            b.addEventListener("enterframe", function() {
+                this.rotation += 20;
+            });
+        }
         return b;
     };
     conf.isInsideOfWorld = function(b) {
         return 0 < b.x && b.x < app.width && 0 < b.y && b.y < app.height;
     };
-    conf.updateProperties = true;
 };
 
 var Player = tm.createClass({
@@ -98,6 +110,7 @@ var Player = tm.createClass({
         }
     }
 });
+
 var Enemy = tm.createClass({
     superClass: tm.app.CircleShape,
     init: function(x, y) {
@@ -105,7 +118,7 @@ var Enemy = tm.createClass({
             fillStyle: "red"
         });
         this.setPosition(x, y);
-        this.scale.x = 1;
-        this.scale.y = 3;
+        this.scale.x = 3;
+        this.scale.y = 1;
     }
 });
