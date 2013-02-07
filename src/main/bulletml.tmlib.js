@@ -292,6 +292,52 @@ tm.bulletml = tm.bulletml || {};
             ticker.isDanmaku = true;
             return ticker;
         },
+        /**
+         * action要素を持たないbullet(等速直進弾)のためのtickerを作る.
+         */
+        _createSimpleTicker: function(config) {
+            config = (function(base) {
+                var result = {};
+                var def = tm.bulletml.AttackPattern.defaultConfig;
+                for ( var prop in def) {
+                    if (def.hasOwnProperty(prop)) {
+                        result[prop] = def[prop];
+                    }
+                }
+                for ( var prop in base) {
+                    if (base.hasOwnProperty(prop)) {
+                        result[prop] = base[prop];
+                    }
+                }
+
+                return result;
+            })(config);
+
+            if (!config.target) {
+                throw new Error("target is undefined in config.");
+            }
+
+            var ticker = function() {
+                // move sprite
+                this.x += ticker.deltaX;
+                this.y += ticker.deltaY;
+
+                // test out of world
+                if (!ticker.config.isInsideOfWorld(this)) {
+                    this.remove();
+                    return;
+                }
+            };
+
+            ticker.config = config;
+            ticker.direction = 0;
+            ticker.speed = 0;
+            ticker.deltaX = 0;
+            ticker.deltaY = 0;
+
+            ticker.isDanmaku = true;
+            return ticker;
+        },
         _fire: function(cmd, config, ticker, pattern) {
             var spec = { label: cmd.bullet.label };
             for (var key in cmd.bullet.option) {
@@ -303,7 +349,12 @@ tm.bulletml = tm.bulletml || {};
                 return;
             }
 
-            var bt = pattern.createTicker(config, cmd.bullet);
+            // 等速直進弾?
+            var bt = (cmd.bullet.actions.length === 0) ? (
+                pattern._createSimpleTicker(config)
+            ) : (
+                pattern.createTicker(config, cmd.bullet)
+            );
 
             var attcker = this;
             var gunPosition = {
@@ -354,6 +405,11 @@ tm.bulletml = tm.bulletml || {};
 
             b.x = gunPosition.x;
             b.y = gunPosition.y;
+
+            if (cmd.bullet.actions.length === 0) {
+                bt.deltaX = Math.cos(bt.direction) * bt.speed * config.speedRate;
+                bt.deltaY = Math.sin(bt.direction) * bt.speed * config.speedRate;
+            }
 
             // set direction, speed to bullet
             this.updateProperties = !!this.updateProperties;
