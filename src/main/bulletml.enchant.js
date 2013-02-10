@@ -294,7 +294,7 @@ enchant.bulletml = enchant.bulletml || {};
                 }
 
                 // set direction, speed to bullet
-                if (conf.updateProperties) {
+                if (conf.updateProperties || this.updateProperties) {
                     this.rotation = (ticker.direction) * RAD_TO_DEG;
                     this.speed = ticker.speed;
                 }
@@ -378,6 +378,52 @@ enchant.bulletml = enchant.bulletml || {};
             ticker.isDanmaku = true;
             return ticker;
         },
+        /**
+         * action要素を持たないbullet(等速直進弾)のためのtickerを作る.
+         */
+        _createSimpleTicker: function(config) {
+            config = (function(base) {
+                var result = {};
+                var def = tm.bulletml.AttackPattern.defaultConfig;
+                for ( var prop in def) {
+                    if (def.hasOwnProperty(prop)) {
+                        result[prop] = def[prop];
+                    }
+                }
+                for ( var prop in base) {
+                    if (base.hasOwnProperty(prop)) {
+                        result[prop] = base[prop];
+                    }
+                }
+
+                return result;
+            })(config);
+
+            if (!config.target) {
+                throw new Error("target is undefined in config.");
+            }
+
+            var ticker = function() {
+                // move sprite
+                this.x += ticker.deltaX;
+                this.y += ticker.deltaY;
+
+                // test out of world
+                if (!ticker.config.isInsideOfWorld(this)) {
+                    this.remove();
+                    return;
+                }
+            };
+
+            ticker.config = config;
+            ticker.direction = 0;
+            ticker.speed = 0;
+            ticker.deltaX = 0;
+            ticker.deltaY = 0;
+
+            ticker.isDanmaku = true;
+            return ticker;
+        },
         _fire : function(cmd, config, ticker, pattern) {
             var spec = { label: cmd.bullet.label };
             for (var key in cmd.bullet.option) {
@@ -389,7 +435,14 @@ enchant.bulletml = enchant.bulletml || {};
                 return;
             }
 
-            var bt = pattern.createTicker(config, cmd.bullet);
+            // 等速直進弾?
+            var uniformLinearBullet = cmd.bullet.actions.length;
+
+            var bt = uniformLinearBullet ? (
+                pattern._createSimpleTicker(config)
+            ) : (
+                pattern.createTicker(config, cmd.bullet)
+            );
 
             var attacker = this;
             var calcDirection = function(d) {
@@ -431,7 +484,15 @@ enchant.bulletml = enchant.bulletml || {};
 
             b.x = this.x + ((this.width || 0) - (b.width || 0)) / 2;
             b.y = this.y + ((this.height || 0) - (b.height || 0)) / 2;
-            if (config.updateProperties) {
+
+            if (uniformLinearBullet) {
+                bt.deltaX = Math.cos(bt.direction) * bt.speed * config.speedRate;
+                bt.deltaY = Math.sin(bt.direction) * bt.speed * config.speedRate;
+            }
+
+            // set direction, speed to bullet
+            this.updateProperties = !!this.updateProperties;
+            if (config.updateProperties || this.updateProperties) {
                 b.rotation = (ticker.direction) * RAD_TO_DEG;
                 b.speed = ticker.speed;
             }
