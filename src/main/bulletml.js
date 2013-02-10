@@ -1224,13 +1224,14 @@ bulletml["_temp"] = function() {};
      * </ol>
      */
     bulletml.dsl.action = function(commands) {
-        if (arguments.length > 1) {
+        if (arguments.length > 0) {
             for (var i = 0, end = arguments.length; i < end; i++) {
                 if (arguments[i] instanceof Function) {
                     arguments[i] = arguments[i]();
                 }
             }
-        } else {
+        }
+        if (commands instanceof Array) {
             for (var i = 0, end = commands.length; i < end; i++) {
                 if (commands[i] instanceof Function) {
                     commands[i] = commands[i]();
