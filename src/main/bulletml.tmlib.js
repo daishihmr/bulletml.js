@@ -244,6 +244,9 @@ tm.bulletml = tm.bulletml || {};
                         this.remove();
                         this.dispatchEvent(tm.event.Event("removed"));
                         break;
+                    case "notify":
+                        ptn._notify.call(this, cmd);
+                        break;
                     }
                 }
 
@@ -353,9 +356,9 @@ tm.bulletml = tm.bulletml || {};
             var uniformLinearBullet = cmd.bullet.actions.length;
 
             var bt = uniformLinearBullet ? (
-                pattern._createSimpleTicker(config)
-            ) : (
                 pattern.createTicker(config, cmd.bullet)
+            ) : (
+                pattern._createSimpleTicker(config)
             );
 
             var attcker = this;
@@ -517,6 +520,15 @@ tm.bulletml = tm.bulletml || {};
                 ticker.aclIncrV = 0;
                 ticker.aclFinV = ticker.speedV;
             }
+        },
+        _notify: function(cmd) {
+            var e = tm.event.Event(cmd.eventName);
+            if (cmd.params) {
+                for (var key in cmd.params) {
+                    e[key] = cmd.params[key];
+                }
+            }
+            this.dispatchEvent(e);
         }
     });
 

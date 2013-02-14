@@ -18,10 +18,9 @@ enchant.bulletml = enchant.bulletml || {};
                 }
 
                 if (xhr.responseXML != null) {
-                    var bulletml = bulletml.build(xhr.responseXML);
-                    if (bulletml) {
-                        game.assets[src] = new enchant.bulletml.AttackPattern(
-                                bulletml);
+                    var root = bulletml.build(xhr.responseXML);
+                    if (root) {
+                        game.assets[src] = new enchant.bulletml.AttackPattern(root);
                     } else {
                         alert(src + "は妥当なBulletMLではありません。");
                         game.assets[src] = xhr.responseXML;
@@ -384,7 +383,7 @@ enchant.bulletml = enchant.bulletml || {};
         _createSimpleTicker: function(config) {
             config = (function(base) {
                 var result = {};
-                var def = tm.bulletml.AttackPattern.defaultConfig;
+                var def = enchant.bulletml.AttackPattern.defaultConfig;
                 for ( var prop in def) {
                     if (def.hasOwnProperty(prop)) {
                         result[prop] = def[prop];
@@ -439,9 +438,9 @@ enchant.bulletml = enchant.bulletml || {};
             var uniformLinearBullet = cmd.bullet.actions.length;
 
             var bt = uniformLinearBullet ? (
-                pattern._createSimpleTicker(config)
+                console.log("normal") || pattern.createTicker(config, cmd.bullet)
             ) : (
-                pattern.createTicker(config, cmd.bullet)
+                console.log("simple") || pattern._createSimpleTicker(config)
             );
 
             var attacker = this;

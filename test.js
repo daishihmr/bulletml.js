@@ -8,21 +8,39 @@ tm.preload(function() {
     };
 
     var $ = bulletml.dsl;
+
+    var normalBullet = $.bullet({
+        image: "redBullet",
+        scaleX: 1.2,
+        scaleY: 0.8,
+        updateProperties: false,
+        rotate: true,
+    });
+    var accelNeedle = $.bullet([
+        $.wait(10),
+        $.changeSpeed($.speed(2), 60),
+    ], {
+        image: "blueBullet",
+        scaleX: 0.5,
+        scaleY: 2.0,
+        updateProperties: true,
+    });
+
     PATTERNS["p1"] = createPattern({
 
         top: $.action([
             $.repeat(999, [
 
                 // left
-                $.fire($.direction(0, "absolute"), $.bulletRef("accelNeedle"), $.offsetX(-30)),
-                $.repeat(360/13, [
-                    $.fire($.direction(13, "sequence"), $.bulletRef("accelNeedle"), $.offsetX(-30)),
+                $.fire($.bulletRef("accelNeedle"), $.offsetX(-30)),
+                $.repeat(20-1, [
+                    $.fire($.direction(360/20, "sequence"), $.bulletRef("accelNeedle"), $.offsetX(-30)),
                 ]),
 
                 // right
-                $.fire($.direction(0, "absolute"), $.bulletRef("accelNeedle"), $.offsetX( 30)),
-                $.repeat(360/13, [
-                    $.fire($.direction(13, "sequence"), $.bulletRef("accelNeedle"), $.offsetX( 30)),
+                $.fire($.bulletRef("accelNeedle"), $.offsetX( 30)),
+                $.repeat(20-1, [
+                    $.fire($.direction(360/20, "sequence"), $.bulletRef("accelNeedle"), $.offsetX( 30)),
                 ]),
 
                 // 4way or 3way
@@ -32,27 +50,35 @@ tm.preload(function() {
                     $.fire($.direction("60 / $i", "sequence"), $.bulletRef("normalBullet"), $.offsetY(-10)),
                 ]),
 
-                $.wait(30),
+                $.wait(200),
             ]),
         ]),
 
-        normalBullet: $.bullet({
-            image: "redBullet",
-            scaleX: 1.5,
-            scaleY: 1.5,
-            updateProperties: false,
-            rotate: true,
-        }),
+        normalBullet: normalBullet,
+        accelNeedle: accelNeedle,
 
-        accelNeedle: $.bullet([
-            $.wait(10),
-            $.changeSpeed($.speed(2), 60),
-        ], {
-            image: "blueBullet",
-            scaleX: 0.5,
-            scaleY: 2.0,
-            updateProperties: true,
-        }),
+    });
+
+    PATTERNS["p2"] = createPattern({
+
+        top: $.action([
+            $.repeat(999, [
+
+                $.wait(100),
+
+                $.notify("発射1秒前"), // アタッカーにイベント通知
+
+                $.wait(60),
+
+                $.fire($.bulletRef("normalBullet")),
+                $.fire($.direction(0, "sequence"), $.speed(1.2), $.bulletRef("normalBullet")),
+                $.fire($.direction(0, "sequence"), $.speed(1.4), $.bulletRef("normalBullet")),
+
+            ]),
+        ]),
+
+        normalBullet: normalBullet,
+        accelNeedle: accelNeedle,
 
     });
 });
@@ -60,18 +86,43 @@ tm.preload(function() {
 tm.main(function() {
     var app = tm.app.CanvasApp("#world");
     app.fps = 60;
+    app.background = "rgba(0, 0, 0, 0.3)";
     app.resize(320, 320).fitWindow();
 
-    var player = Player(app.width/2, app.height-30).addChildTo(app.currentScene);
-    var enemy = Enemy(app.width/2, app.height/2).addChildTo(app.currentScene);
+    var player = Player(160, app.height-30).addChildTo(app.currentScene);
 
     setupPatternConfig(app, player);
 
-    enemy.addEventListener("enterframe", function() {
+    // 敵1. グルグル回りながら攻撃
+    var enemy1 = Enemy(0, 0).addChildTo(app.currentScene);
+    enemy1.addEventListener("enterframe", function() {
         this.x = app.width/2 + Math.cos(app.frame/120) * 100;
         this.y = 80 + Math.sin(app.frame/120) * 30;
     });
-    enemy.addEventListener("enterframe", PATTERNS["p1"].createTicker());
+    enemy1.addEventListener("enterframe", PATTERNS["p1"].createTicker());
+
+    // 敵2. 攻撃直前に伸びたり縮んだりする
+    var enemy2 = Enemy(160, 50).addChildTo(app.currentScene);
+    enemy2.addEventListener("enterframe", PATTERNS["p2"].createTicker());
+    // BulletML側から通知されたイベントをハンドル
+    enemy2.addEventListener("発射1秒前", function() {
+        var before = this.scaleX;
+        this.animation.addTween({
+            prop: "scaleX",
+            begin: before,
+            finish: 3,
+            duration: 500,
+            func: tm.anim.easing.easeOutQuad,
+        });
+        this.animation.addTween({
+            prop: "scaleX",
+            begin: 3,
+            finish: before,
+            duration: 500,
+            func: tm.anim.easing.easeInQuad,
+            delay: 500,
+        });
+    });
 
     app.run();
 });
@@ -112,13 +163,13 @@ var Player = tm.createClass({
 });
 
 var Enemy = tm.createClass({
-    superClass: tm.app.CircleShape,
+    superClass: tm.app.RectangleShape,
     init: function(x, y) {
         this.superInit(32, 32, {
             fillStyle: "red"
         });
         this.setPosition(x, y);
-        this.scale.x = 3;
+        this.scale.x = 1.2;
         this.scale.y = 1;
     }
 });
