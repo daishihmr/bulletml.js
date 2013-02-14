@@ -70,6 +70,7 @@ bulletml["_temp"] = function() {};
             }
         }
     };
+
     /**
      * find top level action element by label.
      *
@@ -80,6 +81,7 @@ bulletml["_temp"] = function() {};
     bulletml.Root.prototype.findAction = function(label) {
         return search(this.actions, label);
     };
+
     /**
      * find actions label starts with 'top'.
      *
@@ -95,6 +97,7 @@ bulletml["_temp"] = function() {};
         }
         return result;
     };
+
     /**
      * find top level action element by label. throw error if action is
      * undefined.
@@ -111,6 +114,7 @@ bulletml["_temp"] = function() {};
             throw new Error("action labeled '" + label + "' is undefined.");
         }
     };
+
     /**
      * find top level bullet element by label.
      *
@@ -121,6 +125,7 @@ bulletml["_temp"] = function() {};
     bulletml.Root.prototype.findBullet = function(label) {
         return search(this.bullets, label);
     };
+
     /**
      * find top level bullet element by label. throw error if bullet is
      * undefined.
@@ -137,6 +142,7 @@ bulletml["_temp"] = function() {};
             throw new Error("bullet labeled '" + label + "' is undefined.");
         }
     };
+
     /**
      * find top level fire element by label.
      *
@@ -147,6 +153,7 @@ bulletml["_temp"] = function() {};
     bulletml.Root.prototype.findFire = function(label) {
         return search(this.fires, label);
     };
+
     /**
      * find top level fire element by label. throw error if fire is undefined.
      *
@@ -161,242 +168,6 @@ bulletml["_temp"] = function() {};
         } else {
             throw new Error("fire labeled '" + label + "' is undefined.");
         }
-    };
-    bulletml.Root.prototype.getWalker = function(actionLabel, rank) {
-        var w = new bulletml.Walker(this, rank);
-        var action = this.findAction(actionLabel);
-        if (action) {
-            w._action = action;
-            return w;
-        }
-    };
-
-    /**
-     * @constructor
-     */
-    bulletml.Walker = function(root, rank) {
-        this._root = root;
-        /**
-         * callstack.
-         * @type {Array}
-         */
-        this._stack = [];
-        /**
-         * program counter.
-         * @type {number}
-         */
-        this._cursor = -1;
-        /**
-         * @type {bulletml.Action}
-         */
-        this._action = null;
-        /**
-         * current localScope variables.
-         * @type {Object.<string,number>}
-         */
-        this._localScope = {};
-        /**
-         * globalScope variables.
-         * @type {Object.<string,number>}
-         */
-        this._globalScope = {
-            $rank : rank || 0
-        };
-    };
-    /**
-     * @return {bulletml.Command}
-     */
-    bulletml.Walker.prototype.next = function() {
-        this._cursor += 1;
-        if (this._action !== null) {
-            var n = this._action.commands[this._cursor];
-
-            if (n !== undefined) {
-                // console.log(n.commandName, n.label, this._localScope);
-                if (n instanceof bulletml.Action) {
-                    this.pushStack();
-                    this._action = n;
-                    this._localScope = this.cloneScope();
-                    return this.next();
-                } else if (n instanceof bulletml.ActionRef) {
-                    this.pushStack();
-                    this._action = this._root.findActionOrThrow(n.label);
-                    this._localScope = this.newScope(n.params);
-                    return this.next();
-                } else if (n instanceof bulletml.Repeat) {
-                    this._localScope.loopCounter = 0;
-                    this._localScope.loopEnd = this.evalParam(n.times);
-                    this.pushStack();
-                    this._action = n.action.clone();
-                    this._localScope = this.cloneScope();
-                    return this.next();
-                } else if (n instanceof bulletml.Fire) {
-                    var f = new bulletml.Fire();
-                    f.bullet = n.bullet.clone(this);
-                    if (n.direction !== null) {
-                        f.direction = new bulletml.Direction(this.evalParam(n.direction.value));
-                        f.direction.type = n.direction.type;
-                    }
-                    if (n.speed !== null) {
-                        f.speed = new bulletml.Speed(this.evalParam(n.speed.value));
-                        f.speed.type = n.speed.type;
-                    }
-                    f.option = n.option;
-                    return f;
-                } else if (n instanceof bulletml.FireRef) {
-                    this.pushStack();
-                    this._action = new bulletml.Action();
-                    this._action.commands = [ this._root.findFireOrThrow(n.label) ];
-                    this._localScope = this.newScope(n.params);
-                    return this.next();
-                } else if (n instanceof bulletml.ChangeDirection) {
-                    var cd = new bulletml.ChangeDirection();
-                    cd.direction.type = n.direction.type;
-                    cd.direction.value = this.evalParam(n.direction.value);
-                    cd.term = this.evalParam(n.term);
-                    return cd;
-                } else if (n instanceof bulletml.ChangeSpeed) {
-                    var cs = new bulletml.ChangeSpeed();
-                    cs.speed.type = n.speed.type;
-                    cs.speed.value = this.evalParam(n.speed.value);
-                    cs.term = this.evalParam(n.term);
-                    return cs;
-                } else if (n instanceof bulletml.Accel) {
-                    var a = new bulletml.Accel();
-                    a.horizontal.type = n.horizontal.type;
-                    a.horizontal.value = this.evalParam(n.horizontal.value);
-                    a.vertical.type = n.vertical.type;
-                    a.vertical.value = this.evalParam(n.vertical.value);
-                    a.term = this.evalParam(n.term);
-                    return a;
-                } else if (n instanceof bulletml.Wait) {
-                    return new bulletml.Wait(this.evalParam(n.value));
-                } else if (n instanceof bulletml.Bind) {
-                    // console.log("bind " + n.variable + " <- " + n.expression);
-                    this._localScope["$" + n.variable] = this.evalParam(n.expression);
-                    // console.log("    = " + this._localScope["$" + n.variable]);
-                    return bulletml.DummyCommand;
-                } else if (n instanceof bulletml.Notify) {
-                    return n;
-                } else {
-                    return null;
-                }
-            } else {
-                this.popStack();
-                if (this._action === null) {
-                    return null;
-                }
-                n = this._action.commands[this._cursor];
-                if (n && n.commandName == "repeat") {
-                    this._localScope.loopCounter++;
-                    if (this._localScope.loopCounter < this._localScope.loopEnd) {
-                        this.pushStack();
-                        this._action = n.action.clone();
-                        this._localScope = this.cloneScope();
-                        return this.next();
-                    } else {
-                        return this.next();
-                    }
-                } else {
-                    return this.next();
-                }
-            }
-        } else {
-            return null;
-        }
-    };
-    bulletml.Walker.prototype.pushStack = function() {
-        // console.log("pushStack");
-        this._stack.push({
-            action : this._action,
-            cursor : this._cursor,
-            scope : this._localScope
-        });
-        this._cursor = -1;
-    };
-    bulletml.Walker.prototype.popStack = function() {
-        // console.log("popStack");
-        var p = this._stack.pop();
-        if (p) {
-            this._cursor = p.cursor;
-            this._action = p.action;
-            this._localScope = p.scope;
-        } else {
-            this._cursor = -1;
-            this._action = null;
-            this._localScope = {};
-        }
-    };
-    /**
-     * @param {(number|string)} exp
-     * @return {number}
-     */
-    bulletml.Walker.prototype.evalParam = function(exp) {
-        // console.log("eval(" + exp + ")", this._localScope);
-        // evalを使わずに済む場合
-        var n;
-        if (typeof exp === "number") {
-            return exp;
-        } else if (!isNaN(n = Number(exp))) {
-            return n;
-        } else if (n = this._localScope[exp]) {
-            return n;
-        } else if (n = this._globalScope[exp]) {
-            return n;
-        } else if (exp == "$rand") {
-            return Math.random();
-        }
-
-        var scope = {};
-        for ( var prop in this._globalScope) {
-            if (this._globalScope.hasOwnProperty(prop)) {
-                scope[prop] = this._globalScope[prop];
-            }
-        }
-        for ( var prop in this._localScope) {
-            if (this._localScope.hasOwnProperty(prop)) {
-                scope[prop] = this._localScope[prop];
-            }
-        }
-        scope.$rand = Math.random();
-        var upperScope = this._stack[this._stack.length - 1];
-        if (upperScope) {
-            scope.$loop = {
-                index: upperScope.scope.loopCounter,
-                count: upperScope.scope.loopCounter + 1,
-                first: upperScope.scope.loopCounter === 0,
-                last: upperScope.scope.loopCounter === upperScope.scope.loopEnd - 1,
-            };
-        }
-        // console.log(scope);
-        // console.log("bulletml._temp = function() { return " + exp.split("$").join("this.$") + "}");
-        var result = eval(
-                "bulletml._temp = function() { return "
-                        + exp.split("$").join("this.$") + "}").bind(scope)();
-        // console.log(result);
-        return result;
-    };
-    bulletml.Walker.prototype.newScope = function(params) {
-        var result = {};
-        if (params) {
-            for ( var i = 0, end = params.length; i < end; i++) {
-                result["$" + (i + 1)] = this.evalParam(params[i]);
-            }
-        } else {
-            for ( var prop in this._localScope)
-                if (this._localScope.hasOwnProperty(prop)) {
-                    result[prop] = this._localScope[prop];
-                }
-        }
-        return result;
-    };
-    bulletml.Walker.prototype.cloneScope = function() {
-        var result = {};
-        for ( var prop in this._localScope)
-            if (this._localScope.hasOwnProperty(prop)) {
-                result[prop] = this._localScope[prop];
-            }
-        return result;
     };
 
     /**
@@ -431,15 +202,10 @@ bulletml["_temp"] = function() {};
         this.option = {};
         this._localScope = {};
     };
-    bulletml.Bullet.prototype.getWalker = function(rank) {
-        var w = new bulletml.Walker(this.root, rank);
-        var action = new bulletml.Action();
-        action.root = this.root;
-        action.commands = this.actions;
-        w._action = action;
-        w._localScope = this._localScope;
-        return w;
-    };
+
+    /**
+     * @return {bulletml.Bullet}
+     */
     bulletml.Bullet.prototype.clone = function(walker) {
         var c = new bulletml.Bullet();
         c.label = this.label;
@@ -453,6 +219,10 @@ bulletml["_temp"] = function() {};
         c._localScope = walker._localScope;
         return c;
     };
+
+    /**
+     * @param {bulletml.Root} root
+     */
     bulletml.Bullet.prototype.setRoot = function(root) {
         this.root = root;
         for (var i = 0, end = this.actions.length; i < end; i++) {
@@ -473,6 +243,10 @@ bulletml["_temp"] = function() {};
          */
         this.params = [];
     };
+
+    /**
+     * @return {bulletml.BulletRef}
+     */
     bulletml.BulletRef.prototype.clone = function(walker) {
         var bkup = walker._localScope;
         walker._localScope = walker.newScope(this.params);
@@ -480,6 +254,10 @@ bulletml["_temp"] = function() {};
         walker._localScope = bkup;
         return b;
     };
+
+    /**
+     * @param {bulletml.Root} root
+     */
     bulletml.BulletRef.prototype.setRoot = function(root) {
         this.root = root;
     };
@@ -499,6 +277,7 @@ bulletml["_temp"] = function() {};
          */
         this.commandName = "";
     };
+
     /**
      * @param {bulletml.Root} root
      */
@@ -532,7 +311,9 @@ bulletml["_temp"] = function() {};
          */
         this.params = [];
     };
+
     bulletml.Action.prototype = new bulletml.Command();
+
     /** @inheritDoc */
     bulletml.Action.prototype.setRoot = function(root) {
         this.root = root;
@@ -540,6 +321,7 @@ bulletml["_temp"] = function() {};
             this.commands[i].setRoot(root);
         }
     };
+
     /** @return {bulletml.Action} */
     bulletml.Action.prototype.clone = function() {
         var c = new bulletml.Action();
@@ -570,7 +352,9 @@ bulletml["_temp"] = function() {};
          */
         this.params = [];
     };
+
     bulletml.ActionRef.prototype = new bulletml.Command();
+
     bulletml.ActionRef.prototype.clone = function() {
         var c = new bulletml.Action();
         c.root = this.root;
@@ -612,7 +396,9 @@ bulletml["_temp"] = function() {};
          */
         this.option = new bulletml.FireOption();
     };
+
     bulletml.Fire.prototype = new bulletml.Command();
+
     /** @inheritDoc */
     bulletml.Fire.prototype.setRoot = function(root) {
         this.root = root;
@@ -637,6 +423,7 @@ bulletml["_temp"] = function() {};
          */
         this.params = [];
     };
+
     bulletml.FireRef.prototype = new bulletml.Command();
 
     /**
@@ -655,6 +442,7 @@ bulletml["_temp"] = function() {};
          */
         this.term = 0;
     };
+
     bulletml.ChangeDirection.prototype = new bulletml.Command();
 
     /**
@@ -673,6 +461,7 @@ bulletml["_temp"] = function() {};
          */
         this.term = 0;
     };
+
     bulletml.ChangeSpeed.prototype = new bulletml.Command();
 
     /**
@@ -694,6 +483,7 @@ bulletml["_temp"] = function() {};
          */
         this.term = 0;
     };
+
     bulletml.Accel.prototype = new bulletml.Command();
 
     /**
@@ -711,6 +501,7 @@ bulletml["_temp"] = function() {};
          */
         this.value = value || 0;
     };
+
     bulletml.Wait.prototype = new bulletml.Command();
 
     /**
@@ -747,7 +538,9 @@ bulletml["_temp"] = function() {};
          */
         this.params = [];
     };
+
     bulletml.Repeat.prototype = new bulletml.Command();
+
     bulletml.Repeat.prototype.setRoot = function(root) {
         this.root = root;
         if (this.action) this.action.setRoot(root);
@@ -767,6 +560,7 @@ bulletml["_temp"] = function() {};
         this.variable = variable;
         this.expression = expression;
     };
+
     bulletml.Bind.prototype = new bulletml.Command();
 
     /**
@@ -779,6 +573,7 @@ bulletml["_temp"] = function() {};
         this.eventName = eventName;
         this.params = params || null;
     };
+
     bulletml.Notify.prototype = new bulletml.Command();
 
     bulletml.DummyCommand = new bulletml.Command();
@@ -876,6 +671,7 @@ bulletml["_temp"] = function() {};
     bulletml.OffsetX = function(value) {
         this.value = value || 0;
     };
+
     /**
      * @constructor
      * @param {number=} value
@@ -883,6 +679,7 @@ bulletml["_temp"] = function() {};
     bulletml.OffsetY = function(value) {
         this.value = value || 0;
     };
+
     /**
      * @constructor
      * @param {boolean=} value
@@ -890,8 +687,6 @@ bulletml["_temp"] = function() {};
     bulletml.Autonomy = function(value) {
         this.value = !!value;
     };
-
-    // utility ---------------------------------------------------
 
     /**
      * @param {Array.<(bulletml.Bullet|bulletml.Action|bulletml.Fire)>} array
@@ -907,5 +702,7 @@ bulletml["_temp"] = function() {};
 
 })();
 
-// 互換性維持
+/**
+ * @deprecated Since version 0.5. You should now use 'bulletml'.
+ */
 var BulletML = bulletml;

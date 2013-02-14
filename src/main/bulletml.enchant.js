@@ -435,12 +435,12 @@ enchant.bulletml = enchant.bulletml || {};
             }
 
             // 等速直進弾?
-            var uniformLinearBullet = cmd.bullet.actions.length;
+            var uniformLinearBullet = !!cmd.bullet.actions.length;
 
             var bt = uniformLinearBullet ? (
-                console.log("normal") || pattern.createTicker(config, cmd.bullet)
+                pattern._createSimpleTicker(config)
             ) : (
-                console.log("simple") || pattern._createSimpleTicker(config)
+                pattern.createTicker(config, cmd.bullet)
             );
 
             var attacker = this;

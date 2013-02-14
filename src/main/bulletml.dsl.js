@@ -1,5 +1,9 @@
 (function() {
 
+    /**
+     * @namespace
+     * @param {string} prefix
+     */
     bulletml.dsl = function(prefix) {
         prefix = prefix || "";
         for (var func in bulletml.dsl) if (bulletml.dsl.hasOwnProperty(func)) {
@@ -15,6 +19,7 @@
      *   <li>1個または複数のCommand（可変長引数）.
      *   <li>Commandの配列.
      * </ol>
+     * @return {bulletml.Action}
      */
     bulletml.dsl.action = function(commands) {
         if (arguments.length > 0) {
@@ -53,7 +58,8 @@
     };
 
     /**
-     * ActionRef要素を作る.
+     * @param {string} label
+     * @return {bulletml.ActionRef}
      */
     bulletml.dsl.actionRef = function(label, args) {
         for (var i = 0, end = arguments.length; i < end; i++) {
@@ -75,6 +81,10 @@
         return result;
     };
 
+    /**
+     * @param {string} label
+     * @return {bulletml.Bullet}
+     */     
     bulletml.dsl.bullet = function(direction, speed, action, label) {
         for (var i = 0, end = arguments.length; i < end; i++) {
             if (arguments[i] instanceof Function) {
@@ -103,6 +113,10 @@
         return result;
     };
 
+    /**
+     * @param {string} label
+     * @return {bulletml.BulletRef}
+     */     
     bulletml.dsl.bulletRef = function(label, args) {
         for (var i = 0, end = arguments.length; i < end; i++) {
             if (arguments[i] instanceof Function) {
@@ -123,6 +137,9 @@
         return result;
     };
 
+    /**
+     * @return {bulletml.Fire}
+     */     
     bulletml.dsl.fire = function(bullet, direction, speed, fireOption) {
         for (var i = 0, end = arguments.length; i < end; i++) {
             if (arguments[i] instanceof Function) {
@@ -155,6 +172,10 @@
         return result;
     };
 
+    /**
+     * @param {string} label
+     * @return {bulletml.FireRef}
+     */     
     bulletml.dsl.fireRef = function(label, args) {
         for (var i = 0, end = arguments.length; i < end; i++) {
             if (arguments[i] instanceof Function) {
@@ -175,6 +196,9 @@
         return result;
     };
 
+    /**
+     * @return {bulletml.ChangeDirection}
+     */     
     bulletml.dsl.changeDirection = function(direction, term) {
         for (var i = 0, end = arguments.length; i < end; i++) {
             if (arguments[i] instanceof Function) {
@@ -194,6 +218,9 @@
         return result;
     };
 
+    /**
+     * @return {bulletml.ChangeSpeed}
+     */     
     bulletml.dsl.changeSpeed = function(speed, term) {
         for (var i = 0, end = arguments.length; i < end; i++) {
             if (arguments[i] instanceof Function) {
@@ -213,6 +240,9 @@
         return result;
     };
 
+    /**
+     * @return {bulletml.Accel}
+     */     
     bulletml.dsl.accel = function(horizontal, vertical, term) {
         for (var i = 0, end = arguments.length; i < end; i++) {
             if (arguments[i] instanceof Function) {
@@ -236,6 +266,9 @@
         return result;
     };
 
+    /**
+     * @return {bulletml.Wait}
+     */     
     bulletml.dsl.wait = function(value) {
         for (var i = 0, end = arguments.length; i < end; i++) {
             if (arguments[i] instanceof Function) {
@@ -247,10 +280,16 @@
         return new bulletml.Wait(value);
     };
 
+    /**
+     * @return {bulletml.Vanish}
+     */     
     bulletml.dsl.vanish = function() {
         return new bulletml.Vanish();
     };
 
+    /**
+     * @return {bulletml.Repeat}
+     */
     bulletml.dsl.repeat = function(times, action) {
         for (var i = 0, end = arguments.length; i < end; i++) {
             if (arguments[i] instanceof Function) {
@@ -285,10 +324,16 @@
         return new bulletml.Bind(variable, expression);
     };
 
+    /**
+     * @return {bulletml.Notify}
+     */
     bulletml.dsl.notify = function(eventName, params) {
         return new bulletml.Notify(eventName, params);
     };
 
+    /**
+     * @return {bulletml.Direction}
+     */
     bulletml.dsl.direction = function(value, type) {
         for (var i = 0, end = arguments.length; i < end; i++) {
             if (arguments[i] instanceof Function) {
@@ -302,6 +347,9 @@
         return result;
     };
 
+    /**
+     * @return {bulletml.Speed}
+     */
     bulletml.dsl.speed = function(value, type) {
         for (var i = 0, end = arguments.length; i < end; i++) {
             if (arguments[i] instanceof Function) {
@@ -315,6 +363,9 @@
         return result;
     };
 
+    /**
+     * @return {bulletml.Horizontal}
+     */
     bulletml.dsl.horizontal = function(value, type) {
         for (var i = 0, end = arguments.length; i < end; i++) {
             if (arguments[i] instanceof Function) {
@@ -328,6 +379,9 @@
         return result;
     };
 
+    /**
+     * @return {bulletml.Vertical}
+     */
     bulletml.dsl.vertical = function(value, type) {
         for (var i = 0, end = arguments.length; i < end; i++) {
             if (arguments[i] instanceof Function) {

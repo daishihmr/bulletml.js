@@ -353,12 +353,12 @@ tm.bulletml = tm.bulletml || {};
             }
 
             // 等速直進弾?
-            var uniformLinearBullet = cmd.bullet.actions.length;
+            var uniformLinearBullet = !!cmd.bullet.actions.length;
 
             var bt = uniformLinearBullet ? (
-                pattern.createTicker(config, cmd.bullet)
-            ) : (
                 pattern._createSimpleTicker(config)
+            ) : (
+                pattern.createTicker(config, cmd.bullet)
             );
 
             var attcker = this;
