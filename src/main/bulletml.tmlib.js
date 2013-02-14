@@ -414,8 +414,8 @@ tm.bulletml = tm.bulletml || {};
             }
 
             // set direction, speed to bullet
-            this.updateProperties = !!this.updateProperties;
-            if (config.updateProperties || this.updateProperties) {
+            b.updateProperties = !!b.updateProperties;
+            if (config.updateProperties || b.updateProperties) {
                 b.rotation = (ticker.direction + Math.PI * 0.5) * Math.RAD_TO_DEG;
                 b.speed = ticker.speed;
             }
