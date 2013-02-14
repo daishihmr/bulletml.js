@@ -416,8 +416,8 @@ tm.bulletml = tm.bulletml || {};
             // set direction, speed to bullet
             b.updateProperties = !!b.updateProperties;
             if (config.updateProperties || b.updateProperties) {
-                b.rotation = (ticker.direction + Math.PI * 0.5) * Math.RAD_TO_DEG;
-                b.speed = ticker.speed;
+                b.rotation = (bt.direction + Math.PI * 0.5) * Math.RAD_TO_DEG;
+                b.speed = bt.speed;
             }
 
             b.addEventListener("enterframe", bt);
