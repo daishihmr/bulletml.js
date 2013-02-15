@@ -115,11 +115,8 @@
     }
 
     function parseActionRef(root, element) {
-        var result = new bulletml.ActionRef();
+        var result = new bulletml.ActionRef(attr(element, "label"));
 
-        attr(element, "label", function(label) {
-            result.label = label;
-        });
         each(element, /param$/, function(param) {
             result.params[result.params.length] = text(param);
         });
@@ -155,11 +152,8 @@
     }
 
     function parseBulletRef(root, element) {
-        var result = new bulletml.BulletRef();
+        var result = new bulletml.BulletRef(attr(element, "label"));
 
-        attr(element, "label", function(label) {
-            result.label = label;
-        });
         each(element, /param$/, function(param) {
             result.params[result.params.length] = text(param);
         });
@@ -196,11 +190,8 @@
     }
 
     function parseFireRef(root, element) {
-        var result = new bulletml.FireRef();
+        var result = new bulletml.FireRef(attr(element, "label"));
 
-        attr(element, "label", function(label) {
-            result.label = label;
-        });
         each(element, /param$/, function(param) {
             result.params[result.params.length] = text(param);
         });
@@ -342,16 +333,10 @@
      * @param {function(Element)} callback
      */
     function each(element, filter, callback) {
-// console.log("element", element);
-// console.log("filter", filter);
         var children = element.childNodes;
         for ( var i = 0, end = children.length; i < end; i++) {
-// console.log("tagName = [" + children[i].tagName + "]");
             if (children[i].tagName && children[i].tagName.toLowerCase().match(filter)) {
-// console.log("   -> match! " + children[i].tagName.toLowerCase());
                 callback(children[i]);
-            } else {
-// console.log("   -> unmatch!");
             }
         }
     }
@@ -360,6 +345,7 @@
      * @param {string} attrName
      * @param {function(string)=} callback
      * @param {function()=} ifNotFound
+     * @return {string}
      */
     function attr(element, attrName, callback, ifNotFound) {
         var attrs = element.attributes;
@@ -368,15 +354,17 @@
             if (callback) {
                 callback(attr.value);
             }
-            return attr;
+            return attr.value;
         } else if (ifNotFound) {
             ifNotFound();
         }
+        return "";
     }
 
     /**
      * @param {Element} element
      * @param {function(string)=} callback
+     * @return {string}
      */
     function text(element, callback) {
         var result = element.textContent.trim();
@@ -386,17 +374,7 @@
             }
             return result;
         }
-
-        // for IE
-        if (element.childNodes[0]) {
-            result = element.childNodes[0].nodeValue;
-            if (result !== undefined) {
-                if (callback) {
-                    callback(result);
-                }
-                return result;
-            }
-        }
+        return "";
     }
 
 })();

@@ -9,9 +9,9 @@ WtTest.prototype.testEval = function() {
         $2 : 2
     };
     var exp = "$1 + $2 + $rank";
-    assertEquals(3.5, walker.eval(exp));
-    assertNotUndefined(walker.eval("$rand*5"));
-    assertNotNaN(walker.eval("$rand*5"));
+    assertEquals(3.5, walker.evalParam(exp));
+    assertNotUndefined(walker.evalParam("$rand*5"));
+    assertNotNaN(walker.evalParam("$rand*5"));
 };
 
 WtTest.prototype.testBasic1 = function() {
@@ -19,7 +19,7 @@ WtTest.prototype.testBasic1 = function() {
             .build("<bulletml><action label='top'><fire><bullet/></fire></action></bulletml>");
     var walker = bulletml.getWalker("top");
     assertEquals("fire", walker.next().commandName);
-    assertUndefined(walker.next());
+    assertNull(walker.next());
 };
 
 WtTest.prototype.testBasic2 = function() {
@@ -35,7 +35,7 @@ WtTest.prototype.testBasic2 = function() {
     assertEquals("fire", walker.next().commandName);
     assertEquals("vanish", walker.next().commandName);
     assertEquals("changeSpeed", walker.next().commandName);
-    assertUndefined(walker.next());
+    assertNull(walker.next());
 };
 
 WtTest.prototype.testRepeatVariableTimes = function() {
@@ -50,7 +50,7 @@ WtTest.prototype.testRepeatVariableTimes = function() {
     assertEquals("vanish", walker.next().commandName);
     assertEquals("vanish", walker.next().commandName);
     assertEquals("changeSpeed", walker.next().commandName);
-    assertUndefined(walker.next());
+    assertNull(walker.next());
 };
 
 WtTest.prototype.testActionRefReturn = function() {
@@ -70,7 +70,7 @@ WtTest.prototype.testActionRefReturn = function() {
     var wait3 = walker.next();
     assertEquals("wait", wait3.commandName);
     assertEquals(1, wait3.value);
-    assertUndefined(walker.next());
+    assertNull(walker.next());
 };
 
 WtTest.prototype.testChangeDirection = function() {
@@ -317,4 +317,54 @@ WtTest.prototype.testXABossWinder = function() {
         roundWinder2[i] = w1.next();
     }
 
+};
+
+WtTest.prototype.testLoopCount1 = function() {
+    var bulletml = BulletML.build(
+        '<bulletml>\
+            <action label="top">\
+                <repeat>\
+                    <times>10</times>\
+                    <action>\
+                        <fire><bullet/></fire>\
+                    </action>\
+                </repeat>\
+            </action>\
+        </bulletml>'
+    );
+    var walker = bulletml.getWalker('top');
+
+    var commands = [];
+    var cmd;
+    while ((cmd = walker.next()) != null) {
+        commands.push(cmd.commandName);
+    }
+
+    assertFalse(commands.some(function(c) { c != 'fire' }));
+    assertEquals(10, commands.length);
+};
+
+WtTest.prototype.testLoopCount2 = function() {
+    var bulletml = BulletML.build(
+        '<bulletml>\
+            <action label="top">\
+                <repeat>\
+                    <times>10.5</times>\
+                    <action>\
+                        <fire><bullet/></fire>\
+                    </action>\
+                </repeat>\
+            </action>\
+        </bulletml>'
+    );
+    var walker = bulletml.getWalker('top');
+
+    var commands = [];
+    var cmd;
+    while ((cmd = walker.next()) != null) {
+        commands.push(cmd.commandName);
+    }
+
+    assertFalse(commands.some(function(c) { c != 'fire' }));
+    assertEquals(10, commands.length);
 };

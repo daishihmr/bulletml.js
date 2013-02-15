@@ -232,13 +232,14 @@ bulletml["_temp"] = function() {};
 
     /**
      * @constructor
+     * @param {string} label
      */
-    bulletml.BulletRef = function() {
+    bulletml.BulletRef = function(label) {
         this.root = null;
         /**
-         * @type {?string}
+         * @type {string}
          */
-        this.label = null;
+        this.label = label;
         /**
          */
         this.params = [];
@@ -334,16 +335,17 @@ bulletml["_temp"] = function() {};
     /**
      * @constructor
      * @extends {bulletml.Command}
+     * @param {string} label
      */
-    bulletml.ActionRef = function() {
+    bulletml.ActionRef = function(label) {
         /**
          * @type {string}
          */
         this.commandName = "actionRef";
         /**
-         * @type {?string}
+         * @type {string}
          */
-        this.label = null;
+        this.label = label;
         /**
          * @type {bulletml.Root}
          */
@@ -409,16 +411,17 @@ bulletml["_temp"] = function() {};
     /**
      * @constructor
      * @extends {bulletml.Command}
+     * @param {string} label
      */
-    bulletml.FireRef = function() {
+    bulletml.FireRef = function(label) {
         /**
          * @type {string}
          */
         this.commandName = "fireRef";
         /**
-         * @type {?string}
+         * @type {string}
          */
-        this.label = null;
+        this.label = label;
         /**
          */
         this.params = [];

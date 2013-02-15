@@ -57,7 +57,7 @@
                     return this.next();
                 } else if (n instanceof bulletml.Repeat) {
                     this._localScope.loopCounter = 0;
-                    this._localScope.loopEnd = this.evalParam(n.times);
+                    this._localScope.loopEnd = this.evalParam(n.times)|0;
                     this.pushStack();
                     this._action = n.action.clone();
                     this._localScope = this.cloneScope();
@@ -103,6 +103,8 @@
                     return a;
                 } else if (n instanceof bulletml.Wait) {
                     return new bulletml.Wait(this.evalParam(n.value));
+                } else if (n instanceof bulletml.Vanish) {
+                    return n;
                 } else if (n instanceof bulletml.Bind) {
                     // console.log("bind " + n.variable + " <- " + n.expression);
                     this._localScope["$" + n.variable] = this.evalParam(n.expression);
@@ -199,7 +201,7 @@
                 index: upperScope.scope.loopCounter,
                 count: upperScope.scope.loopCounter + 1,
                 first: upperScope.scope.loopCounter === 0,
-                last: upperScope.scope.loopCounter === upperScope.scope.loopEnd - 1,
+                last: (upperScope.scope.loopCounter + 1) >= upperScope.scope.loopEnd,
             };
         }
         // console.log(scope);

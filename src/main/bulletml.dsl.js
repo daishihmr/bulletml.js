@@ -69,8 +69,7 @@
         }
 
         if (label === undefined) throw new Error("label is required.");
-        var result = new bulletml.ActionRef();
-        result.label = "" + label;
+        var result = new bulletml.ActionRef(label);
         if (args instanceof Array) {
             result.params = args;
         } else {
@@ -125,8 +124,7 @@
         }
 
         if (label === undefined) throw new Error("label is required.");
-        var result = new bulletml.BulletRef();
-        result.label = "" + label;
+        var result = new bulletml.BulletRef(label);
         if (args instanceof Array) {
             result.params = args;
         } else {
@@ -184,8 +182,7 @@
         }
 
         if (label === undefined) throw new Error("label is required.");
-        var result = new bulletml.FireRef();
-        result.label = "" + label;
+        var result = new bulletml.FireRef(label);
         if (args instanceof Array) {
             result.params = args;
         } else {

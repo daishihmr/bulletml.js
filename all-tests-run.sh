@@ -1,1 +1,1 @@
-java -jar build-tools/JsTestDriver-1.3.5.jar --tests all
+java -jar build-tools/JsTestDriver-1.3.5.jar --tests all --config jsTestDriver.conf
