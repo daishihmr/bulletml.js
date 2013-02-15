@@ -551,6 +551,7 @@ bulletml["_temp"] = function() {};
      * @extends {bulletml.Command}
      * @param {string} variable
      * @param {(string|number)} expression
+     * @since 0.5
      */
     bulletml.Bind = function(variable, expression) {
         /**
@@ -567,6 +568,7 @@ bulletml["_temp"] = function() {};
      * @constructor
      * @param {string} eventName
      * @param {?Array} params
+     * @since 0.5
      */
     bulletml.Notify = function(eventName, params) {
         this.commandName = "notify";
@@ -643,6 +645,7 @@ bulletml["_temp"] = function() {};
     /**
      * @constructor
      * @param {Object=} params
+     * @since 0.5
      */
     bulletml.FireOption = function(params) {
         params = params || {};
@@ -667,6 +670,7 @@ bulletml["_temp"] = function() {};
     /**
      * @constructor
      * @param {number=} value
+     * @since 0.5
      */
     bulletml.OffsetX = function(value) {
         this.value = value || 0;
@@ -675,6 +679,7 @@ bulletml["_temp"] = function() {};
     /**
      * @constructor
      * @param {number=} value
+     * @since 0.5
      */
     bulletml.OffsetY = function(value) {
         this.value = value || 0;
@@ -683,6 +688,7 @@ bulletml["_temp"] = function() {};
     /**
      * @constructor
      * @param {boolean=} value
+     * @since 0.5
      */
     bulletml.Autonomy = function(value) {
         this.value = !!value;

@@ -2,6 +2,8 @@
     
     /**
      * @constructor
+     * @param {bulletml.Root} root
+     * @param {number=} rank
      */
     bulletml.Walker = function(root, rank) {
         this._root = root;

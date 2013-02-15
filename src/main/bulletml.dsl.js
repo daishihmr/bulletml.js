@@ -319,6 +319,7 @@
      * @param {string} variable
      * @param {(string|number)} expression
      * @return {bulletml.Bind}
+     * @since 0.5
      */
     bulletml.dsl.bindVar = function(variable, expression) {
         return new bulletml.Bind(variable, expression);
@@ -326,6 +327,7 @@
 
     /**
      * @return {bulletml.Notify}
+     * @since 0.5
      */
     bulletml.dsl.notify = function(eventName, params) {
         return new bulletml.Notify(eventName, params);
@@ -398,6 +400,7 @@
     /**
      * @param {Object.<string,*>} params
      * @return {bulletml.FireOption}
+     * @since 0.5
      */
     bulletml.dsl.fireOption = function(params) {
         return new bulletml.FireOption(params);
@@ -406,6 +409,7 @@
     /**
      * @param {number} x
      * @return {bulletml.OffsetX}
+     * @since 0.5
      */
     bulletml.dsl.offsetX = function(x) {
         return new bulletml.OffsetX(x);
@@ -414,6 +418,7 @@
     /**
      * @param {number} y
      * @return {bulletml.OffsetY}
+     * @since 0.5
      */
     bulletml.dsl.offsetY = function(y) {
         return new bulletml.OffsetY(y);
@@ -422,6 +427,7 @@
     /**
      * @param {boolean} autonomy
      * @return {bulletml.Autonomy}
+     * @since 0.5
      */
     bulletml.dsl.autonomy = function(autonomy) {
         return new bulletml.Autonomy(autonomy);
