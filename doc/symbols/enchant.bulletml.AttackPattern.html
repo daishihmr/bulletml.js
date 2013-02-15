@@ -247,10 +247,6 @@ ul.inheritsList
 	
 	<li><a href="../symbols/enchant.bulletml.AttackPattern.html">enchant.bulletml.AttackPattern</a></li>
 	
-	<li><a href="../symbols/enchant.EventTarget.html">enchant.EventTarget</a></li>
-	
-	<li><a href="../symbols/enchant.EventTarget%23-bulletml.html">enchant.EventTarget#-bulletml</a></li>
-	
 	<li><a href="../symbols/tm.bulletml.html">tm.bulletml</a></li>
 	
 	<li><a href="../symbols/tm.bulletml.AttackPattern.html">tm.bulletml.AttackPattern</a></li>
@@ -327,6 +323,16 @@ ul.inheritsList
 							</td>
 						</tr>
 					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								enchant.bulletml.AttackPattern.<b><a href="../symbols/enchant.bulletml.AttackPattern.html#.defaultConfig">defaultConfig</a></b>
+								</div>
+								<div class="description">configのデフォルト値.</div>
+							</td>
+						</tr>
+					
 					</tbody>
 				</table>
 				
@@ -349,29 +355,11 @@ ul.inheritsList
 					<tbody>
 					
 						<tr>
-							<td class="attributes">&lt;inner&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/enchant.bulletml.AttackPattern.html#-angleAtoB">angleAtoB</a></b>(a, b)
-								</div>
-								<div class="description">スプライトAから見たスプライトBの方向をラジアンで返す.</div>
-							</td>
-						</tr>
-					
-						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/enchant.bulletml.AttackPattern.html#createTicker">createTicker</a></b>(config, action)
 								</div>
 								<div class="description">enterframeイベントのリスナを作成する.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;inner&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/enchant.bulletml.AttackPattern.html#-normalizeRadian">normalizeRadian</a></b>(radian)
-								</div>
-								<div class="description">ラジアンを -π<= rad < π の範囲に正規化する.</div>
 							</td>
 						</tr>
 					
@@ -434,12 +422,34 @@ ul.inheritsList
 					<a name="bulletml"> </a>
 					<div class="fixedFont">
 					
-					<span class="light">{<a href="../symbols/bulletml.Root.html">bulletml.Root</a>}</span>
+					
 					<b>bulletml</b>
 					
 					</div>
 					<div class="description">
 						攻撃パターンの元となるBulletML定義.解析済みのBulletMLオブジェクト.<br>読み取り専用.
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name=".defaultConfig"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					
+					<span class="light">enchant.bulletml.AttackPattern.</span><b>defaultConfig</b>
+					
+					</div>
+					<div class="description">
+						configのデフォルト値.
 						
 						
 					</div>
@@ -461,48 +471,6 @@ ul.inheritsList
 					Method Detail
 				</div>
 				
-					<a name="-angleAtoB"> </a>
-					<div class="fixedFont">&lt;inner&gt; 
-					
-					
-					<b>angleAtoB</b>(a, b)
-					
-					</div>
-					<div class="description">
-						スプライトAから見たスプライトBの方向をラジアンで返す.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{enchant.Node}</span> <b>a</b>
-									
-								</dt>
-								<dd>スプライトA</dd>
-							
-								<dt>
-									<span class="light fixedFont">{enchant.Node}</span> <b>b</b>
-									
-								</dt>
-								<dd>スプライトB</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
 					<a name="createTicker"> </a>
 					<div class="fixedFont">
 					
@@ -511,7 +479,7 @@ ul.inheritsList
 					
 					</div>
 					<div class="description">
-						enterframeイベントのリスナを作成する.<br><br>第1引数configで各種設定を行う. <br>
+						enterframeイベントのリスナを作成する.<br><br>第1引数configで各種設定を行う.<br>
 						
 						
 					</div>
@@ -523,52 +491,16 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{Object|enchant.Node}</span> <b>config</b>
-									<i>Optional</i>
-								</dt>
-								<dd>発射される弾に関する設定.<br>           <table border=1>           <tr>           <th>プロパティ名</th>           <th>型</th>           <th>設定内容</th>           <th>デフォルト値</th>           <th>必須</th>           </tr>           <tr>           <td>target</td>           <td>enchant.Node</td>           <td>攻撃の標的となるオブジェクト</td>           <td>null</td>           <td>○</td>           </tr>           <tr>           <td>addTarget</td>           <td>enchant.Group</td>           <td>生成した弾を追加するノード</td>           <td>攻撃を実行するノードのparentNode</td>           <td></td>           </tr>           <tr>           <td>bulletFactory</td>           <td>function</td>           <td>弾ノードを生成する関数</td>           <td>小さな赤い弾を生成</td>           <td></td>           </tr>           <tr>           <td>updateProperties</td>           <td>boolean</td>           <td>弾のプロパティ(direction, speed)を更新するかどうか</td>           <td>false</td>           <td></td>           </tr>           <tr>           <td>isInsideOfWorld</td>           <td>function</td>           <td>弾が画面内に存在することを判定する関数</td>           <td>Gameインスタンスの大きさをベースにして判定する</td>           <td></td>           </tr>           <tr>           <td>rank</td>           <td>number</td>           <td>弾幕ランク.BulletMLの$rankに対応する.0.0～1.0の範囲で指定.</td>           <td>0</td>           <td></td>           </tr>           <tr>           <td>speedRate</td>           <td>number</td>           <td>弾速度の補正倍率.</td>           <td>1</td>           <td></td>           </tr>           </table>           設定する項目がtargetのみの場合、標的オブジェクトを直接引数として渡すことが可能.</dd>
-							
-								<dt>
-									<span class="light fixedFont">{string}</span> <b>action</b>
-									<i>Optional</i>
-								</dt>
-								<dd>最初に読み込むactionのラベル.<br>           省略可.</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="-normalizeRadian"> </a>
-					<div class="fixedFont">&lt;inner&gt; 
-					
-					
-					<b>normalizeRadian</b>(radian)
-					
-					</div>
-					<div class="description">
-						ラジアンを -π<= rad < π の範囲に正規化する.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<b>radian</b>
+									<span class="light fixedFont">{Object=}</span> <b>config</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>発射される弾に関する設定.<br>           <table border=1>           <tr>           <th>プロパティ名</th>           <th>型</th>           <th>設定内容</th>           <th>デフォルト値</th>           <th>必須</th>           </tr>           <tr>           <td>target</td>           <td>enchant.Node</td>           <td>攻撃の標的となるオブジェクト</td>           <td>null</td>           <td>○</td>           </tr>           <tr>           <td>addTarget</td>           <td>enchant.Group</td>           <td>生成した弾を追加するノード</td>           <td>攻撃を実行するノードのparentNode</td>           <td></td>           </tr>           <tr>           <td>bulletFactory</td>           <td>function</td>           <td>弾ノードを生成する関数</td>           <td>小さな赤い弾を生成</td>           <td></td>           </tr>           <tr>           <td>updateProperties</td>           <td>boolean</td>           <td>弾のプロパティ(direction, speed)を更新するかどうか</td>           <td>false</td>           <td></td>           </tr>           <tr>           <td>isInsideOfWorld</td>           <td>function</td>           <td>弾が画面内に存在することを判定する関数</td>           <td>Gameインスタンスの大きさをベースにして判定する</td>           <td></td>           </tr>           <tr>           <td>rank</td>           <td>number</td>           <td>弾幕ランク.BulletMLの$rankに対応する.0.0～1.0の範囲で指定.</td>           <td>0</td>           <td></td>           </tr>           <tr>           <td>speedRate</td>           <td>number</td>           <td>弾速度の補正倍率.</td>           <td>1</td>           <td></td>           </tr>           </table></dd>
+							
+								<dt>
+									<span class="light fixedFont">{string=}</span> <b>action</b>
+									
+								</dt>
+								<dd>最初に読み込むactionのラベル.省略可.</dd>
 							
 							</dl>
 						
@@ -593,7 +525,7 @@ ul.inheritsList
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Feb 15 2013 11:02:54 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Feb 15 2013 11:38:57 GMT+0900 (JST)
 		</div>
 	</body>
 </html>
