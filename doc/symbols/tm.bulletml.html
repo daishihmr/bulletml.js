@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - bulletml.ChangeDirection</title>
+		<title>JsDoc Reference - tm.bulletml</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -264,27 +264,25 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Class bulletml.ChangeDirection
+				Namespace tm.bulletml
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
 			<p class="description">
 				
-				<br />Extends
-					.<br />
 				
 			
 				
 				
 				
-					<br /><i>Defined in: </i> <a href="../symbols/src/src_main__bulletml.js.html">bulletml.js</a>.
+					<br /><i>Defined in: </i> <a href="../symbols/src/src_main__bulletml.tmlib.js.html">bulletml.tmlib.js</a>.
 				
 			</p>
 
 <!-- ============================== constructor summary ==================== -->			
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class bulletml.ChangeDirection.">
-				<caption>Class Summary</caption>
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class tm.bulletml.">
+				<caption>Namespace Summary</caption>
 				<thead>
 					<tr>
 						<th scope="col">Constructor Attributes</th>
@@ -296,7 +294,7 @@ ul.inheritsList
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/bulletml.ChangeDirection.html#constructor">bulletml.ChangeDirection</a></b>()
+								<b><a href="../symbols/tm.bulletml.html#constructor">tm.bulletml</a></b>
 							</div>
 							<div class="description"></div>
 						</td>
@@ -307,45 +305,36 @@ ul.inheritsList
 
 <!-- ============================== properties summary ===================== -->
 			
+
+<!-- ============================== methods summary ======================== -->
+			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class bulletml.ChangeDirection.">
-					<caption>Field Summary</caption>
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class tm.bulletml.">
+					<caption>Method Summary</caption>
 					<thead>
 						<tr>
-							<th scope="col">Field Attributes</th>
-							<th scope="col">Field Name and Description</th>
+							<th scope="col">Method Attributes</th>
+							<th scope="col">Method Name and Description</th>
 						</tr>
 					</thead>
 					<tbody>
 					
 						<tr>
-							<td class="attributes">&nbsp;</td>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/bulletml.ChangeDirection.html#commandName">commandName</a></b>
+								<div class="fixedFont">tm.bulletml.<b><a href="../symbols/tm.bulletml.html#.defaultBulletFactory">defaultBulletFactory</a></b>(spec)
 								</div>
-								<div class="description"></div>
+								<div class="description">bulletFactory未指定時に使用される弾スプライトの生成関数.</div>
 							</td>
 						</tr>
 					
 						<tr>
-							<td class="attributes">&nbsp;</td>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/bulletml.ChangeDirection.html#direction">direction</a></b>
+								<div class="fixedFont">tm.bulletml.<b><a href="../symbols/tm.bulletml.html#.defaultIsInsideOfWorld">defaultIsInsideOfWorld</a></b>(bullet)
 								</div>
-								<div class="description"></div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/bulletml.ChangeDirection.html#term">term</a></b>
-								</div>
-								<div class="description"></div>
+								<div class="description">isInsideOfWorld未指定時に使用される関数.</div>
 							</td>
 						</tr>
 					
@@ -355,9 +344,6 @@ ul.inheritsList
 				
 				
 			
-
-<!-- ============================== methods summary ======================== -->
-			
 <!-- ============================== events summary ======================== -->
 			
 
@@ -365,11 +351,11 @@ ul.inheritsList
 			
 			<div class="details"><a name="constructor"> </a>
 				<div class="sectionTitle">
-					Class Detail
+					Namespace Detail
 				</div>
 				
 				<div class="fixedFont">
-						<b>bulletml.ChangeDirection</b>()
+						<b>tm.bulletml</b>
 				</div>
 				
 				<div class="description">
@@ -393,79 +379,92 @@ ul.inheritsList
 
 <!-- ============================== field details ========================== -->		
 			
-				<div class="sectionTitle">
-					Field Detail
-				</div>
-				
-					<a name="commandName"> </a>
-					<div class="fixedFont">
-					
-					
-					<b>commandName</b>
-					
-					</div>
-					<div class="description">
-						
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="direction"> </a>
-					<div class="fixedFont">
-					
-					
-					<b>direction</b>
-					
-					</div>
-					<div class="description">
-						
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="term"> </a>
-					<div class="fixedFont">
-					
-					
-					<b>term</b>
-					
-					</div>
-					<div class="description">
-						
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					
-				
-			
 
 <!-- ============================== method details ========================= -->		
+			
+				<div class="sectionTitle">
+					Method Detail
+				</div>
+				
+					<a name=".defaultBulletFactory"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{tm.app.CanvasElement}</span>
+					<span class="light">tm.bulletml.</span><b>defaultBulletFactory</b>(spec)
+					
+					</div>
+					<div class="description">
+						bulletFactory未指定時に使用される弾スプライトの生成関数.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>spec</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{tm.app.CanvasElement}</span> 8px x 8px の大きさのスプライト</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".defaultIsInsideOfWorld"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					
+					<span class="light">tm.bulletml.</span><b>defaultIsInsideOfWorld</b>(bullet)
+					
+					</div>
+					<div class="description">
+						isInsideOfWorld未指定時に使用される関数.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>bullet</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					
+				
 			
 			
 <!-- ============================== event details ========================= -->		
@@ -478,7 +477,7 @@ ul.inheritsList
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Feb 15 2013 11:02:53 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Feb 15 2013 11:02:54 GMT+0900 (JST)
 		</div>
 	</body>
 </html>

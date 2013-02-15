@@ -1,14 +1,12 @@
 /**
- * plugin namespace object
- *
- * @type {Object}
+ * @namespace
  */
 tm.bulletml = tm.bulletml || {};
 
 (function() {
 
     /**
-     * @scope enchant.bulletml.AttackPattern.prototype
+     * @constructor
      */
     tm.bulletml.AttackPattern = tm.createClass({
         /**
@@ -549,9 +547,7 @@ tm.bulletml = tm.bulletml || {};
     /**
      * bulletFactory未指定時に使用される弾スプライトの生成関数.
      *
-     * @returns {tm.app.CanvasElement} 8px x 8px の大きさのスプライト
-     * @type function
-     * @memberOf enchant.bulletml
+     * @return {tm.app.CanvasElement} 8px x 8px の大きさのスプライト
      */
     tm.bulletml.defaultBulletFactory = function(spec) {
         var bullet = tm.app.Sprite(8, 8, DEFAULT_BULLET_IMAGE);
@@ -568,8 +564,6 @@ tm.bulletml = tm.bulletml || {};
 
     /**
      * configのデフォルト値.
-     *
-     * @scope enchant.bulletml.AttackPattern
      */
     tm.bulletml.AttackPattern.defaultConfig = {
         bulletFactory: tm.bulletml.defaultBulletFactory,
@@ -596,9 +590,9 @@ tm.bulletml = tm.bulletml || {};
     /**
      * スプライトAから見たスプライトBの方向をラジアンで返す.
      *
-     * @param {enchant.Node}
+     * @param {tm.app.CanvasElement}
      *            a スプライトA
-     * @param {enchant.Node}
+     * @param {tm.app.CanvasElement}
      *            b スプライトB
      */
     function angleAtoB(a, b) {

@@ -1,356 +1,599 @@
-<!DOCTYPE HTML>
-<html lang="en">
-<head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-	<meta name="generator" content="JsDoc Toolkit" />
-	<title>JsDoc Reference - enchant.bulletml.AttackPattern</title>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="generator" content="JsDoc Toolkit" />
+		
+		<title>JsDoc Reference - enchant.bulletml.AttackPattern</title>
 
-	<link media="all" rel="stylesheet" href="../css/common.css" type="text/css" />
-	<link media="all" rel="stylesheet" href="../css/prettify.css" type="text/css" />
-	<link media="all" rel="stylesheet" href="../css/bootstrap.min.css" type="text/css" />
-	<link media="print" rel="stylesheet" href="../css/print.css" type="text/css" />
-	<style type="text/css">
-		.icon-jsdoc {
-			background: url("../img/classicons.png") no-repeat;
-		}
-	</style>
-	<script src="../js/jquery-1.7.2.min.js" type="text/javascript"></script>
-	<script src="../js/bootstrap.min.js" type="text/javascript"></script>
-	<script src="../js/prettify.js" type="text/javascript"></script>
-	<script src="../js/accordion.js" type="text/javascript"></script>
-</head>
+		<style type="text/css">
+			/* default.css */
+body
+{
+	font: 12px "Lucida Grande", Tahoma, Arial, Helvetica, sans-serif;
+	width: 800px;
+}
 
-<body onload="prettyPrint()"><div class="container-fluid">
+.header
+{
+	clear: both;
+	background-color: #ccc;
+	padding: 8px;
+}
+
+h1
+{
+	font-size: 150%;
+	font-weight: bold;
+	padding: 0;
+	margin: 1em 0 0 .3em;
+}
+
+hr
+{
+	border: none 0;
+	border-top: 1px solid #7F8FB1;
+	height: 1px;
+}
+
+pre.code
+{
+	display: block;
+	padding: 8px;
+	border: 1px dashed #ccc;
+}
+
+#index
+{
+	margin-top: 24px;
+	float: left;
+	width: 160px;
+	position: absolute;
+	left: 8px;
+	background-color: #F3F3F3;
+	padding: 8px;
+}
+
+#content
+{
+	margin-left: 190px;
+	width: 600px;
+}
+
+.classList
+{
+	list-style-type: none;
+	padding: 0;
+	margin: 0 0 0 8px;
+	font-family: arial, sans-serif;
+	font-size: 1em;
+	overflow: auto;
+}
+
+.classList li
+{
+	padding: 0;
+	margin: 0 0 8px 0;
+}
+
+.summaryTable { width: 100%; }
+
+h1.classTitle
+{
+	font-size:170%;
+	line-height:130%;
+}
+
+h2 { font-size: 110%; }
+caption, div.sectionTitle
+{
+	background-color: #7F8FB1;
+	color: #fff;
+	font-size:130%;
+	text-align: left;
+	padding: 2px 6px 2px 6px;
+	border: 1px #7F8FB1 solid;
+}
+
+div.sectionTitle { margin-bottom: 8px; }
+.summaryTable thead { display: none; }
+
+.summaryTable td
+{
+	vertical-align: top;
+	padding: 4px;
+	border-bottom: 1px #7F8FB1 solid;
+	border-right: 1px #7F8FB1 solid;
+}
+
+/*col#summaryAttributes {}*/
+.summaryTable td.attributes
+{
+	border-left: 1px #7F8FB1 solid;
+	width: 140px;
+	text-align: right;
+}
+
+td.attributes, .fixedFont
+{
+	line-height: 15px;
+	color: #002EBE;
+	font-family: "Courier New",Courier,monospace;
+	font-size: 13px;
+}
+
+.summaryTable td.nameDescription
+{
+	text-align: left;
+	font-size: 13px;
+	line-height: 15px;
+}
+
+.summaryTable td.nameDescription, .description
+{
+	line-height: 15px;
+	padding: 4px;
+	padding-left: 4px;
+}
+
+.summaryTable { margin-bottom: 8px; }
+
+ul.inheritsList
+{
+	list-style: square;
+	margin-left: 20px;
+	padding-left: 0;
+}
+
+.detailList {
+	margin-left: 20px; 
+	line-height: 15px;
+}
+.detailList dt { margin-left: 20px; }
+
+.detailList .heading
+{
+	font-weight: bold;
+	padding-bottom: 6px;
+	margin-left: 0;
+}
+
+.light, td.attributes, .light a:link, .light a:visited
+{
+	color: #777;
+	font-style: italic;
+}
+
+.fineprint
+{
+	text-align: right;
+	font-size: 10px;
+}
+		</style>
+	</head>
+
+	<body>
 <!-- ============================== header ================================= -->	
-	<!-- begin static/header.html -->
-	<header class="header navbar navbar-fixed-top">
-		<div class="navbar-inner">
-			<div class="container-fluid">
-				<a class="brand" href="#"><strong>JsDoc</strong> Reference</a>
-				<ul id="class-file-selector" class="nav">
-					<li><a href="../index.html">Class Index</a></li>
-					<li><a href="../files.html">File Index</a></li>
-				</ul>
-			</div>
-		</div>
-	</header>
-	<!-- end static/header.html -->
+		<!-- begin static/header.html -->
+		<div id="header">
+</div>
+		<!-- end static/header.html -->
 
 <!-- ============================== classes index ============================ -->
-	<div class="row-fluid">
-		<div id="index" class="span3">
+		<div id="index">
 			<!-- begin publish.classesIndex -->
-			<div class="well" id="class-list">
-	<ul class="nav nav-list">
-		<li class="nav-header">Classes</li>
-		
-			<li><a href="../symbols/BulletML.html"><span class="indent" style="padding-left:0px;"><i class="icon-jsdoc icon-jsdoc-namespace"></i><span class="jsdoc-class-index">BulletML</span></span></a></li>
-		
-			<li><a href="../symbols/BulletML.Accel.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Accel</span></span></a></li>
-		
-			<li><a href="../symbols/BulletML.Action.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Action</span></span></a></li>
-		
-			<li><a href="../symbols/BulletML.ActionRef.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">ActionRef</span></span></a></li>
-		
-			<li><a href="../symbols/BulletML.Bullet.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Bullet</span></span></a></li>
-		
-			<li><a href="../symbols/BulletML.BulletRef.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">BulletRef</span></span></a></li>
-		
-			<li><a href="../symbols/BulletML.ChangeDirection.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">ChangeDirection</span></span></a></li>
-		
-			<li><a href="../symbols/BulletML.ChangeSpeed.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">ChangeSpeed</span></span></a></li>
-		
-			<li><a href="../symbols/BulletML.Command.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Command</span></span></a></li>
-		
-			<li><a href="../symbols/BulletML.Direction.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Direction</span></span></a></li>
-		
-			<li><a href="../symbols/BulletML.Fire.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Fire</span></span></a></li>
-		
-			<li><a href="../symbols/BulletML.FireRef.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">FireRef</span></span></a></li>
-		
-			<li><a href="../symbols/BulletML.Horizontal.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Horizontal</span></span></a></li>
-		
-			<li><a href="../symbols/BulletML.Repeat.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Repeat</span></span></a></li>
-		
-			<li><a href="../symbols/BulletML.Root.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Root</span></span></a></li>
-		
-			<li><a href="../symbols/BulletML.Speed.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Speed</span></span></a></li>
-		
-			<li><a href="../symbols/BulletML.Vanish.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Vanish</span></span></a></li>
-		
-			<li><a href="../symbols/BulletML.Vertical.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Vertical</span></span></a></li>
-		
-			<li><a href="../symbols/BulletML.Wait.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">Wait</span></span></a></li>
-		
-			<li><a href="../symbols/_global_.html"><span class="indent" style="padding-left:0px;"><i class="icon-jsdoc icon-jsdoc-namespace"></i><span class="jsdoc-class-index">_global_</span></span></a></li>
-		
-			<li><a href="../symbols/enchant.bulletml.html"><span class="indent" style="padding-left:14px;"><i class="icon-jsdoc icon-jsdoc-namespace"></i><span class="jsdoc-class-index">bulletml</span></span></a></li>
-		
-			<li><a href="../symbols/enchant.bulletml.AttackPattern.html"><span class="indent" style="padding-left:28px;"><i class="icon-jsdoc icon-jsdoc-class"></i><span class="jsdoc-class-index">AttackPattern</span></span></a></li>
-		
-	</ul>
-</div>
-
+			<div align="center"><a href="../index.html">Class Index</a>
+| <a href="../files.html">File Index</a></div>
+<hr />
+<h2>Classes</h2>
+<ul class="classList">
+	
+	<li><i><a href="../symbols/_global_.html">_global_</a></i></li>
+	
+	<li><a href="../symbols/bulletml.Accel.html">bulletml.Accel</a></li>
+	
+	<li><a href="../symbols/bulletml.Action.html">bulletml.Action</a></li>
+	
+	<li><a href="../symbols/bulletml.ActionRef.html">bulletml.ActionRef</a></li>
+	
+	<li><a href="../symbols/bulletml.Autonomy.html">bulletml.Autonomy</a></li>
+	
+	<li><a href="../symbols/bulletml.Bind.html">bulletml.Bind</a></li>
+	
+	<li><a href="../symbols/bulletml.Bullet.html">bulletml.Bullet</a></li>
+	
+	<li><a href="../symbols/bulletml.BulletRef.html">bulletml.BulletRef</a></li>
+	
+	<li><a href="../symbols/bulletml.ChangeDirection.html">bulletml.ChangeDirection</a></li>
+	
+	<li><a href="../symbols/bulletml.ChangeSpeed.html">bulletml.ChangeSpeed</a></li>
+	
+	<li><a href="../symbols/bulletml.Command.html">bulletml.Command</a></li>
+	
+	<li><a href="../symbols/bulletml.Direction.html">bulletml.Direction</a></li>
+	
+	<li><a href="../symbols/bulletml.dsl.html">bulletml.dsl</a></li>
+	
+	<li><a href="../symbols/bulletml.Fire.html">bulletml.Fire</a></li>
+	
+	<li><a href="../symbols/bulletml.FireOption.html">bulletml.FireOption</a></li>
+	
+	<li><a href="../symbols/bulletml.FireRef.html">bulletml.FireRef</a></li>
+	
+	<li><a href="../symbols/bulletml.Horizontal.html">bulletml.Horizontal</a></li>
+	
+	<li><a href="../symbols/bulletml.Notify.html">bulletml.Notify</a></li>
+	
+	<li><a href="../symbols/bulletml.OffsetX.html">bulletml.OffsetX</a></li>
+	
+	<li><a href="../symbols/bulletml.OffsetY.html">bulletml.OffsetY</a></li>
+	
+	<li><a href="../symbols/bulletml.Repeat.html">bulletml.Repeat</a></li>
+	
+	<li><a href="../symbols/bulletml.Root.html">bulletml.Root</a></li>
+	
+	<li><a href="../symbols/bulletml.Speed.html">bulletml.Speed</a></li>
+	
+	<li><a href="../symbols/bulletml.Vanish.html">bulletml.Vanish</a></li>
+	
+	<li><a href="../symbols/bulletml.Vertical.html">bulletml.Vertical</a></li>
+	
+	<li><a href="../symbols/bulletml.Wait.html">bulletml.Wait</a></li>
+	
+	<li><a href="../symbols/bulletml.Walker.html">bulletml.Walker</a></li>
+	
+	<li><a href="../symbols/enchant.bulletml.html">enchant.bulletml</a></li>
+	
+	<li><a href="../symbols/enchant.bulletml.AttackPattern.html">enchant.bulletml.AttackPattern</a></li>
+	
+	<li><a href="../symbols/enchant.EventTarget.html">enchant.EventTarget</a></li>
+	
+	<li><a href="../symbols/enchant.EventTarget%23-bulletml.html">enchant.EventTarget#-bulletml</a></li>
+	
+	<li><a href="../symbols/tm.bulletml.html">tm.bulletml</a></li>
+	
+	<li><a href="../symbols/tm.bulletml.AttackPattern.html">tm.bulletml.AttackPattern</a></li>
+	
+</ul>
+<hr />
 			<!-- end publish.classesIndex -->
 		</div>
 		
-		<div id="content" class="span9">
+		<div id="content">
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				<img src="../img/class.png" alt="Class " class="jsdoc-large-icon" />enchant.bulletml.AttackPattern
-				
-				
-				
-				
-				
-				
+				Class enchant.bulletml.AttackPattern
 			</h1>
-			
-			
-			<div class="jsdoc-hierarchy-nav">
-				<ul class="breadcrumb">
-					
-						<li class="jsdoc-hierarchy-caption">Inheritance</li>
-							
-						<li class="active">AttackPattern</li>
-					
-				</ul>
-			</div>
 
-<!-- ============================== constructor summary ==================== -->
+<!-- ============================== class summary ========================== -->			
+			<p class="description">
+				
+				
 			
-				<h3>Constructor</h3>
-				<div class="jsdoc-members">
-					<div class="jsdoc-member accordion-button">
-						<div class="jsdoc-member-definition">
-							<b><a id="AttackPattern" href="../symbols/enchant.bulletml.AttackPattern.html">AttackPattern</a></b>
-							( <span class="jsdoc-typedesc"><a href="../symbols/BulletML.Root.html">BulletML.Root</a></span> bulletml )
-							
-							
-							
-							
-							
-							
-							<span class="label label-jsdoc label-jsdoc-static">Static</span>
-						</div>
-						<div class="jsdoc-member-description">
-							<div class="jsdoc-member-content">
-								<div class="jsdoc-member-summary">
-									攻撃パターン.
-									<span class="pull-right"><a href="../symbols/src/src_main_bulletml.enchant.js.html">code »</a></span>
-								</div>
-								
-								
-								
-								
-								
-								
-								
-									<div class="jsdoc-member-detail accordion-content">
-										
-											<b>Parameters</b>
-											<dl>
-												
-													<dt>bulletml : <span class="jsdoc-typedesc"><a href="../symbols/BulletML.Root.html">BulletML.Root</a></span></dt>
-													<dd>BulletMLデータ</dd>
-												
-											</dl>
-										
-										
-									</div>
-								
+				
+				
+				
+					<br /><i>Defined in: </i> <a href="../symbols/src/src_main__bulletml.enchant.js.html">bulletml.enchant.js</a>.
+				
+			</p>
+
+<!-- ============================== constructor summary ==================== -->			
+			
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class enchant.bulletml.AttackPattern.">
+				<caption>Class Summary</caption>
+				<thead>
+					<tr>
+						<th scope="col">Constructor Attributes</th>
+						<th scope="col">Constructor Name and Description</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td class="attributes">&nbsp;</td>
+						<td class="nameDescription" >
+							<div class="fixedFont">
+								<b><a href="../symbols/enchant.bulletml.AttackPattern.html#constructor">enchant.bulletml.AttackPattern</a></b>(bulletml)
 							</div>
-						</div>
-					</div>
+							<div class="description">攻撃パターン.</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			
+
+<!-- ============================== properties summary ===================== -->
+			
+				
+				
+				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class enchant.bulletml.AttackPattern.">
+					<caption>Field Summary</caption>
+					<thead>
+						<tr>
+							<th scope="col">Field Attributes</th>
+							<th scope="col">Field Name and Description</th>
+						</tr>
+					</thead>
+					<tbody>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/enchant.bulletml.AttackPattern.html#bulletml">bulletml</a></b>
+								</div>
+								<div class="description">攻撃パターンの元となるBulletML定義.</div>
+							</td>
+						</tr>
+					
+					</tbody>
+				</table>
+				
+				
+				
+			
+
+<!-- ============================== methods summary ======================== -->
+			
+				
+				
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class enchant.bulletml.AttackPattern.">
+					<caption>Method Summary</caption>
+					<thead>
+						<tr>
+							<th scope="col">Method Attributes</th>
+							<th scope="col">Method Name and Description</th>
+						</tr>
+					</thead>
+					<tbody>
+					
+						<tr>
+							<td class="attributes">&lt;inner&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/enchant.bulletml.AttackPattern.html#-angleAtoB">angleAtoB</a></b>(a, b)
+								</div>
+								<div class="description">スプライトAから見たスプライトBの方向をラジアンで返す.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/enchant.bulletml.AttackPattern.html#createTicker">createTicker</a></b>(config, action)
+								</div>
+								<div class="description">enterframeイベントのリスナを作成する.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;inner&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/enchant.bulletml.AttackPattern.html#-normalizeRadian">normalizeRadian</a></b>(radian)
+								</div>
+								<div class="description">ラジアンを -π<= rad < π の範囲に正規化する.</div>
+							</td>
+						</tr>
+					
+					</tbody>
+				</table>
+				
+				
+				
+			
+<!-- ============================== events summary ======================== -->
+			
+
+<!-- ============================== constructor details ==================== -->		
+			
+			<div class="details"><a name="constructor"> </a>
+				<div class="sectionTitle">
+					Class Detail
 				</div>
+				
+				<div class="fixedFont">
+						<b>enchant.bulletml.AttackPattern</b>(bulletml)
+				</div>
+				
+				<div class="description">
+					攻撃パターン.
+					
+				</div>
+				
+				
+				
+				
+					
+						<dl class="detailList">
+						<dt class="heading">Parameters:</dt>
+						
+							<dt>
+								<span class="light fixedFont">{<a href="../symbols/bulletml.Root.html">bulletml.Root</a>}</span>  <b>bulletml</b>
+								
+							</dt>
+								<dd>BulletMLデータ</dd>
+						
+						</dl>
+					
+					
+					
+					
+					
+					
+					
+
+			</div>
 			
 
-<!-- ============================== instance members summary ===================== -->
+<!-- ============================== field details ========================== -->		
 			
-			
-				<h3>Instance members</h3>
+				<div class="sectionTitle">
+					Field Detail
+				</div>
 				
-					<h4>Instance Methods<span class="jsdoc-inherits-caption pull-right">Defined By</span></h4>
-					<div class="jsdoc-members">
+					<a name="bulletml"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/bulletml.Root.html">bulletml.Root</a>}</span>
+					<b>bulletml</b>
+					
+					</div>
+					<div class="description">
+						攻撃パターンの元となるBulletML定義.解析済みのBulletMLオブジェクト.<br>読み取り専用.
 						
-							<div class="jsdoc-member accordion-button">
-								<div class="jsdoc-member-definition">
-									<div class="jsdoc-member-content">
-										<b><a id="createTicker" href="../symbols/enchant.bulletml.AttackPattern.html#createTicker">createTicker</a></b>
-										<span class="signature">( [<span class="jsdoc-typedesc">Object/enchant.Node</span> config], [<span class="jsdoc-typedesc">string</span> action] )</span>
-										
-										
-										
-										
-										<span class="jsdoc-inherits-from pull-right"><a href="../symbols/enchant.bulletml.AttackPattern.html">enchant.bulletml.AttackPattern</a></span>
-									</div>
-								</div>
-								<div class="jsdoc-member-description">
-									<div class="jsdoc-member-content">
-										<div class="jsdoc-member-summary">
-											enterframeイベントのリスナを作成する.<br><br>第1引数configで各種設定を行う. <br>
-											<span class="pull-right"><a href="../symbols/src/src_main_bulletml.enchant.js.html">code »</a></span>
-										</div>
-										
-										
-										
-										
-										
-										
-										
-											<div class="jsdoc-member-detail accordion-content">
-												
-													<b>Parameters</b>
-													<dl>
-														
-															<dt>config : <span class="jsdoc-typedesc">Object/enchant.Node</span></dt>
-															<dd>発射される弾に関する設定.<br>           <table border=1>           <tr>           <th>プロパティ名</th>           <th>型</th>           <th>設定内容</th>           <th>デフォルト値</th>           <th>必須</th>           </tr>           <tr>           <td>target</td>           <td>enchant.Node</td>           <td>攻撃の標的となるオブジェクト</td>           <td>null</td>           <td>○</td>           </tr>           <tr>           <td>addTarget</td>           <td>enchant.Group</td>           <td>生成した弾を追加するノード</td>           <td>攻撃を実行するノードのparentNode</td>           <td></td>           </tr>           <tr>           <td>bulletFactory</td>           <td>function</td>           <td>弾ノードを生成する関数</td>           <td>小さな赤い弾を生成</td>           <td></td>           </tr>           <tr>           <td>updateProperties</td>           <td>boolean</td>           <td>弾のプロパティ(direction, speed)を更新するかどうか</td>           <td>false</td>           <td></td>           </tr>           <tr>           <td>isInsideOfWorld</td>           <td>function</td>           <td>弾が画面内に存在することを判定する関数</td>           <td>Gameインスタンスの大きさをベースにして判定する</td>           <td></td>           </tr>           <tr>           <td>rank</td>           <td>number</td>           <td>弾幕ランク.BulletMLの$rankに対応する.0.0～1.0の範囲で指定.</td>           <td>0</td>           <td></td>           </tr>           <tr>           <td>speedRate</td>           <td>number</td>           <td>弾速度の補正倍率.</td>           <td>1</td>           <td></td>           </tr>           </table>           設定する項目がtargetのみの場合、標的オブジェクトを直接引数として渡すことが可能.</dd>
-														
-															<dt>action : <span class="jsdoc-typedesc">string</span></dt>
-															<dd>最初に読み込むactionのラベル.<br>           省略可.</dd>
-														
-													</dl>
-												
-												
-											</div>
-										
-									</div>
-								</div>
-							</div>
-						
-							<div class="jsdoc-member accordion-button">
-								<div class="jsdoc-member-definition">
-									<div class="jsdoc-member-content">
-										<b><a id="angleAtoB" href="../symbols/enchant.bulletml.AttackPattern.html#-angleAtoB">angleAtoB</a></b>
-										<span class="signature">( <span class="jsdoc-typedesc">enchant.Node</span> a, <span class="jsdoc-typedesc">enchant.Node</span> b )</span>
-										
-										
-										
-										<span class="label label-jsdoc label-jsdoc-inner">Inner</span>
-										<span class="jsdoc-inherits-from pull-right"><a href="../symbols/enchant.bulletml.AttackPattern.html">enchant.bulletml.AttackPattern</a></span>
-									</div>
-								</div>
-								<div class="jsdoc-member-description">
-									<div class="jsdoc-member-content">
-										<div class="jsdoc-member-summary">
-											スプライトAから見たスプライトBの方向をラジアンで返す.
-											<span class="pull-right"><a href="../symbols/src/src_main_bulletml.enchant.js.html">code »</a></span>
-										</div>
-										
-										
-										
-										
-										
-										
-										
-											<div class="jsdoc-member-detail accordion-content">
-												
-													<b>Parameters</b>
-													<dl>
-														
-															<dt>a : <span class="jsdoc-typedesc">enchant.Node</span></dt>
-															<dd>スプライトA</dd>
-														
-															<dt>b : <span class="jsdoc-typedesc">enchant.Node</span></dt>
-															<dd>スプライトB</dd>
-														
-													</dl>
-												
-												
-											</div>
-										
-									</div>
-								</div>
-							</div>
-						
-							<div class="jsdoc-member accordion-button">
-								<div class="jsdoc-member-definition">
-									<div class="jsdoc-member-content">
-										<b><a id="normalizeRadian" href="../symbols/enchant.bulletml.AttackPattern.html#-normalizeRadian">normalizeRadian</a></b>
-										<span class="signature">( <span class="jsdoc-typedesc">unknown</span> radian )</span>
-										
-										
-										
-										<span class="label label-jsdoc label-jsdoc-inner">Inner</span>
-										<span class="jsdoc-inherits-from pull-right"><a href="../symbols/enchant.bulletml.AttackPattern.html">enchant.bulletml.AttackPattern</a></span>
-									</div>
-								</div>
-								<div class="jsdoc-member-description">
-									<div class="jsdoc-member-content">
-										<div class="jsdoc-member-summary">
-											ラジアンを -π<= rad < π の範囲に正規化する.
-											<span class="pull-right"><a href="../symbols/src/src_main_bulletml.enchant.js.html">code »</a></span>
-										</div>
-										
-										
-										
-										
-										
-										
-										
-											<div class="jsdoc-member-detail accordion-content">
-												
-													<b>Parameters</b>
-													<dl>
-														
-															<dt>radian : <span class="jsdoc-typedesc">unknown</span></dt>
-															<dd>No description.</dd>
-														
-													</dl>
-												
-												
-											</div>
-										
-									</div>
-								</div>
-							</div>
 						
 					</div>
-				
-				
-					<h4>Instance Properties<span class="jsdoc-inherits-caption pull-right">Defined By</span></h4>
-					<div class="jsdoc-members">
+					
+					
+
 						
-							<div class="jsdoc-member">
-								<div class="jsdoc-member-definition">
-									<b><a id="bulletml" href="../symbols/enchant.bulletml.AttackPattern.html#bulletml">bulletml</a></b>
-									 : <a href="../symbols/BulletML.Root.html">BulletML.Root</a>
-									
-									
-									
-									
-									<span class="jsdoc-inherits-from pull-right"><a href="../symbols/enchant.bulletml.AttackPattern.html">enchant.bulletml.AttackPattern</a></span>
-								</div>
-								<div class="jsdoc-member-description">
-									<div class="jsdoc-member-content">
-										<div class="jsdoc-member-summary">
-											攻撃パターンの元となるBulletML定義.解析済みのBulletMLオブジェクト.<br>読み取り専用.
-											<span class="pull-right"><a href="../symbols/src/src_main_bulletml.enchant.js.html">code »</a></span>
-										</div>
-										
-										
-										
-										
-										
-										
-										
-									</div>
-								</div>
-							</div>
+						
+						
+						
+
+					
+				
+			
+
+<!-- ============================== method details ========================= -->		
+			
+				<div class="sectionTitle">
+					Method Detail
+				</div>
+				
+					<a name="-angleAtoB"> </a>
+					<div class="fixedFont">&lt;inner&gt; 
+					
+					
+					<b>angleAtoB</b>(a, b)
+					
+					</div>
+					<div class="description">
+						スプライトAから見たスプライトBの方向をラジアンで返す.
+						
 						
 					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{enchant.Node}</span> <b>a</b>
+									
+								</dt>
+								<dd>スプライトA</dd>
+							
+								<dt>
+									<span class="light fixedFont">{enchant.Node}</span> <b>b</b>
+									
+								</dt>
+								<dd>スプライトB</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="createTicker"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>createTicker</b>(config, action)
+					
+					</div>
+					<div class="description">
+						enterframeイベントのリスナを作成する.<br><br>第1引数configで各種設定を行う. <br>
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object|enchant.Node}</span> <b>config</b>
+									<i>Optional</i>
+								</dt>
+								<dd>発射される弾に関する設定.<br>           <table border=1>           <tr>           <th>プロパティ名</th>           <th>型</th>           <th>設定内容</th>           <th>デフォルト値</th>           <th>必須</th>           </tr>           <tr>           <td>target</td>           <td>enchant.Node</td>           <td>攻撃の標的となるオブジェクト</td>           <td>null</td>           <td>○</td>           </tr>           <tr>           <td>addTarget</td>           <td>enchant.Group</td>           <td>生成した弾を追加するノード</td>           <td>攻撃を実行するノードのparentNode</td>           <td></td>           </tr>           <tr>           <td>bulletFactory</td>           <td>function</td>           <td>弾ノードを生成する関数</td>           <td>小さな赤い弾を生成</td>           <td></td>           </tr>           <tr>           <td>updateProperties</td>           <td>boolean</td>           <td>弾のプロパティ(direction, speed)を更新するかどうか</td>           <td>false</td>           <td></td>           </tr>           <tr>           <td>isInsideOfWorld</td>           <td>function</td>           <td>弾が画面内に存在することを判定する関数</td>           <td>Gameインスタンスの大きさをベースにして判定する</td>           <td></td>           </tr>           <tr>           <td>rank</td>           <td>number</td>           <td>弾幕ランク.BulletMLの$rankに対応する.0.0～1.0の範囲で指定.</td>           <td>0</td>           <td></td>           </tr>           <tr>           <td>speedRate</td>           <td>number</td>           <td>弾速度の補正倍率.</td>           <td>1</td>           <td></td>           </tr>           </table>           設定する項目がtargetのみの場合、標的オブジェクトを直接引数として渡すことが可能.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{string}</span> <b>action</b>
+									<i>Optional</i>
+								</dt>
+								<dd>最初に読み込むactionのラベル.<br>           省略可.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="-normalizeRadian"> </a>
+					<div class="fixedFont">&lt;inner&gt; 
+					
+					
+					<b>normalizeRadian</b>(radian)
+					
+					</div>
+					<div class="description">
+						ラジアンを -π<= rad < π の範囲に正規化する.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>radian</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					
 				
 			
-
-<!-- ============================== static members summary ======================== -->
+			
+<!-- ============================== event details ========================= -->		
 			
 			
+			<hr />
+		</div>
 
-<!-- ============================== footer ================================= -->
-	<footer class="footer">
 		
-		<p>Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blankt">JsDoc Toolkit</a> 2.4.0 on Thu Dec 27 2012 15:09:57 GMT+0900 (JST)</p>
-	</footer>
-</div></body>
+<!-- ============================== footer ================================= -->
+		<div class="fineprint" style="clear:both">
+			
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Feb 15 2013 11:02:54 GMT+0900 (JST)
+		</div>
+	</body>
 </html>
