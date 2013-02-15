@@ -681,4 +681,8 @@ enchant.bulletml = enchant.bulletml || {};
         return Math.atan2(cb.y - ca.y, cb.x - ca.x);
     }
 
+    bulletml.Root.prototype.createTicker = function(config) {
+        return new AttackPattern(this).createTicker(config);
+    };
+
 })();

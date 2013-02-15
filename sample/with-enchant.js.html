@@ -1,0 +1,69 @@
+<html>
+<head>
+<script type="text/javascript" src="../lib/enchant.js"></script>
+<script type="text/javascript" src="../target/bulletml.for.enchant.js"></script>
+<script type="text/javascript">
+enchant();
+var game;
+window.onload = function() {
+    game = new Core(320, 320);
+    game.preload("chara1.png");
+    game.onload = function() {
+        game.rootScene.backgroundColor = "rgb(0,0,32)";
+
+        var player = new Player();
+        var enemy = new Enemy();
+
+        AttackPattern.defaultConfig.target = player;
+
+        var $ = bulletml.dsl;
+        var pattern = new bulletml.Root({
+            top: $.action([
+                $.repeat(999, [
+                    $.fire($.direction(0), $.bullet()),
+                    $.repeat(32-1, [
+                        $.fire($.direction(360/32, "sequence"), $.bullet()),
+                    ]),
+                    $.wait(30),
+                ]),
+            ]),
+        });
+
+        enemy.on("enterframe", pattern.createTicker());
+    };
+    game.start();
+};
+
+var Player = Class.create(Sprite, {
+    initialize: function() {
+        Sprite.call(this, 32, 32);
+        this.image = game.assets["chara1.png"];
+        this.moveTo((320-32)/2, 320-32);
+        this.scaleX = -1;
+        game.rootScene.addChild(this);
+    },
+    onenterframe: function() {
+        if (game.input.left)  this.x -= 4;
+        if (game.input.right) this.x += 4;
+        if (game.input.up)    this.y -= 4;
+        if (game.input.down)  this.y += 4;
+    },
+});
+
+var Enemy = Class.create(Player, {
+    initialize: function() {
+        Player.call(this, 32, 32);
+        this.frame = 6;
+        this.moveTo((320-32)/2, 20);
+        this.scale(-2, 2);
+    },
+    onenterframe: function() {
+        this.x = (320-32)/2 + Math.sin(this.age*0.02)*120;
+        this.frame = this.age%2 + 6;
+    },
+});
+</script>
+</head>
+<body style="margin:0">
+</body>
+</html>

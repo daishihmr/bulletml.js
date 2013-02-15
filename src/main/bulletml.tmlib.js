@@ -604,4 +604,9 @@ tm.bulletml = tm.bulletml || {};
     function angleAtoB(a, b) {
         return Math.atan2(b.y-a.y, b.x-a.x);
     }
+
+    bulletml.Root.prototype.createTicker = function(config) {
+        return tm.bulletml.AttackPattern(this).createTicker(config);
+    };
+
 })();

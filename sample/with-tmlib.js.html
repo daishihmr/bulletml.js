@@ -1,0 +1,74 @@
+<html>
+<head>
+<script type="text/javascript" src="../lib/tmlib.js"></script>
+<script type="text/javascript" src="../target/bulletml.for.tmlib.js"></script>
+<script type="text/javascript">
+var app;
+tm.main(function() {
+    app = tm.app.CanvasApp("#world");
+    app.background = "rgb(0,0,32)";
+    app.resize(320, 320);
+    app.fitWindow();
+
+    var player = Player();
+    var enemy = Enemy();
+
+    tm.bulletml.AttackPattern.defaultConfig.target = player;
+
+    var $ = bulletml.dsl;
+    var pattern = new bulletml.Root({
+        top: $.action([
+            $.repeat(999, [
+                $.fire($.direction(0), $.bullet()),
+                $.repeat(32-1, [
+                    $.fire($.direction(360/32, "sequence"), $.bullet()),
+                ]),
+                $.wait(30),
+            ]),
+        ]),
+    });
+
+    enemy.addEventListener("enterframe", pattern.createTicker());
+
+    app.run();
+});
+
+var Player = tm.createClass({
+    superClass: tm.app.Shape,
+    init: function() {
+        this.superInit(84, 84);
+        this.setPosition(320/2, 320-32);
+        this.canvas.setColorStyle("white", "yellow").fillCircle(42, 42, 32);
+        this.canvas.setColorStyle("white", "black").fillCircle(27, 27, 2);
+        this.canvas.setColorStyle("white", "brown").fillRect(40, 70, 4, 15).fillTriangle(0, 40, 11, 35, 11, 45);
+        this.scaleX = this.scaleY = 0.5;
+        app.currentScene.addChild(this);
+    },
+    update: function(app) {
+        var kb = app.keyboard;
+        if (kb.getKey("left"))  this.x -= 4;
+        if (kb.getKey("right")) this.x += 4;
+        if (kb.getKey("up"))    this.y -= 4;
+        if (kb.getKey("down"))  this.y += 4;
+    },
+});
+
+var Enemy = tm.createClass({
+    superClass: Player,
+    init: function() {
+        this.superInit();
+        this.setPosition(320/2, 32);
+        this.scaleX = -1;
+        this.scaleY = 1;
+    },
+    update: function(app) {
+        this.x = (320-32)/2 + Math.sin(app.frame*0.02)*120;
+        this.rotation += 7;
+    },
+});
+</script>
+</head>
+<body>
+    <canvas id="world"></canvas>
+</body>
+</html>
