@@ -211,9 +211,9 @@ bulletml["_temp"] = function() {};
         c.label = this.label;
         c.root = this.root;
         c.actions = this.actions;
-        c.direction = new bulletml.Direction(walker.evalParam(this.direction.value));
+        c.direction = new bulletml.Direction(walker._evalParam(this.direction.value));
         c.direction.type = this.direction.type;
-        c.speed = new bulletml.Speed(walker.evalParam(this.speed.value));
+        c.speed = new bulletml.Speed(walker._evalParam(this.speed.value));
         c.speed.type = this.speed.type;
         c.option = this.option;
         c._localScope = walker._localScope;
@@ -250,7 +250,7 @@ bulletml["_temp"] = function() {};
      */
     bulletml.BulletRef.prototype.clone = function(walker) {
         var bkup = walker._localScope;
-        walker._localScope = walker.newScope(this.params);
+        walker._localScope = walker._newScope(this.params);
         var b = this.root.findBulletOrThrow(this.label).clone(walker);
         walker._localScope = bkup;
         return b;
@@ -289,6 +289,7 @@ bulletml["_temp"] = function() {};
     /**
      * @constructor
      * @extends {bulletml.Command}
+     * @augments bulletml.Command
      */
     bulletml.Action = function() {
         /**
@@ -335,6 +336,7 @@ bulletml["_temp"] = function() {};
     /**
      * @constructor
      * @extends {bulletml.Command}
+     * @augments bulletml.Command
      * @param {string} label
      */
     bulletml.ActionRef = function(label) {
@@ -367,6 +369,7 @@ bulletml["_temp"] = function() {};
     /**
      * @constructor
      * @extends {bulletml.Command}
+     * @augments bulletml.Command
      */
     bulletml.Fire = function() {
         /**
@@ -411,6 +414,7 @@ bulletml["_temp"] = function() {};
     /**
      * @constructor
      * @extends {bulletml.Command}
+     * @augments bulletml.Command
      * @param {string} label
      */
     bulletml.FireRef = function(label) {
@@ -432,6 +436,7 @@ bulletml["_temp"] = function() {};
     /**
      * @constructor
      * @extends {bulletml.Command}
+     * @augments bulletml.Command
      */
     bulletml.ChangeDirection = function() {
         /**
@@ -451,6 +456,7 @@ bulletml["_temp"] = function() {};
     /**
      * @constructor
      * @extends {bulletml.Command}
+     * @augments bulletml.Command
      */
     bulletml.ChangeSpeed = function() {
         /**
@@ -470,6 +476,7 @@ bulletml["_temp"] = function() {};
     /**
      * @constructor
      * @extends {bulletml.Command}
+     * @augments bulletml.Command
      */
     bulletml.Accel = function() {
         /**
@@ -492,6 +499,7 @@ bulletml["_temp"] = function() {};
     /**
      * @constructor
      * @extends {bulletml.Command}
+     * @augments bulletml.Command
      * @param {(number|string)=} value
      */
     bulletml.Wait = function(value) {
@@ -510,6 +518,7 @@ bulletml["_temp"] = function() {};
     /**
      * @constructor
      * @extends {bulletml.Command}
+     * @augments bulletml.Command
      */
     bulletml.Vanish = function() {
         /**
@@ -522,6 +531,7 @@ bulletml["_temp"] = function() {};
     /**
      * @constructor
      * @extends {bulletml.Command}
+     * @augments bulletml.Command
      */
     bulletml.Repeat = function() {
         /**
@@ -552,6 +562,7 @@ bulletml["_temp"] = function() {};
     /**
      * @constructor
      * @extends {bulletml.Command}
+     * @augments bulletml.Command
      * @param {string} variable
      * @param {(string|number)} expression
      * @since 0.5
