@@ -2,6 +2,8 @@
     
     /**
      * @constructor
+     * @param {bulletml.Root} root
+     * @param {number=} rank
      */
     bulletml.Walker = function(root, rank) {
         this._root = root;
@@ -44,66 +46,68 @@
             if (n !== undefined) {
                 // console.log(n.commandName, n.label, this._localScope);
                 if (n instanceof bulletml.Action) {
-                    this.pushStack();
+                    this._pushStack();
                     this._action = n;
-                    this._localScope = this.cloneScope();
+                    this._localScope = this._cloneScope();
                     return this.next();
                 } else if (n instanceof bulletml.ActionRef) {
-                    this.pushStack();
+                    this._pushStack();
                     this._action = this._root.findActionOrThrow(n.label);
-                    this._localScope = this.newScope(n.params);
+                    this._localScope = this._newScope(n.params);
                     return this.next();
                 } else if (n instanceof bulletml.Repeat) {
                     this._localScope.loopCounter = 0;
-                    this._localScope.loopEnd = this.evalParam(n.times);
-                    this.pushStack();
+                    this._localScope.loopEnd = this._evalParam(n.times)|0;
+                    this._pushStack();
                     this._action = n.action.clone();
-                    this._localScope = this.cloneScope();
+                    this._localScope = this._cloneScope();
                     return this.next();
                 } else if (n instanceof bulletml.Fire) {
                     var f = new bulletml.Fire();
                     f.bullet = n.bullet.clone(this);
                     if (n.direction !== null) {
-                        f.direction = new bulletml.Direction(this.evalParam(n.direction.value));
+                        f.direction = new bulletml.Direction(this._evalParam(n.direction.value));
                         f.direction.type = n.direction.type;
                     }
                     if (n.speed !== null) {
-                        f.speed = new bulletml.Speed(this.evalParam(n.speed.value));
+                        f.speed = new bulletml.Speed(this._evalParam(n.speed.value));
                         f.speed.type = n.speed.type;
                     }
                     f.option = n.option;
                     return f;
                 } else if (n instanceof bulletml.FireRef) {
-                    this.pushStack();
+                    this._pushStack();
                     this._action = new bulletml.Action();
                     this._action.commands = [ this._root.findFireOrThrow(n.label) ];
-                    this._localScope = this.newScope(n.params);
+                    this._localScope = this._newScope(n.params);
                     return this.next();
                 } else if (n instanceof bulletml.ChangeDirection) {
                     var cd = new bulletml.ChangeDirection();
                     cd.direction.type = n.direction.type;
-                    cd.direction.value = this.evalParam(n.direction.value);
-                    cd.term = this.evalParam(n.term);
+                    cd.direction.value = this._evalParam(n.direction.value);
+                    cd.term = this._evalParam(n.term);
                     return cd;
                 } else if (n instanceof bulletml.ChangeSpeed) {
                     var cs = new bulletml.ChangeSpeed();
                     cs.speed.type = n.speed.type;
-                    cs.speed.value = this.evalParam(n.speed.value);
-                    cs.term = this.evalParam(n.term);
+                    cs.speed.value = this._evalParam(n.speed.value);
+                    cs.term = this._evalParam(n.term);
                     return cs;
                 } else if (n instanceof bulletml.Accel) {
                     var a = new bulletml.Accel();
                     a.horizontal.type = n.horizontal.type;
-                    a.horizontal.value = this.evalParam(n.horizontal.value);
+                    a.horizontal.value = this._evalParam(n.horizontal.value);
                     a.vertical.type = n.vertical.type;
-                    a.vertical.value = this.evalParam(n.vertical.value);
-                    a.term = this.evalParam(n.term);
+                    a.vertical.value = this._evalParam(n.vertical.value);
+                    a.term = this._evalParam(n.term);
                     return a;
                 } else if (n instanceof bulletml.Wait) {
-                    return new bulletml.Wait(this.evalParam(n.value));
+                    return new bulletml.Wait(this._evalParam(n.value));
+                } else if (n instanceof bulletml.Vanish) {
+                    return n;
                 } else if (n instanceof bulletml.Bind) {
                     // console.log("bind " + n.variable + " <- " + n.expression);
-                    this._localScope["$" + n.variable] = this.evalParam(n.expression);
+                    this._localScope["$" + n.variable] = this._evalParam(n.expression);
                     // console.log("    = " + this._localScope["$" + n.variable]);
                     return bulletml.DummyCommand;
                 } else if (n instanceof bulletml.Notify) {
@@ -112,7 +116,7 @@
                     return null;
                 }
             } else {
-                this.popStack();
+                this._popStack();
                 if (this._action === null) {
                     return null;
                 }
@@ -120,9 +124,9 @@
                 if (n && n.commandName == "repeat") {
                     this._localScope.loopCounter++;
                     if (this._localScope.loopCounter < this._localScope.loopEnd) {
-                        this.pushStack();
+                        this._pushStack();
                         this._action = n.action.clone();
-                        this._localScope = this.cloneScope();
+                        this._localScope = this._cloneScope();
                         return this.next();
                     } else {
                         return this.next();
@@ -136,8 +140,8 @@
         }
     };
 
-    bulletml.Walker.prototype.pushStack = function() {
-        // console.log("pushStack");
+    bulletml.Walker.prototype._pushStack = function() {
+        // console.log("_pushStack");
         this._stack.push({
             action : this._action,
             cursor : this._cursor,
@@ -146,8 +150,8 @@
         this._cursor = -1;
     };
 
-    bulletml.Walker.prototype.popStack = function() {
-        // console.log("popStack");
+    bulletml.Walker.prototype._popStack = function() {
+        // console.log("_popStack");
         var p = this._stack.pop();
         if (p) {
             this._cursor = p.cursor;
@@ -163,7 +167,7 @@
      * @param {(number|string)} exp
      * @return {number}
      */
-    bulletml.Walker.prototype.evalParam = function(exp) {
+    bulletml.Walker.prototype._evalParam = function(exp) {
         // console.log("eval(" + exp + ")", this._localScope);
         // evalを使わずに済む場合
         var n;
@@ -197,7 +201,7 @@
                 index: upperScope.scope.loopCounter,
                 count: upperScope.scope.loopCounter + 1,
                 first: upperScope.scope.loopCounter === 0,
-                last: upperScope.scope.loopCounter === upperScope.scope.loopEnd - 1,
+                last: (upperScope.scope.loopCounter + 1) >= upperScope.scope.loopEnd,
             };
         }
         // console.log(scope);
@@ -209,11 +213,11 @@
         return result;
     };
 
-    bulletml.Walker.prototype.newScope = function(params) {
+    bulletml.Walker.prototype._newScope = function(params) {
         var result = {};
         if (params) {
             for ( var i = 0, end = params.length; i < end; i++) {
-                result["$" + (i + 1)] = this.evalParam(params[i]);
+                result["$" + (i + 1)] = this._evalParam(params[i]);
             }
         } else {
             for ( var prop in this._localScope)
@@ -224,7 +228,7 @@
         return result;
     };
 
-    bulletml.Walker.prototype.cloneScope = function() {
+    bulletml.Walker.prototype._cloneScope = function() {
         var result = {};
         for ( var prop in this._localScope)
             if (this._localScope.hasOwnProperty(prop)) {

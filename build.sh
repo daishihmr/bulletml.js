@@ -33,3 +33,10 @@ java -jar build-tools/compiler-latest/compiler.jar \
     --js src/main/bulletml.dsl.js \
     --js src/main/bulletml.tmlib.js \
     --js_output_file target/bulletml.for.tmlib.js
+
+java -jar build-tools/jsdoc-toolkit/jsrun.jar \
+    build-tools/jsdoc-toolkit/app/run.js \
+    -d=doc\
+    -a \
+    -t=build-tools/jsdoc-toolkit/templates/jsdoc \
+    src/main/

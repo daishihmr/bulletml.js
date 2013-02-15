@@ -133,7 +133,7 @@ ParseTest2.prototype.testAccel2 = function() {
     var n = accel(horizontal(1), 3);
     assertTrue(n instanceof BulletML.Accel);
     assertEquals(n.horizontal.value, 1);
-    assertEquals(n.vertical, null);
+    assertEquals(n.vertical.value, 0);
     assertEquals(n.term, 3);
 };
 

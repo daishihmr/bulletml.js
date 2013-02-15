@@ -92,16 +92,14 @@ enchant.bulletml = enchant.bulletml || {};
         }
     };
 
-    /**
-     * @scope enchant.bulletml.AttackPattern.prototype
-     */
-    enchant.bulletml.AttackPattern = enchant.Class.create({
+    enchant.bulletml.AttackPattern = enchant.Class.create(
+    /** @lends enchant.bulletml.AttackPattern.prototype */
+    {
         /**
          * 攻撃パターン.
          *
          * @constructs
-         * @param {bulletml.Root}
-         *            bulletml BulletMLデータ
+         * @param {bulletml.Root} bulletml BulletMLデータ
          */
         initialize : function(bulletml) {
             if (!bulletml) {
@@ -112,11 +110,10 @@ enchant.bulletml = enchant.bulletml || {};
         /**
          * enterframeイベントのリスナを作成する.<br>
          * <br>
-         * 第1引数configで各種設定を行う. <br>
+         * 第1引数configで各種設定を行う.<br>
          *
-         *
-         * @param {Object|enchant.Node}
-         *            [config] 発射される弾に関する設定.<br>
+         * @param {Object=} config
+         *            発射される弾に関する設定.<br>
          *            <table border=1>
          *            <tr>
          *            <th>プロパティ名</th>
@@ -175,10 +172,8 @@ enchant.bulletml = enchant.bulletml || {};
          *            <td></td>
          *            </tr>
          *            </table>
-         *            設定する項目がtargetのみの場合、標的オブジェクトを直接引数として渡すことが可能.
-         * @param {string}
-         *            [action] 最初に読み込むactionのラベル.<br>
-         *            省略可.
+         * @param {string=} action
+         *            最初に読み込むactionのラベル.省略可.
          */
         createTicker : function(config, action) {
             if (config instanceof enchant.Node) {
@@ -221,6 +216,9 @@ enchant.bulletml = enchant.bulletml || {};
                 return this._createTicker(config, action);
             }
         },
+        /**
+         * @private
+         */
         _createTicker : function(config, action) {
             config = (function(base) {
                 var result = {};
@@ -379,6 +377,7 @@ enchant.bulletml = enchant.bulletml || {};
         },
         /**
          * action要素を持たないbullet(等速直進弾)のためのtickerを作る.
+         * @private
          */
         _createSimpleTicker: function(config) {
             config = (function(base) {
@@ -423,6 +422,9 @@ enchant.bulletml = enchant.bulletml || {};
             ticker.isDanmaku = true;
             return ticker;
         },
+        /**
+         * @private
+         */
         _fire : function(cmd, config, ticker, pattern) {
             var spec = { label: cmd.bullet.label };
             for (var key in cmd.bullet.option) {
@@ -506,6 +508,9 @@ enchant.bulletml = enchant.bulletml || {};
                 this.parentNode.addChild(b);
             }
         },
+        /**
+         * @private
+         */
         _changeDirection : function(cmd, config, ticker) {
             var d = eval(cmd.direction.value) * DEG_TO_RAD;
             var t = eval(cmd.term);
@@ -533,6 +538,9 @@ enchant.bulletml = enchant.bulletml || {};
             }
             ticker.chDirEnd = this.age + t;
         },
+        /**
+         * @private
+         */
         _changeSpeed : function(cmd, ticker) {
             var s = eval(cmd.speed.value);
             var t = eval(cmd.term);
@@ -552,6 +560,9 @@ enchant.bulletml = enchant.bulletml || {};
             }
             ticker.chSpdEnd = this.age + t;
         },
+        /**
+         * @private
+         */
         _accel : function(cmd, ticker) {
             var t = eval(cmd.term);
             ticker.aclEnd = this.age + t;
@@ -598,7 +609,7 @@ enchant.bulletml = enchant.bulletml || {};
          * 解析済みのBulletMLオブジェクト.<br>
          * 読み取り専用.
          *
-         * @type bulletml.Root
+         * @type {bulletml.Root}
          */
         bulletml : {
             get : function() {
@@ -635,8 +646,6 @@ enchant.bulletml = enchant.bulletml || {};
 
     /**
      * configのデフォルト値.
-     *
-     * @scope enchant.bulletml.AttackPattern
      */
     enchant.bulletml.AttackPattern.defaultConfig = {
         bulletFactory : enchant.bulletml.defaultBulletFactory,

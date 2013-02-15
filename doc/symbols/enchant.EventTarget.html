@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - bulletml.BulletRef</title>
+		<title>JsDoc Reference - enchant.EventTarget</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -247,6 +247,10 @@ ul.inheritsList
 	
 	<li><a href="../symbols/enchant.bulletml.AttackPattern.html">enchant.bulletml.AttackPattern</a></li>
 	
+	<li><a href="../symbols/enchant.EventTarget.html">enchant.EventTarget</a></li>
+	
+	<li><a href="../symbols/enchant.EventTarget%23-bulletml.html">enchant.EventTarget#-bulletml</a></li>
+	
 	<li><a href="../symbols/tm.bulletml.html">tm.bulletml</a></li>
 	
 	<li><a href="../symbols/tm.bulletml.AttackPattern.html">tm.bulletml.AttackPattern</a></li>
@@ -260,7 +264,7 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Class bulletml.BulletRef
+				Class enchant.EventTarget
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
@@ -271,13 +275,13 @@ ul.inheritsList
 				
 				
 				
-					<br /><i>Defined in: </i> <a href="../symbols/src/src_main__bulletml.js.html">bulletml.js</a>.
+					<br /><i>Defined in: </i> <a href="../symbols/src/src_main__bulletml.tmlib.js.html">bulletml.tmlib.js</a>.
 				
 			</p>
 
 <!-- ============================== constructor summary ==================== -->			
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class bulletml.BulletRef.">
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class enchant.EventTarget.">
 				<caption>Class Summary</caption>
 				<thead>
 					<tr>
@@ -290,9 +294,9 @@ ul.inheritsList
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/bulletml.BulletRef.html#constructor">bulletml.BulletRef</a></b>(label)
+								<b><a href="../symbols/enchant.EventTarget.html#constructor">enchant.EventTarget</a></b>(bulletml)
 							</div>
-							<div class="description"></div>
+							<div class="description">攻撃パターン.</div>
 						</td>
 					</tr>
 				</tbody>
@@ -301,50 +305,12 @@ ul.inheritsList
 
 <!-- ============================== properties summary ===================== -->
 			
-				
-				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class bulletml.BulletRef.">
-					<caption>Field Summary</caption>
-					<thead>
-						<tr>
-							<th scope="col">Field Attributes</th>
-							<th scope="col">Field Name and Description</th>
-						</tr>
-					</thead>
-					<tbody>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/bulletml.BulletRef.html#label">label</a></b>
-								</div>
-								<div class="description"></div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/bulletml.BulletRef.html#params">params</a></b>
-								</div>
-								<div class="description"></div>
-							</td>
-						</tr>
-					
-					</tbody>
-				</table>
-				
-				
-				
-			
 
 <!-- ============================== methods summary ======================== -->
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class bulletml.BulletRef.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class enchant.EventTarget.">
 					<caption>Method Summary</caption>
 					<thead>
 						<tr>
@@ -357,7 +323,7 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/bulletml.BulletRef.html#clone">clone</a></b>(walker)
+								<div class="fixedFont"><b><a href="../symbols/enchant.EventTarget.html#removeDanmaku">removeDanmaku</a></b>()
 								</div>
 								<div class="description"></div>
 							</td>
@@ -366,7 +332,7 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/bulletml.BulletRef.html#setRoot">setRoot</a></b>(root)
+								<div class="fixedFont"><b><a href="../symbols/enchant.EventTarget.html#setDanmaku">setDanmaku</a></b>(attackPattern, config)
 								</div>
 								<div class="description"></div>
 							</td>
@@ -389,11 +355,11 @@ ul.inheritsList
 				</div>
 				
 				<div class="fixedFont">
-						<b>bulletml.BulletRef</b>(label)
+						<b>enchant.EventTarget</b>(bulletml)
 				</div>
 				
 				<div class="description">
-					
+					攻撃パターン.
 					
 				</div>
 				
@@ -405,10 +371,10 @@ ul.inheritsList
 						<dt class="heading">Parameters:</dt>
 						
 							<dt>
-								<span class="light fixedFont">{string}</span>  <b>label</b>
+								<span class="light fixedFont">{<a href="../symbols/bulletml.Root.html">bulletml.Root</a>}</span>  <b>bulletml</b>
 								
 							</dt>
-								<dd></dd>
+								<dd>BulletMLデータ</dd>
 						
 						</dl>
 					
@@ -424,55 +390,6 @@ ul.inheritsList
 
 <!-- ============================== field details ========================== -->		
 			
-				<div class="sectionTitle">
-					Field Detail
-				</div>
-				
-					<a name="label"> </a>
-					<div class="fixedFont">
-					
-					
-					<b>label</b>
-					
-					</div>
-					<div class="description">
-						
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="params"> </a>
-					<div class="fixedFont">
-					
-					
-					<b>params</b>
-					
-					</div>
-					<div class="description">
-						
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					
-				
-			
 
 <!-- ============================== method details ========================= -->		
 			
@@ -480,58 +397,46 @@ ul.inheritsList
 					Method Detail
 				</div>
 				
-					<a name="clone"> </a>
+					<a name="removeDanmaku"> </a>
 					<div class="fixedFont">
 					
-					<span class="light">{<a href="../symbols/bulletml.BulletRef.html">bulletml.BulletRef</a>}</span>
-					<b>clone</b>(walker)
+					
+					<b>removeDanmaku</b>()
 					
 					</div>
 					<div class="description">
 						
 						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/src_main__bulletml.enchant.js.html">bulletml.enchant.js</a>.
+						
 						
 					</div>
 					
 					
 					
 						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<b>walker</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
 						
 						
 						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{<a href="../symbols/bulletml.BulletRef.html">bulletml.BulletRef</a>}</span> </dd>
-							
-							</dl>
 						
 						
 						
 
 					<hr />
 				
-					<a name="setRoot"> </a>
+					<a name="setDanmaku"> </a>
 					<div class="fixedFont">
 					
 					
-					<b>setRoot</b>(root)
+					<b>setDanmaku</b>(attackPattern, config)
 					
 					</div>
 					<div class="description">
 						
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/src_main__bulletml.enchant.js.html">bulletml.enchant.js</a>.
 						
 						
 					</div>
@@ -543,7 +448,13 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{<a href="../symbols/bulletml.Root.html">bulletml.Root</a>}</span> <b>root</b>
+									<b>attackPattern</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>config</b>
 									
 								</dt>
 								<dd></dd>
@@ -571,7 +482,7 @@ ul.inheritsList
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Feb 15 2013 11:45:50 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Feb 15 2013 11:02:54 GMT+0900 (JST)
 		</div>
 	</body>
 </html>
