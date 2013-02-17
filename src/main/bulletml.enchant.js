@@ -1,6 +1,6 @@
 /**
  * @fileOverview bullet.enchant.js
- * @version 0.4.1
+ * @version 0.4.2
  * @require enchant.js v0.5.2+, bulletml-min.js v0.3.1
  * @author daishi_hmr
  *

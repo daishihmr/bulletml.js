@@ -1,6 +1,6 @@
 /**
  * @fileOverview bullet.tmlib.js
- * @version 0.4.1
+ * @version 0.4.2
  * @require tmlib.js
  * @author daishi_hmr
  *
