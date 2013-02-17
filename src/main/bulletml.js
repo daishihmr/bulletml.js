@@ -302,6 +302,8 @@ bulletml["_temp"] = function() {};
                     a.vertical.value = this.evalParam(n.vertical.value);
                     a.term = this.evalParam(n.term);
                     return a;
+                } else if (n instanceof bulletml.Vanish) {
+                    return n;
                 } else if (n instanceof bulletml.Wait) {
                     return new bulletml.Wait(this.evalParam(n.value));
                 } else {
