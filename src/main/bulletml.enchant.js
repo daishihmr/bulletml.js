@@ -507,6 +507,8 @@ enchant.bulletml = enchant.bulletml || {};
             } else if (this.parentNode) {
                 this.parentNode.addChild(b);
             }
+
+            config.onFire(b);
         },
         /**
          * @private
@@ -621,7 +623,7 @@ enchant.bulletml = enchant.bulletml || {};
     /**
      * bulletFactory未指定時に使用される弾スプライトの生成関数.
      *
-     * @return {enchant.Sprite} 8px x 8px の大きさのスプライト
+     * @return {enchant.Node} 8px x 8px の大きさのスプライト
      */
     enchant.bulletml.defaultBulletFactory = function() {
         var bullet = new enchant.Sprite(8, 8);
@@ -645,14 +647,29 @@ enchant.bulletml = enchant.bulletml || {};
     };
 
     /**
+     * onFire未指定時に使用される関数.
+     */
+    enchant.bulletml.defaultOnFire = function(bullet) {
+    };
+
+    /**
      * configのデフォルト値.
      */
     enchant.bulletml.AttackPattern.defaultConfig = {
+        /** @type {function(Object): enchant.Node} */
         bulletFactory : enchant.bulletml.defaultBulletFactory,
+        /** @type {function(enchant.Node): boolean} */
         isInsideOfWorld : enchant.bulletml.defaultIsInsideOfWorld,
+        /** @type {function(enchant.Node)} */
+        onFire: enchant.bulletml.defaultOnFire,
+        /** @type {number} */
         rank : 0,
+        /** @type {boolean} */
         updateProperties : false,
-        speedRate : 2
+        /** @type {number} */
+        speedRate : 2,
+        /** @type {enchant.Node} */
+        target : null
     };
 
     var RAD_TO_DEG = 180 / Math.PI;

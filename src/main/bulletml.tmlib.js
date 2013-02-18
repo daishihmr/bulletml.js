@@ -193,6 +193,7 @@ tm.bulletml = tm.bulletml || {};
                 // test out of world
                 if (!conf.isInsideOfWorld(this)) {
                     this.remove();
+                    this.dispatchEvent(tm.event.Event("removed"));
                     ticker.completed = true;
                     if (ticker.parentTicker) {
                         ticker.parentTicker.completeChild();
@@ -326,6 +327,7 @@ tm.bulletml = tm.bulletml || {};
                 // test out of world
                 if (!ticker.config.isInsideOfWorld(this)) {
                     this.remove();
+                    this.dispatchEvent(tm.event.Event("removed"));
                     return;
                 }
             };
@@ -434,6 +436,8 @@ tm.bulletml = tm.bulletml || {};
             } else if (this.parent) {
                 this.parent.addChild(b);
             }
+
+            config.onFire(b);
         },
         /**
          * @private
@@ -562,7 +566,8 @@ tm.bulletml = tm.bulletml || {};
     /**
      * bulletFactory未指定時に使用される弾スプライトの生成関数.
      *
-     * @return {tm.app.CanvasElement} 8px x 8px の大きさのスプライト
+     * @param {Object} spec
+     * @return {tm.app.Element} 8px x 8px の大きさのスプライト
      */
     tm.bulletml.defaultBulletFactory = function(spec) {
         var bullet = tm.app.Sprite(8, 8, DEFAULT_BULLET_IMAGE);
@@ -572,20 +577,36 @@ tm.bulletml = tm.bulletml || {};
 
     /**
      * isInsideOfWorld未指定時に使用される関数.
+     *
+     * @return {boolean}
      */
     tm.bulletml.defaultIsInsideOfWorld = function(bullet) {
         return true;
     };
 
     /**
+     * onFire未指定時に使用される関数.
+     */
+    tm.bulletml.defaultOnFire = function(bullet) {
+    };
+
+    /**
      * configのデフォルト値.
      */
     tm.bulletml.AttackPattern.defaultConfig = {
+        /** @type {function(Object): tm.app.Element} */
         bulletFactory: tm.bulletml.defaultBulletFactory,
+        /** @type {function(tm.app.Element): boolean} */
         isInsideOfWorld: tm.bulletml.defaultIsInsideOfWorld,
+        /** @type {function(tm.app.Element)} */
+        onFire: tm.bulletml.defaultOnFire,
+        /** @type {number} */
         rank: 0,
+        /** @type {boolean} */
         updateProperties: false,
+        /** @type {number} */
         speedRate: 2,
+        /** @type {tm.app.Element} */
         target: null
     };
 
