@@ -6,17 +6,24 @@
 enchant();
 var game;
 window.onload = function() {
+    // ゲームを作成
     game = new Core(320, 320);
     game.preload("chara1.png");
     game.onload = function() {
         game.rootScene.backgroundColor = "rgb(0,0,32)";
 
+        // 自機を作成
         var player = new Player();
+        // 敵を作成
         var enemy = new Enemy();
 
+        // 弾幕の攻撃対象を自機とする
         AttackPattern.defaultConfig.target = player;
 
+        // 弾幕パターンをDSLで書くよ宣言
         var $ = bulletml.dsl;
+
+        // 全周32way弾を30frame毎に発射。それを999回繰り返す
         var pattern = new bulletml.Root({
             top: $.action([
                 $.repeat(999, [
@@ -29,20 +36,28 @@ window.onload = function() {
             ]),
         });
 
+        // 敵に弾幕パターンをセット
         enemy.on("enterframe", pattern.createTicker());
     };
+
+    // ゲームスタート
     game.start();
 };
 
+/** 自機 */
 var Player = Class.create(Sprite, {
     initialize: function() {
         Sprite.call(this, 32, 32);
+
+        // クマ
         this.image = game.assets["chara1.png"];
+
         this.moveTo((320-32)/2, 320-32);
         this.scaleX = -1;
         game.rootScene.addChild(this);
     },
     onenterframe: function() {
+        // キーボード操作に対応
         if (game.input.left)  this.x -= 4;
         if (game.input.right) this.x += 4;
         if (game.input.up)    this.y -= 4;
@@ -50,6 +65,7 @@ var Player = Class.create(Sprite, {
     },
 });
 
+/** 敵 */
 var Enemy = Class.create(Player, {
     initialize: function() {
         Player.call(this, 32, 32);
@@ -58,6 +74,7 @@ var Enemy = Class.create(Player, {
         this.scale(-2, 2);
     },
     onenterframe: function() {
+        // ジタバタしながら左右に動く
         this.x = (320-32)/2 + Math.sin(this.age*0.02)*120;
         this.frame = this.age%2 + 6;
     },
