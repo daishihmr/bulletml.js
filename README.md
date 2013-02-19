@@ -1,12 +1,19 @@
 bulletml.js
 ===========
 
+弾幕記述言語BulletMLをJavaScriptで利用するためのユーティリティ集。
+
+enchant.js用プラグイン、tmlib.js用プラグインもあるよ。
+
+bulletml.js
+-----------
+
 BulletMLをJavaScriptで読み込んでいろいろやるためのパーサー。
 
 
 
 bulletml.enchant.js
-===================
+-------------------
 
 enchant.jsでBulletMLを利用するためのプラグイン。
 
@@ -15,7 +22,7 @@ enchant.jsでBulletMLを利用するためのプラグイン。
 
 
 bulletml.tmlib.js
-===================
+-----------------
 
 tmlib.jsでBulletMLを利用するためのプラグイン。
 
@@ -24,8 +31,8 @@ tmlib.jsでBulletMLを利用するためのプラグイン。
 DEMO
 ====
 
-<a href="http://static.dev7.jp/bulletml.js/sample/with-enchant.js.html">with enchant.js</a><br/>
-<a href="http://static.dev7.jp/bulletml.js/sample/with-tmlib.js.html">with tmlib.js</a><br/>
+<a href="http://daishihmr.github.com/bulletml.js/sample/with-enchant.js">with enchant.js</a><br/>
+<a href="http://daishihmr.github.com/bulletml.js/sample/with-tmlib.js">with tmlib.js</a><br/>
 
 This library is used by ...
 ============================
