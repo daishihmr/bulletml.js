@@ -24,10 +24,14 @@ tmlib.jsでBulletMLを利用するためのプラグイン。
 DEMO
 ====
 
+<a href="http://static.dev7.jp/bulletml.js/sample/with-enchant.js.html">with enchant.js</a><br/>
+<a href="http://static.dev7.jp/bulletml.js/sample/with-tmlib.js.html">with tmlib.js</a><br/>
+
+This library is used by ...
+============================
+
 <a href="http://9leap.net/games/2877/"><img src="http://9leap.net/screenshots//140x140/2877_140"/></a>
-<a href="http://9leap.net/games/2364/"><img src="http://9leap.net/screenshots//140x140/2364_140"/></a>
-
-
+<!-- <a href="http://9leap.net/games/2995/"><img src="http://9leap.net/screenshots//140x140/2995_140"/></a> -->
 
 FEATURES
 ========
