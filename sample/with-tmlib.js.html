@@ -24,11 +24,6 @@ tm.main(function() {
     // 弾幕の攻撃対象を自機とする
     config.target = player;
 
-    // 弾が生き残る範囲を設定する
-    config.isInsideOfWorld = function(bullet) {
-        return 0 < bullet.x && bullet.x < 320 && 0 < bullet.y && bullet.y < 320;
-    };
-
     // 弾の発射時に呼び出される
     config.onFire = function(bullet) {
         bullets[bullets.length] = bullet;

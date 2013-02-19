@@ -10,19 +10,48 @@ window.onload = function() {
     game = new Core(320, 320);
     game.preload("chara1.png");
     game.onload = function() {
+        game.assets["explosion"] = (function() {
+            var sur = new Surface(64, 64);
+            var ctx = sur.context;
+            var gra = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+            gra.addColorStop(0.0, "rgba(255, 255, 255, 0.0)");
+            gra.addColorStop(0.9, "rgba(255, 255, 255, 1.0)");
+            gra.addColorStop(1.0, "rgba(255, 255, 255, 0.0)");
+            ctx.fillStyle = gra;
+            ctx.fillRect(0, 0, 64, 64);
+            return sur;
+        })();
+
         game.rootScene.backgroundColor = "rgb(0,0,32)";
 
         // 自機を作成
         var player = new Player();
         // 敵を作成
         var enemy = new Enemy();
+        // 生きてる弾の配列
+        var bullets = [];
+
+        // 弾幕パターンに関する設定 ここから ---
+        var config = AttackPattern.defaultConfig;
 
         // 弾幕の攻撃対象を自機とする
-        AttackPattern.defaultConfig.target = player;
+        config.target = player;
+
+        // 弾の発射時に呼び出される
+        config.onFire = function(bullet) {
+            console.log("onfire")
+            bullets[bullets.length] = bullet;
+            bullet.addEventListener("removed", function() {
+                var idx = bullets.indexOf(this);
+                if (idx !== -1) bullets.splice(idx, 1);
+            });
+        };
+        // 弾幕パターンに関する設定 ここまで ---
 
         // 弾幕パターンをDSLで書くよ宣言
         var $ = bulletml.dsl;
 
+        // 弾幕パターンDSL
         // 全周32way弾を30frame毎に発射。それを999回繰り返す
         var pattern = new bulletml.Root({
             top: $.action([
@@ -38,6 +67,19 @@ window.onload = function() {
 
         // 敵に弾幕パターンをセット
         enemy.on("enterframe", pattern.createTicker());
+
+        game.rootScene.onenterframe = function() {
+            // 自機と弾の衝突判定
+            for (var i = 0, len = bullets.length; i < len; i++) {
+                if (bullets[i].within(player, 8)) {
+                    // 爆発を表示
+                    explode(bullets[i].x, bullets[i].y);
+                    // 弾をどこか遠くへやる→このフレームで消える
+                    bullets[i].x = 9999;
+                }
+            }
+        };
+
     };
 
     // ゲームスタート
@@ -79,6 +121,36 @@ var Enemy = Class.create(Player, {
         this.frame = this.age%2 + 6;
     },
 });
+
+/** 爆発を発生させる */
+var explode = function(x, y) {
+    new Explosion(x, y);
+};
+/** 爆発クラス */
+var Explosion = Class.create(Sprite, {
+    initialize: function(x, y) {
+        Sprite.call(this, 64, 64);
+        this.image = game.assets["explosion"];
+        this.x = x - 32;
+        this.y = y - 32;
+        this.scaleX = this.scaleY = 0.1;
+        this.opacity = 1;
+        this.compositeOperation = "lighter";
+        this.direction = Math.random() * Math.PI * 2;
+        game.rootScene.addChild(this);
+    },
+    onenterframe: function() {
+        this.x += Math.cos(this.direction) * 0.5;
+        this.y += Math.sin(this.direction) * 0.5;
+        this.scaleX += 0.1;
+        this.scaleY += 0.1;
+        this.opacity -= 0.05;
+        if (this.opacity < 0) {
+            this.remove();
+        }
+    },
+});
+
 </script>
 </head>
 <body style="margin:0">

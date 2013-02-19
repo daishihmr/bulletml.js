@@ -580,8 +580,12 @@ tm.bulletml = tm.bulletml || {};
      *
      * @return {boolean}
      */
+    var ROOT = null;
     tm.bulletml.defaultIsInsideOfWorld = function(bullet) {
-        return true;
+        if (ROOT === null) {
+            ROOT = bullet.getRoot();
+        }
+        return 0 <= bullet.x && bullet.x < APP.width && 0 <= bullet.y && bullet.y < APP.height;
     };
 
     /**
