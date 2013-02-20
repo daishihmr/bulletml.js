@@ -1,12 +1,19 @@
 bulletml.js
 ===========
 
+弾幕記述言語BulletMLをJavaScriptで利用するためのユーティリティ集。
+
+enchant.js用プラグイン、tmlib.js用プラグインもあるよ。
+
+bulletml.js
+-----------
+
 BulletMLをJavaScriptで読み込んでいろいろやるためのパーサー。
 
 
 
 bulletml.enchant.js
-===================
+-------------------
 
 enchant.jsでBulletMLを利用するためのプラグイン。
 
@@ -15,7 +22,7 @@ enchant.jsでBulletMLを利用するためのプラグイン。
 
 
 bulletml.tmlib.js
-===================
+-----------------
 
 tmlib.jsでBulletMLを利用するためのプラグイン。
 
@@ -24,8 +31,17 @@ tmlib.jsでBulletMLを利用するためのプラグイン。
 DEMO
 ====
 
+<a href="http://jsdo.it/daishi.hmr/oLN6"><img width="140" src="http://jsdo-it-static-contents.s3.amazonaws.com/images/capture/o/L/N/oLN6.jpg"/></a>
+<a href="http://jsdo.it/daishi.hmr/xPND"><img width="140" src="http://jsdo-it-static-contents.s3.amazonaws.com/images/capture/x/P/N/xPND.jpg"/></a>
+<a href="http://jsdo.it/daishi.hmr/vZxS"><img width="140" src="http://jsdo-it-static-contents.s3.amazonaws.com/images/capture/v/Z/x/vZxS.jpg"/></a>
+
+
+
+This library is used by ...
+============================
+
 <a href="http://9leap.net/games/2877/"><img src="http://9leap.net/screenshots//140x140/2877_140"/></a>
-<a href="http://9leap.net/games/2364/"><img src="http://9leap.net/screenshots//140x140/2364_140"/></a>
+<a href="http://9leap.net/games/2995/"><img src="http://9leap.net/screenshots//140x140/2995_140"/></a>
 
 
 
