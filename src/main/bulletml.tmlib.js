@@ -193,7 +193,6 @@ tm.bulletml = tm.bulletml || {};
                 // test out of world
                 if (!conf.isInsideOfWorld(this)) {
                     this.remove();
-                    this.dispatchEvent(tm.event.Event("removed"));
                     ticker.completed = true;
                     if (ticker.parentTicker) {
                         ticker.parentTicker.completeChild();
@@ -240,7 +239,6 @@ tm.bulletml = tm.bulletml || {};
                         break;
                     case "vanish":
                         this.remove();
-                        this.dispatchEvent(tm.event.Event("removed"));
                         break;
                     case "notify":
                         ptn._notify.call(this, cmd);
