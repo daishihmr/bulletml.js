@@ -31,7 +31,7 @@
          * @type {Object.<string,number>}
          */
         this._globalScope = {
-            $rank : rank || 0
+            "$rank" : rank || 0
         };
     };
 
@@ -194,21 +194,20 @@
                 scope[prop] = this._localScope[prop];
             }
         }
-        scope.$rand = Math.random();
+        scope["$rand"] = Math.random();
         var upperScope = this._stack[this._stack.length - 1];
         if (upperScope) {
-            scope.$loop = {
-                index: upperScope.scope.loopCounter,
-                count: upperScope.scope.loopCounter + 1,
-                first: upperScope.scope.loopCounter === 0,
-                last: (upperScope.scope.loopCounter + 1) >= upperScope.scope.loopEnd,
+            scope["$loop"] = {
+                "index": upperScope.scope.loopCounter,
+                "count": upperScope.scope.loopCounter + 1,
+                "first": upperScope.scope.loopCounter === 0,
+                "last": (upperScope.scope.loopCounter + 1) >= upperScope.scope.loopEnd,
             };
         }
         // console.log(scope);
-        // console.log("bulletml._temp = function() { return " + exp.split("$").join("this.$") + "}");
-        var result = eval(
-                "bulletml._temp = function() { return "
-                        + exp.split("$").join("this.$") + "}").bind(scope)();
+        var f = new Function("return " + exp.split("$").join("this.$"));
+        // console.log(f);
+        var result = f.apply(scope);
         // console.log(result);
         return result;
     };

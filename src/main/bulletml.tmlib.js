@@ -429,13 +429,14 @@ tm.bulletml = tm.bulletml || {};
                 this.removeEventListener("enterframe", bt);
                 this.removeEventListener("removed", arguments.callee);
             });
-            if (config.addTarget) {
-                config.addTarget.addChild(b);
-            } else if (this.parent) {
-                this.parent.addChild(b);
-            }
 
-            config.onFire(b);
+            if (config.onFire.call(this, b)) {
+                if (config.addTarget) {
+                    config.addTarget.addChild(b);
+                } else if (this.parent) {
+                    this.parent.addChild(b);
+                }
+            }
         },
         /**
          * @private
@@ -590,6 +591,7 @@ tm.bulletml = tm.bulletml || {};
      * onFire未指定時に使用される関数.
      */
     tm.bulletml.defaultOnFire = function(bullet) {
+        return true;
     };
 
     /**

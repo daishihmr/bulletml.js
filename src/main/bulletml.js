@@ -9,7 +9,6 @@
 var bulletml = {};
 /** @const */
 bulletml.GLOBAL = this;
-bulletml["_temp"] = function() {};
 
 (function() {
 
