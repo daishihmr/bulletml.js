@@ -343,6 +343,10 @@ tm.bulletml = tm.bulletml || {};
          * @private
          */
         _fire: function(cmd, config, ticker, pattern) {
+            if (this.onfire !== undefined && !this.onfire()) {
+                return;
+            }
+
             var spec = { label: cmd.bullet.label };
             for (var key in cmd.bullet.option) {
                 spec[key] = cmd.bullet.option[key];
@@ -430,12 +434,10 @@ tm.bulletml = tm.bulletml || {};
                 this.removeEventListener("removed", arguments.callee);
             });
 
-            if (config.onFire.call(this, b)) {
-                if (config.addTarget) {
-                    config.addTarget.addChild(b);
-                } else if (this.parent) {
-                    this.parent.addChild(b);
-                }
+            if (config.addTarget) {
+                config.addTarget.addChild(b);
+            } else if (this.parent) {
+                this.parent.addChild(b);
             }
         },
         /**
@@ -602,8 +604,6 @@ tm.bulletml = tm.bulletml || {};
         bulletFactory: tm.bulletml.defaultBulletFactory,
         /** @type {function(tm.app.Element): boolean} */
         isInsideOfWorld: tm.bulletml.defaultIsInsideOfWorld,
-        /** @type {function(tm.app.Element)} */
-        onFire: tm.bulletml.defaultOnFire,
         /** @type {number} */
         rank: 0,
         /** @type {boolean} */
