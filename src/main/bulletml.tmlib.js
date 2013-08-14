@@ -257,9 +257,9 @@ tm.bulletml = tm.bulletml || {};
 
             action = action || "top";
             if (typeof (action) === "string") {
-                ticker.walker = this._bulletml.getWalker(action, config.rank);
+                ticker.walker = this._bulletml.getWalker(action);
             } else if (action instanceof bulletml.Bullet) {
-                ticker.walker = action.getWalker(config.rank);
+                ticker.walker = action.getWalker();
             } else {
                 window.console.error(config, action);
                 throw new Error("引数が不正");
@@ -562,7 +562,9 @@ tm.bulletml = tm.bulletml || {};
                 { offset: 1.0, color: "red" },
             ]).toStyle()
         ).fillCircle(0, 0, 4);
-        return r;
+
+        var result = tm.asset.Texture(r.canvas.toDataURL());
+        return result;
     })();
     /**
      * bulletFactory未指定時に使用される弾スプライトの生成関数.
@@ -571,7 +573,7 @@ tm.bulletml = tm.bulletml || {};
      * @return {tm.app.Element} 8px x 8px の大きさのスプライト
      */
     tm.bulletml.defaultBulletFactory = function(spec) {
-        var bullet = tm.app.Sprite(8, 8, DEFAULT_BULLET_IMAGE);
+        var bullet = tm.app.Sprite(DEFAULT_BULLET_IMAGE, 8, 8);
         bullet.label = spec.label;
         return bullet;
     };
@@ -584,9 +586,12 @@ tm.bulletml = tm.bulletml || {};
     var ROOT = null;
     tm.bulletml.defaultIsInsideOfWorld = function(bullet) {
         if (ROOT === null) {
-            ROOT = bullet.getRoot();
+            if (!bullet.getRoot().app) return true; // しかたがないのでtrueを返す
+
+            ROOT = bullet.getRoot().app;
+            console.log(ROOT instanceof tm.app.BaseApp);
         }
-        return 0 <= bullet.x && bullet.x < APP.width && 0 <= bullet.y && bullet.y < APP.height;
+        return 0 <= bullet.x && bullet.x < ROOT.width && 0 <= bullet.y && bullet.y < ROOT.height;
     };
 
     /**
@@ -611,7 +616,7 @@ tm.bulletml = tm.bulletml || {};
         /** @type {number} */
         speedRate: 2,
         /** @type {tm.app.Element} */
-        target: null
+        target: null,
     };
 
     /**

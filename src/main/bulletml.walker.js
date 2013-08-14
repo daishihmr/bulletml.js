@@ -1,11 +1,10 @@
 (function() {
-    
+
     /**
      * @constructor
      * @param {bulletml.Root} root
-     * @param {number=} rank
      */
-    bulletml.Walker = function(root, rank) {
+    bulletml.Walker = function(root) {
         this._root = root;
         /**
          * callstack.
@@ -26,13 +25,6 @@
          * @type {Object.<string,number>}
          */
         this._localScope = {};
-        /**
-         * globalScope variables.
-         * @type {Object.<string,number>}
-         */
-        this._globalScope = {
-            "$rank" : rank || 0
-        };
     };
 
     /**
@@ -177,16 +169,16 @@
             return n;
         } else if (n = this._localScope[exp]) {
             return n;
-        } else if (n = this._globalScope[exp]) {
+        } else if (n = bulletml.Walker.globalScope[exp]) {
             return n;
-        } else if (exp == "$rand") {
+        } else if (exp === "$rand") {
             return Math.random();
         }
 
         var scope = {};
-        for ( var prop in this._globalScope) {
-            if (this._globalScope.hasOwnProperty(prop)) {
-                scope[prop] = this._globalScope[prop];
+        for ( var prop in bulletml.Walker.globalScope) {
+            if (bulletml.Walker.globalScope.hasOwnProperty(prop)) {
+                scope[prop] = bulletml.Walker.globalScope[prop];
             }
         }
         for ( var prop in this._localScope) {
@@ -240,8 +232,8 @@
     /**
      * @return {bulletml.Walker}
      */
-    bulletml.Root.prototype.getWalker = function(actionLabel, rank) {
-        var w = new bulletml.Walker(this, rank);
+    bulletml.Root.prototype.getWalker = function(actionLabel) {
+        var w = new bulletml.Walker(this);
         var action = this.findAction(actionLabel);
         if (action) {
             w._action = action;
@@ -252,8 +244,8 @@
     /**
      * @return {bulletml.Walker}
      */
-    bulletml.Bullet.prototype.getWalker = function(rank) {
-        var w = new bulletml.Walker(this.root, rank);
+    bulletml.Bullet.prototype.getWalker = function() {
+        var w = new bulletml.Walker(this.root);
         var action = new bulletml.Action();
         action.root = this.root;
         action.commands = this.actions;
@@ -261,5 +253,7 @@
         w._localScope = this._localScope;
         return w;
     };
+
+    bulletml.Walker.globalScope = {};
 
 })();
