@@ -325,7 +325,6 @@ tm.bulletml = tm.bulletml || {};
                 // test out of world
                 if (!ticker.config.isInsideOfWorld(this)) {
                     this.remove();
-                    this.dispatchEvent(tm.event.Event("removed"));
                     return;
                 }
             };
@@ -358,7 +357,7 @@ tm.bulletml = tm.bulletml || {};
             }
 
             // 等速直進弾?
-            var uniformLinearBullet = !!cmd.bullet.actions.length;
+            var uniformLinearBullet = cmd.bullet.actions.length === 0;
 
             var bt = uniformLinearBullet ? (
                 pattern._createSimpleTicker(config)
@@ -429,10 +428,6 @@ tm.bulletml = tm.bulletml || {};
             }
 
             b.addEventListener("enterframe", bt);
-            b.addEventListener("removed", function() {
-                this.removeEventListener("enterframe", bt);
-                this.removeEventListener("removed", arguments.callee);
-            });
 
             if (config.addTarget) {
                 config.addTarget.addChild(b);
