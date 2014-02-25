@@ -99,6 +99,8 @@ tm.bulletml = tm.bulletml || {};
                     tickers[tickers.length] = this._createTicker(config, topLabels[i]);
                 }
                 var parentTicker = function() {
+                    if (parentTicker.stop) return;
+
                     for ( var i = tickers.length; i--; ) {
                         tickers[i].call(this);
                     }
@@ -119,6 +121,7 @@ tm.bulletml = tm.bulletml || {};
                 parentTicker.compChildCount = 0;
                 parentTicker.completed = false;
                 parentTicker.isDanmaku = true;
+                parentTicker.stop = false;
 
                 return parentTicker;
             } else {
@@ -151,6 +154,8 @@ tm.bulletml = tm.bulletml || {};
             }
 
             var ticker = function() {
+                if (ticker.stop) return;
+
                 ticker.age += 1;
                 this.age = ticker.age;
 
@@ -287,6 +292,7 @@ tm.bulletml = tm.bulletml || {};
             ticker.aclFinV = 0;
             ticker.aclEnd = -1;
             ticker.age = -1;
+            ticker.stop = false;
 
             ticker.isDanmaku = true;
             return ticker;
@@ -318,6 +324,8 @@ tm.bulletml = tm.bulletml || {};
             }
 
             var ticker = function() {
+                if (ticker.stop) return;
+
                 // move sprite
                 this.x += ticker.deltaX;
                 this.y += ticker.deltaY;
@@ -334,6 +342,7 @@ tm.bulletml = tm.bulletml || {};
             ticker.speed = 0;
             ticker.deltaX = 0;
             ticker.deltaY = 0;
+            ticker.stop = false;
 
             ticker.isDanmaku = true;
             return ticker;

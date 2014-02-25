@@ -65,7 +65,10 @@
                         f.speed = new bulletml.Speed(this._evalParam(n.speed.value));
                         f.speed.type = n.speed.type;
                     }
-                    f.option = n.option;
+                    f.option = new bulletml.FireOption();
+                    f.option.offsetX = this._evalParam(n.option.offsetX);
+                    f.option.offsetY = this._evalParam(n.option.offsetY);
+                    f.option.autonomy = n.option.autonomy;
                     return f;
                 } else if (n instanceof bulletml.FireRef) {
                     this._pushStack();
@@ -163,7 +166,9 @@
         // console.log("eval(" + exp + ")", this._localScope);
         // evalを使わずに済む場合
         var n;
-        if (typeof exp === "number") {
+        if (typeof exp === "boolean") {
+            return exp;
+        } else if (typeof exp === "number") {
             return exp;
         } else if (!isNaN(n = Number(exp))) {
             return n;

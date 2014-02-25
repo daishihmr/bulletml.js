@@ -664,11 +664,11 @@ bulletml.GLOBAL = this;
         params = params || {};
 
         /**
-         * @type {number}
+         * @type {(string|number)}
          */
         this.offsetX = params.offsetX || 0;
         /**
-         * @type {number}
+         * @type {(string|number)}
          */
         this.offsetY = params.offsetY || 0;
         /**
