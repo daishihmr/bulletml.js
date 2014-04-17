@@ -167,7 +167,7 @@
         // evalを使わずに済む場合
         var n;
         if (typeof exp === "boolean") {
-            return exp;
+            return exp ? 1 : 0;
         } else if (typeof exp === "number") {
             return exp;
         } else if (!isNaN(n = Number(exp))) {

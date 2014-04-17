@@ -84,7 +84,7 @@ bulletml.GLOBAL = this;
     /**
      * find actions label starts with 'top'.
      *
-     * @return Array.<bulletml.Action>
+     * @return {Array.<string>}
      */
     bulletml.Root.prototype.getTopActionLabels = function() {
         var result = [];
