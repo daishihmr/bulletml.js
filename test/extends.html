@@ -1,0 +1,38 @@
+<html>
+<head>
+</head>
+<body>
+<script>
+
+var myspace = {};
+
+myspace.SuperClass = function() {
+};
+myspace.SuperClass.prototype = {
+    constructor: myspace.SuperClass,
+    hello: function() { console.log("hello") }
+};
+
+myspace.SubClass1 = function(name) {
+    myspace.SuperClass.call(this);
+
+    this.name = name;
+};
+myspace.SubClass1.prototype = Object.create(myspace.SuperClass.prototype);
+myspace.SubClass1.prototype.go = function() {
+    console.log("gogo! let'go " + this.name);
+};
+
+myspace.SubClass2 = function(name) {
+    myspace.SuperClass.call(this);
+
+    this.name = name;
+};
+myspace.SubClass2.prototype = Object.create(myspace.SuperClass.prototype);
+myspace.SubClass2.prototype.go = function() {
+    console.log("gogo go " + this.name + " go!");
+};
+
+</script>
+</body>
+</html>

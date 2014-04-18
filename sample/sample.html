@@ -1,0 +1,235 @@
+<html>
+<head>
+</head>
+<body style="margin:0">
+<canvas id="canvas"></cavnas>
+
+<!-- <script src="../src/main/bulletml.js"></script> -->
+<!-- <script src="../src/main/bulletml.walker.js"></script> -->
+<!-- <script src="../src/main/bulletml.dsl.js"></script> -->
+<!-- <script src="../src/main/bulletml.runner.js"></script> -->
+
+<script src="../target/bulletml.min.js"></script>
+
+<script>
+var SCREEN_WIDTH = 200;
+var SCREEN_HEIGHT = 250;
+
+var score = 0;
+
+var keyboard = null;
+
+var canvas = null;
+var context = null;
+var allObjects = [];
+var frame = 0;
+allObjects.remove = function(obj) {
+    var idx = allObjects.indexOf(obj);
+    if (idx !== -1) allObjects.splice(idx, 1);
+};
+var render = function() {
+    context.fillStyle = "black";
+    context.globalCompositeOperation = "source-over";
+    context.globalAlpha = 0.5;
+    context.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    context.globalCompositeOperation = "lighter";
+    var copied = Array.apply(null, allObjects);
+    for (var i = 0, end = copied.length; i < end; i++) {
+        copied[i].update(frame);
+        copied[i].draw(context);
+    }
+
+    context.fillStyle = "white";
+    context.globalAlpha = 1;
+    context.fillText(score, SCREEN_WIDTH*0.99, SCREEN_HEIGHT*0.01);
+
+    frame += 1;
+    requestAnimationFrame(render);
+};
+
+var Hex = function(w, h, color) {
+    this.w = w;
+    this.h = h;
+    this.x = 0;
+    this.y = 0;
+    this.rot = 0;
+    this.color = color || "hsl(0, 60%, 60%)";
+
+    this.canvas = document.createElement("canvas");
+    this.canvas.width = w*2;
+    this.canvas.height = h*2;
+    var context = this.canvas.getContext("2d");
+    context.globalCompositeOperation = "lighter";
+    context.fillStyle = this.color;
+    context.translate(w, h);
+    context.globalAlpha = 1.0;
+    fillHex(context, this.w, this.h);
+    context.globalAlpha = 0.03;
+    for (var i = 0; i < 10; i++) {
+        var w = this.w * (1+i*0.1);
+        var h = this.h * (1+i*0.1);
+        fillHex(context, w, h);
+        fillHex(context, w, h);
+        fillHex(context, w, h);
+    }
+};
+Hex.prototype.update = function() {};
+Hex.prototype.draw = function(context) {
+    context.fillStyle = this.color;
+    context.save();
+    context.translate(this.x, this.y);
+    context.rotate(this.rot);
+    context.drawImage(this.canvas, -this.canvas.width*.5, -this.canvas.height*.5);
+    context.restore();
+};
+
+var fillHex = function(context, w, h) {
+    context.beginPath();
+    context.moveTo(Math.sin(Math.PI/3 * 0)*w*.5, Math.cos(Math.PI/3 * 0)*h*.5);
+    for (var i = 1; i < 6; i++) {
+        context.lineTo(Math.sin(Math.PI/3 * i)*w*.5, Math.cos(Math.PI/3 * i)*h*.5);
+    }
+    context.closePath();
+    context.fill();
+};
+
+var $ = bulletml.dsl;
+var bml = new bulletml.Root({
+    top: $.action([
+        $.repeat(999, [
+            $.repeat(30, [
+                $.fire($.direction(4, "sequence"), $.speed(5), $.bullet($.actionRef("b"))),
+                $.repeat(9-1, [
+                    $.fire($.direction(360/9, "sequence"), $.speed(5), $.bullet($.actionRef("b"))),
+                ]),
+                $.wait(2),
+            ]),
+            $.wait(30),
+            $.repeat(30, [
+                $.fire($.direction(-4, "sequence"), $.speed(5), $.bullet($.actionRef("b"), {color:"hsl(220, 60%, 60%)"})),
+                $.repeat(9-1, [
+                    $.fire($.direction(360/9, "sequence"), $.speed(5), $.bullet($.actionRef("b"), {color:"hsl(220, 60%, 60%)"})),
+                ]),
+                $.wait(2),
+            ]),
+            $.wait(30),
+        ]),
+    ]),
+    b: $.action([
+        $.changeSpeed($.speed(1), 30),
+        $.wait(30),
+        $.changeDirection($.direction(0, "aim"), 60),
+        $.changeSpeed($.speed(3), 30),
+    ]),
+});
+
+window.onload = function() {
+    keyboard = {
+        up: false,
+        down: false,
+        left: false,
+        right: false,
+        z: false,
+        x: false,
+        space: false
+    };
+    document.addEventListener("keydown", function(e) {
+        switch (e.keyCode) {
+        case 18: keyboard.space = true; break;
+        case 37: keyboard.left = true; break;
+        case 38: keyboard.up = true; break;
+        case 39: keyboard.right = true; break;
+        case 40: keyboard.down = true; break;
+        case 88: keyboard.x = true; break;
+        case 90: keyboard.z = true; break;
+        }
+    }, false);
+    document.addEventListener("keyup", function(e) {
+        switch (e.keyCode) {
+        case 18: keyboard.space = false; break;
+        case 37: keyboard.left = false; break;
+        case 38: keyboard.up = false; break;
+        case 39: keyboard.right = false; break;
+        case 40: keyboard.down = false; break;
+        case 88: keyboard.x = false; break;
+        case 90: keyboard.z = false; break;
+        }
+    }, false);
+
+    canvas = document.getElementById("canvas");
+    canvas.width = SCREEN_WIDTH;
+    canvas.height = SCREEN_HEIGHT;
+    var resize = function() {
+        var rateWidth = canvas.width/window.innerWidth;
+        var rateHeight= canvas.height/window.innerHeight;
+        var rate = canvas.height/canvas.width;
+        if (rateWidth > rateHeight) {
+            canvas.style.width  = innerWidth+"px";
+            canvas.style.height = innerWidth*rate+"px";
+        } else {
+            canvas.style.width  = innerHeight/rate+"px";
+            canvas.style.height = innerHeight+"px";
+        }
+    };
+    window.addEventListener("resize", resize, false);
+    resize();
+
+    context = canvas.getContext("2d");
+    context.textAlign = "right";
+    context.textBaseline = "top";
+
+    var player = new Hex(10, 10, "hsl(120, 60%, 60%)");
+    player.x = SCREEN_WIDTH * 0.5;
+    player.y = SCREEN_HEIGHT * 0.9;
+    player.update = function() {
+        if (keyboard.up) this.y -= 3;
+        else if (keyboard.down) this.y += 3;
+        if (keyboard.left) this.x -= 3;
+        else if (keyboard.right) this.x += 3;
+    };
+    allObjects.push(player);
+
+    var createNewBullet = function(bullet, runner, spec) {
+        var newBullet = new Hex(5, 10, spec.color);
+        newBullet.bx = 0;
+        newBullet.by = 0;
+        newBullet.update = function() {
+            this.bx = this.x;
+            this.by = this.y;
+
+            runner.update();
+
+            this.x = bullet.x;
+            this.y = bullet.y;
+
+            this.rot = Math.atan2(this.y-this.by, this.x-this.bx)+Math.PI*.5;
+
+            if (this.x < 0 || SCREEN_WIDTH < this.x || this.y < 0 || SCREEN_HEIGHT < this.y) {
+                allObjects.remove(newBullet);
+            }
+        };
+        allObjects.push(newBullet);
+
+        bullet.vanish = function() {
+            allObjects.remove(newBullet);
+        };
+    };
+    var config = {
+        target: player,
+        createNewBullet: createNewBullet
+    };
+
+    var enemy = new Hex(40, 30, "hsl(270, 60%, 60%)");
+    enemy.x = SCREEN_WIDTH * 0.5;
+    enemy.y = SCREEN_HEIGHT * 0.1;
+    allObjects.push(enemy);
+    bml.startAttack(enemy, config, function(bullet, runner) {
+        enemy.update = function() { runner.update(); };
+    });
+
+    render();
+};
+</script>
+</body>
+</html>

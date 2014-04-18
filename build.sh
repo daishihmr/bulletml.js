@@ -9,8 +9,9 @@ java -jar build-tools/compiler-latest/compiler.jar \
     --js src/main/bulletml.walker.js \
     --js src/main/bulletml.xml.js \
     --js src/main/bulletml.dsl.js \
-    --js src/main/bulletml.ticker.js \
-    --js_output_file target/bulletml.min.js
+    --js src/main/bulletml.runner.js \
+    --js_output_file target/bulletml.min.js \
+    # --formatting PRETTY_PRINT
 
 # java -jar build-tools/jsdoc-toolkit/jsrun.jar \
 #     build-tools/jsdoc-toolkit/app/run.js \
