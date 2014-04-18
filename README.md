@@ -40,6 +40,7 @@ DEMO
 This library is used by ...
 ============================
 
+<a href="http://tmshooter.net/"><img width="140" src="http://tmshooter.net/tmshooter/glshooter2.png"/></a>
 <a href="http://9leap.net/games/2877/"><img src="http://9leap.net/screenshots//140x140/2877_140"/></a>
 <a href="http://9leap.net/games/2995/"><img src="http://9leap.net/screenshots//140x140/2995_140"/></a>
 
