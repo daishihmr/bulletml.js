@@ -12,8 +12,14 @@
 <script src="../target/bulletml.min.js"></script>
 
 <script>
+Array.prototype.remove = function(obj) {
+    var idx = allObjects.indexOf(obj);
+    if (idx !== -1) allObjects.splice(idx, 1);
+};
+
 var SCREEN_WIDTH = 200;
 var SCREEN_HEIGHT = 250;
+var SPEED = 1;
 
 var score = 0;
 
@@ -23,14 +29,10 @@ var canvas = null;
 var context = null;
 var allObjects = [];
 var frame = 0;
-allObjects.remove = function(obj) {
-    var idx = allObjects.indexOf(obj);
-    if (idx !== -1) allObjects.splice(idx, 1);
-};
 var render = function() {
     context.fillStyle = "black";
     context.globalCompositeOperation = "source-over";
-    context.globalAlpha = 0.5;
+    context.globalAlpha = 0.7;
     context.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     context.globalCompositeOperation = "lighter";
@@ -48,9 +50,12 @@ var render = function() {
     requestAnimationFrame(render);
 };
 
-var Hex = function(w, h, color) {
+var enemies = [];
+
+var Hex = function(w, h, radius, color) {
     this.w = w;
     this.h = h;
+    this.radius = radius;
     this.x = 0;
     this.y = 0;
     this.rot = 0;
@@ -83,6 +88,9 @@ Hex.prototype.draw = function(context) {
     context.drawImage(this.canvas, -this.canvas.width*.5, -this.canvas.height*.5);
     context.restore();
 };
+Hex.prototype.hit = function(another) {
+    return (this.x - another.x)*(this.x - another.x) + (this.y - another.y)*(this.y - another.y) < (this.radius+another.radius)*(this.radius+another.radius);
+};
 
 var fillHex = function(context, w, h) {
     context.beginPath();
@@ -99,7 +107,7 @@ var bml = new bulletml.Root({
     top: $.action([
         $.repeat(999, [
             $.repeat(30, [
-                $.fire($.direction(4, "sequence"), $.speed(5), $.bullet($.actionRef("b"))),
+                $.fire($.direction(12, "sequence"), $.speed(5), $.bullet($.actionRef("b"))),
                 $.repeat(9-1, [
                     $.fire($.direction(360/9, "sequence"), $.speed(5), $.bullet($.actionRef("b"))),
                 ]),
@@ -107,7 +115,7 @@ var bml = new bulletml.Root({
             ]),
             $.wait(30),
             $.repeat(30, [
-                $.fire($.direction(-4, "sequence"), $.speed(5), $.bullet($.actionRef("b"), {color:"hsl(220, 60%, 60%)"})),
+                $.fire($.direction(-12, "sequence"), $.speed(5), $.bullet($.actionRef("b"), {color:"hsl(220, 60%, 60%)"})),
                 $.repeat(9-1, [
                     $.fire($.direction(360/9, "sequence"), $.speed(5), $.bullet($.actionRef("b"), {color:"hsl(220, 60%, 60%)"})),
                 ]),
@@ -130,9 +138,23 @@ window.onload = function() {
         down: false,
         left: false,
         right: false,
+        c: false,
         z: false,
         x: false,
         space: false
+    };
+    keyboard.angles = {
+           1: { x:Math.cos(Math.PI*.25 * 0), y:Math.sin(Math.PI*.25 * 0) },
+          10: { x:Math.cos(Math.PI*.25 * 4), y:Math.sin(Math.PI*.25 * 4) },
+         100: { x:Math.cos(Math.PI*.25 * 2), y:Math.sin(Math.PI*.25 * 2) },
+         101: { x:Math.cos(Math.PI*.25 * 1), y:Math.sin(Math.PI*.25 * 1) },
+         110: { x:Math.cos(Math.PI*.25 * 3), y:Math.sin(Math.PI*.25 * 3) },
+        1000: { x:Math.cos(Math.PI*.25 * 6), y:Math.sin(Math.PI*.25 * 6) },
+        1001: { x:Math.cos(Math.PI*.25 * 7), y:Math.sin(Math.PI*.25 * 7) },
+        1010: { x:Math.cos(Math.PI*.25 * 5), y:Math.sin(Math.PI*.25 * 5) },
+    };
+    keyboard.angle = function() {
+        return this.angles[this.up*1000+this.down*100+this.left*10+this.right];
     };
     document.addEventListener("keydown", function(e) {
         switch (e.keyCode) {
@@ -141,6 +163,7 @@ window.onload = function() {
         case 38: keyboard.up = true; break;
         case 39: keyboard.right = true; break;
         case 40: keyboard.down = true; break;
+        case 67: keyboard.c = true; break;
         case 88: keyboard.x = true; break;
         case 90: keyboard.z = true; break;
         }
@@ -152,6 +175,7 @@ window.onload = function() {
         case 38: keyboard.up = false; break;
         case 39: keyboard.right = false; break;
         case 40: keyboard.down = false; break;
+        case 67: keyboard.c = false; break;
         case 88: keyboard.x = false; break;
         case 90: keyboard.z = false; break;
         }
@@ -179,19 +203,56 @@ window.onload = function() {
     context.textAlign = "right";
     context.textBaseline = "top";
 
-    var player = new Hex(10, 10, "hsl(120, 60%, 60%)");
+    var player = new Hex(10, 10, 5, "hsl(120, 60%, 60%)");
     player.x = SCREEN_WIDTH * 0.5;
     player.y = SCREEN_HEIGHT * 0.9;
-    player.update = function() {
-        if (keyboard.up) this.y -= 3;
-        else if (keyboard.down) this.y += 3;
-        if (keyboard.left) this.x -= 3;
-        else if (keyboard.right) this.x += 3;
+    player.speed = 2;
+    player.shot = function(x, y, theta) {
+        var newShot = new Hex(3, 12, 2, "hsl(110, 60%, 60%)");
+        newShot.x = this.x + x;
+        newShot.y = this.y + y;
+        newShot.bx = 0;
+        newShot.by = 0;
+        newShot.dx = Math.cos(theta)*5;
+        newShot.dy = Math.sin(theta)*5;
+        newShot.update = function() {
+            this.bx = this.x;
+            this.by = this.y;
+            this.x += this.dx;
+            this.y += this.dy;
+            this.rot = Math.atan2(this.y-this.by, this.x-this.bx)+Math.PI*.5;
+            if (this.x < 0 || SCREEN_WIDTH < this.x || this.y < 0 || SCREEN_HEIGHT < this.y) {
+                allObjects.remove(this);
+                return;
+            }
+
+
+        };
+        allObjects.push(newShot);
+    };
+    player.update = function(frame) {
+        var a = keyboard.angle();
+        if (a) {
+            this.x += a.x * this.speed;
+            this.y += a.y * this.speed;
+        }
+        this.x = Math.max(0, Math.min(this.x, SCREEN_WIDTH));
+        this.y = Math.max(0, Math.min(this.y, SCREEN_HEIGHT));
+        if (keyboard.z && frame%5 === 0) {
+            var t = frame/5;
+            this.shot(-6, +4, Math.PI*1.5 + -0.2);
+            this.shot(-4,  0, Math.PI*1.5 + -0.1);
+            this.shot(-2, -4, Math.PI*1.5 +  0.0);
+            this.shot(+2, -4, Math.PI*1.5 +  0.0);
+            this.shot(+4,  0, Math.PI*1.5 + +0.1);
+            this.shot(+6, +4, Math.PI*1.5 + +0.2);
+        }
+        this.speed = keyboard.c ? SPEED : SPEED*2;
     };
     allObjects.push(player);
 
     var createNewBullet = function(bullet, runner, spec) {
-        var newBullet = new Hex(5, 10, spec.color);
+        var newBullet = new Hex(5, 10, 2, spec.color);
         newBullet.bx = 0;
         newBullet.by = 0;
         newBullet.update = function() {
@@ -206,7 +267,14 @@ window.onload = function() {
             this.rot = Math.atan2(this.y-this.by, this.x-this.bx)+Math.PI*.5;
 
             if (this.x < 0 || SCREEN_WIDTH < this.x || this.y < 0 || SCREEN_HEIGHT < this.y) {
-                allObjects.remove(newBullet);
+                allObjects.remove(this);
+                return;
+            }
+
+            if (this.hit(player)) {
+                console.log("hit!!");
+                allObjects.remove(this);
+                return;
             }
         };
         allObjects.push(newBullet);
@@ -220,7 +288,7 @@ window.onload = function() {
         createNewBullet: createNewBullet
     };
 
-    var enemy = new Hex(40, 30, "hsl(270, 60%, 60%)");
+    var enemy = new Hex(40, 30, 15, "hsl(270, 60%, 60%)");
     enemy.x = SCREEN_WIDTH * 0.5;
     enemy.y = SCREEN_HEIGHT * 0.1;
     allObjects.push(enemy);
