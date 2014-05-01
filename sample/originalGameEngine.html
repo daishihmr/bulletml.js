@@ -13,59 +13,116 @@ var danmaku0 = bulletml.buildXML(
             "<repeat>" +
                 "<times>999</times>" +
                 "<action>" +
-                    "<fire>" +
-                        "<direction type='sequence'>12</direction>" +
-                        "<speed>4</speed>" +
-                        "<bullet />" +
-                    "</fire>" +
                     "<repeat>" +
-                        "<times>9-1</times>" +
+                        "<times>30</times>" +
                         "<action>" +
                             "<fire>" +
-                                "<direction type='sequence'>360/9</direction>" +
-                                "<speed>4</speed>" +
-                                "<bullet />" +
+                                "<direction type='sequence'>12</direction>" +
+                                "<speed>5</speed>" +
+                                "<bullet>" +
+                                    "<actionRef label='b'/>" +
+                                "</bullet>" +
                             "</fire>" +
+                            "<repeat>" +
+                                "<times>9-1</times>" +
+                                "<action>" +
+                                    "<fire>" +
+                                        "<direction type='sequence'>360/9</direction>" +
+                                        "<speed>5</speed>" +
+                                        "<bullet>" +
+                                            "<actionRef label='b'/>" +
+                                        "</bullet>" +
+                                    "</fire>" +
+                                "</action>" +
+                            "</repeat>" +
+                            "<wait>2</wait>" +
                         "</action>" +
                     "</repeat>" +
-                    "<wait>2</wait>" +
+                    "<wait>30</wait>" +
+                    "<repeat>" +
+                        "<times>30</times>" +
+                        "<action>" +
+                            "<fire>" +
+                                "<direction type='sequence'>-12</direction>" +
+                                "<speed>5</speed>" +
+                                "<bullet>" +
+                                    "<actionRef label='b'/>" +
+                                "</bullet>" +
+                            "</fire>" +
+                            "<repeat>" +
+                                "<times>9-1</times>" +
+                                "<action>" +
+                                    "<fire>" +
+                                        "<direction type='sequence'>360/9</direction>" +
+                                        "<speed>5</speed>" +
+                                        "<bullet>" +
+                                            "<actionRef label='b'/>" +
+                                        "</bullet>" +
+                                    "</fire>" +
+                                "</action>" +
+                            "</repeat>" +
+                            "<wait>2</wait>" +
+                        "</action>" +
+                    "</repeat>" +
+                    "<wait>30</wait>" +
                 "</action>" +
             "</repeat>" +
+        "</action>" +
+        "<action label='b'>" +
+            "<changeSpeed>" +
+                "<speed>1</speed>" +
+                "<term>30</term>" +
+            "</changeSpeed>" +
+            "<wait>30</wait>" +
+            "<changeDirection>" +
+                "<direction type='aim'>1</direction>" +
+                "<term>60</term>" +
+            "</changeDirection>" +
+            "<changeSpeed>" +
+                "<speed>3</speed>" +
+                "<term>30</term>" +
+            "</changeSpeed>" +
+            "<wait>50</wait>" +
+            "<vanish />" +
+            "<fire>" +
+                "<speed>2</speed>" +
+                "<bullet />" +
+            "</fire>" +
         "</action>" +
     "</bulletml>"
 );
 
-// BulletML DSLで記述
-var $ = bulletml.dsl;
+// 弾幕パターンをBulletML DSLで記述
+bulletml.dsl();
 var danmaku1 = new bulletml.Root({
-    top: $.action([
-        $.repeat(999, [
-            $.repeat(30, [
-                $.fire($.direction(12, "sequence"), $.speed(5), $.bullet($.actionRef("b"))),
-                $.repeat(9-1, [
-                    $.fire($.direction(360/9, "sequence"), $.speed(5), $.bullet($.actionRef("b"))),
+    top: action([
+        repeat(999, [
+            repeat(30, [
+                fire(direction(12, "sequence"), speed(5), bullet(actionRef("b"))),
+                repeat(9-1, [
+                    fire(direction(360/9, "sequence"), speed(5), bullet(actionRef("b"))),
                 ]),
-                $.wait(2),
+                wait(2),
             ]),
-            $.wait(30),
-            $.repeat(30, [
-                $.fire($.direction(-12, "sequence"), $.speed(5), $.bullet($.actionRef("b"), {color:"hsl(220, 60%, 80%)"})),
-                $.repeat(9-1, [
-                    $.fire($.direction(360/9, "sequence"), $.speed(5), $.bullet($.actionRef("b"), {color:"hsl(220, 60%, 80%)"})),
+            wait(30),
+            repeat(30, [
+                fire(direction(-12, "sequence"), speed(5), bullet(actionRef("b"), {color:"hsl(220, 60%, 80%)"})),
+                repeat(9-1, [
+                    fire(direction(360/9, "sequence"), speed(5), bullet(actionRef("b"), {color:"hsl(220, 60%, 80%)"})),
                 ]),
-                $.wait(2),
+                wait(2),
             ]),
-            $.wait(30),
+            wait(30),
         ]),
     ]),
-    b: $.action([
-        $.changeSpeed($.speed(1), 30),
-        $.wait(30),
-        $.changeDirection($.direction(0, "aim"), 60),
-        $.changeSpeed($.speed(3), 30),
-        $.wait(30),
-        $.vanish(),
-        $.fire($.speed(2), $.bullet({color:"hsl(50, 60%, 80%)"}))
+    b: action([
+        changeSpeed(speed(1), 30),
+        wait(30),
+        changeDirection(direction(0, "aim"), 60),
+        changeSpeed(speed(3), 30),
+        wait(50),
+        vanish(),
+        fire(speed(2), bullet({color:"hsl(50, 60%, 80%)"}))
     ]),
 });
 
@@ -101,6 +158,7 @@ window.onload = function() {
             //   spec
             //     BulletML内に記述した弾の付加情報
             //     内容はユーザーが自由に定義することが出来る
+            //     DSL版のみ使用可能
 
             // 弾オブジェクトを作成
             var bullet = new Bullet(spec);
