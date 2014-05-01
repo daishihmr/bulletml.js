@@ -1,5 +1,5 @@
 /**
- * @preserve bulletml.js v0.5.0-SNAPSHOT
+ * @preserve bulletml.js v0.6.0-SNAPSHOT
  *
  * License
  * http://daishihmr.mit-license.org/
@@ -720,8 +720,3 @@ bulletml.GLOBAL = this;
     }
 
 })();
-
-/**
- * @deprecated Since version 0.5. You should now use 'bulletml'.
- */
-var BulletML = bulletml;
