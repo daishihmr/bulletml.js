@@ -5,22 +5,6 @@ bulletml.runner = bulletml.runner || {};
 
 /**
  * @constructor
- */
-bulletml.runner.Bullet = function() {
-    this.x = 0.0;
-    this.y = 0.0;
-};
-
-bulletml.runner.Bullet.prototype.vanish = function() {};
-
-/**
- * @param {string} eventName
- * @param {Object} params
- */
-bulletml.runner.Bullet.prototype.notify = function(eventName, params) {};
-
-/**
- * @constructor
  * @param {bulletml.Root} root
  */
 bulletml.runner.RunnerFactory = function(root) {
@@ -28,11 +12,10 @@ bulletml.runner.RunnerFactory = function(root) {
 };
 
 /**
- * @param {bulletml.runner.Bullet} attacker
  * @param {Object} config
  * @return {bulletml.runner.Runner}
  */
-bulletml.runner.RunnerFactory.prototype.create = function(attacker, config) {
+bulletml.runner.RunnerFactory.prototype.create = function(config) {
     for (var key in bulletml.runner.DEFAULT_CONFIG) if (bulletml.runner.DEFAULT_CONFIG.hasOwnProperty(key)) {
         if (config[key] === undefined) {
             config[key] = bulletml.runner.DEFAULT_CONFIG[key]
@@ -42,7 +25,6 @@ bulletml.runner.RunnerFactory.prototype.create = function(attacker, config) {
     var topLabels = this.root.getTopActionLabels();
     if (topLabels.length === 1) {
         return new bulletml.runner.SubRunner(
-            attacker,
             config,
             this.root.getWalker(topLabels[0])
         );
@@ -50,7 +32,6 @@ bulletml.runner.RunnerFactory.prototype.create = function(attacker, config) {
         var parentRunner = new bulletml.runner.ParentRunner();
         for (var i = 0, end = topLabels.length; i < end; i++) {
             parentRunner.addSubRunner(new bulletml.runner.SubRunner(
-                attacker,
                 config,
                 this.root.getWalker(topLabels[i])
             ));
@@ -60,17 +41,17 @@ bulletml.runner.RunnerFactory.prototype.create = function(attacker, config) {
 };
 
 /**
- * @param {{x:number,y:number}} enemy
+ * @param {number} initialX
+ * @param {number} initialY
  * @param {Object} config
- * @param {function(bulletml.runner.Bullet,bulletml.runner.Runner)=} callback
+ * @param {function(bulletml.runner.Runner)=} callback
  * @return {bulletml.runner.Runner}
  */
-bulletml.Root.prototype.startAttack = function(enemy, config, callback) {
-    var attacker = new bulletml.runner.Bullet();
-    attacker.x = enemy.x;
-    attacker.y = enemy.y;
-    var runner = new bulletml.runner.RunnerFactory(this).create(attacker, config);
-    if (callback) callback(attacker, runner);
+bulletml.Root.prototype.createRunner = function(initialX, initialY, config, callback) {
+    var runner = new bulletml.runner.RunnerFactory(this).create(config);
+    runner.x = initialX;
+    runner.y = initialY;
+    if (callback) callback(runner);
 
     return runner;
 };
@@ -80,17 +61,26 @@ bulletml.runner.DEFAULT_CONFIG = {
     rank: 0,
     /** @type {?{x: number, y: number}} */
     target: null,
-    /** @type {function(bulletml.runner.Bullet,bulletml.runner.Runner,Object)} */
-    createNewBullet: function(bullet, spec) {}
+    /** @type {function(bulletml.runner.Runner,Object)} */
+    createNewBullet: function(runner, spec) {}
 };
 
 /**
  * @constructor
  */
-bulletml.runner.Runner = function() {};
+bulletml.runner.Runner = function() {
+    this.x = 0;
+    this.y = 0;
+};
 bulletml.runner.Runner.prototype = {
     constructor: bulletml.runner.Runner,
-    update: function() {}
+    update: function() {},
+    onVanish: function() {},
+    /**
+     * @param {string} eventName
+     * @param {Object} params
+     */
+    onNotify: function(eventName, params) {},
 };
 
 /**
@@ -132,13 +122,11 @@ bulletml.runner.ParentRunner.prototype.update = function() {
 /**
  * @constructor
  * @extends {bulletml.runner.Runner}
- * @param {bulletml.runner.Bullet} attacker
  * @param {Object} config
  */
-bulletml.runner.SimpleSubRunner = function(attacker, config) {
+bulletml.runner.SimpleSubRunner = function(config) {
     bulletml.runner.Runner.call(this);
 
-    this.attacker = attacker;
     this.config = config;
 
     this.direction = 0.0;
@@ -156,19 +144,18 @@ bulletml.runner.SimpleSubRunner.prototype.update = function() {
     if (this.deltaX === null) this.deltaX = Math.cos(this.direction) * this.speed;
     if (this.deltaY === null) this.deltaY = Math.sin(this.direction) * this.speed;
 
-    this.attacker.x += this.deltaX;
-    this.attacker.y += this.deltaY;
+    this.x += this.deltaX;
+    this.y += this.deltaY;
 };
 
 /**
  * @constructor
  * @extends {bulletml.runner.SimpleSubRunner}
- * @param {bulletml.runner.Bullet} attacker
  * @param {Object} config
  * @param {bulletml.Walker} walker
  */
-bulletml.runner.SubRunner = function(attacker, config, walker) {
-    bulletml.runner.SimpleSubRunner.call(this, attacker, config);
+bulletml.runner.SubRunner = function(config, walker) {
+    bulletml.runner.SimpleSubRunner.call(this, config);
 
     this.walker = walker;
 
@@ -234,10 +221,10 @@ bulletml.runner.SubRunner.prototype.update = function() {
     }
 
     // move
-    this.attacker.x += Math.cos(this.direction) * this.speed;
-    this.attacker.y += Math.sin(this.direction) * this.speed;
-    this.attacker.x += this.speedH;
-    this.attacker.y += this.speedV;
+    this.x += Math.cos(this.direction) * this.speed;
+    this.y += Math.sin(this.direction) * this.speed;
+    this.x += this.speedH;
+    this.y += this.speedV;
 
     // proccess walker
     if (this.age < this.waitTo || this.completed) {
@@ -262,7 +249,7 @@ bulletml.runner.SubRunner.prototype.update = function() {
             this.accel(/**@type{bulletml.Accel}*/(cmd));
             break;
         case "vanish":
-            this.attacker.vanish();
+            this.onVanish();
             break;
         case "notify":
             this.notify(/**@type{bulletml.Notify}*/(cmd));
@@ -283,18 +270,16 @@ bulletml.runner.SubRunner.prototype.update = function() {
  */
 bulletml.runner.SubRunner.prototype.fire = function(cmd) {
 
-    var bullet = new bulletml.runner.Bullet();
-
     var bulletRunner;
     if (cmd.bullet.actions.length === 0) {
-        bulletRunner = new bulletml.runner.SimpleSubRunner(bullet, this.config);
+        bulletRunner = new bulletml.runner.SimpleSubRunner(this.config);
     } else {
-        bulletRunner = new bulletml.runner.SubRunner(bullet, this.config, cmd.bullet.getWalker());
+        bulletRunner = new bulletml.runner.SubRunner(this.config, cmd.bullet.getWalker());
     }
 
     var gunPosition = {
-        x: this.attacker.x + /**@type{number}*/(cmd.option.offsetX),
-        y: this.attacker.y + /**@type{number}*/(cmd.option.offsetY)
+        x: this.x + /**@type{number}*/(cmd.option.offsetX),
+        y: this.y + /**@type{number}*/(cmd.option.offsetY)
     };
 
     // direction
@@ -306,7 +291,7 @@ bulletml.runner.SubRunner.prototype.fire = function(cmd) {
             if (cmd.option.autonomy) {
                 bulletRunner.direction = angleAtoB(gunPosition, this.config.target) + dv;
             } else {
-                bulletRunner.direction = angleAtoB(this.attacker, this.config.target) + dv;
+                bulletRunner.direction = angleAtoB(this, this.config.target) + dv;
             }
         } else {
             bulletRunner.direction = dv - Math.PI / 2;
@@ -341,15 +326,15 @@ bulletml.runner.SubRunner.prototype.fire = function(cmd) {
     this.lastSpeed = bulletRunner.speed;
 
     // initialize position
-    bullet.x = gunPosition.x;
-    bullet.y = gunPosition.y;
+    bulletRunner.x = gunPosition.x;
+    bulletRunner.y = gunPosition.y;
 
     var spec = {};
     for (var key in cmd.bullet.option) {
         spec[key] = cmd.bullet.option[key];
     }
     spec.label = cmd.bullet.label;
-    this.config.createNewBullet(bullet, bulletRunner, spec);
+    this.config.createNewBullet(bulletRunner, spec);
 };
 
 /**
@@ -361,7 +346,7 @@ bulletml.runner.SubRunner.prototype.changeDirection = function(cmd) {
     var t = cmd.term;
     switch (cmd.direction.type) {
     case "aim":
-        this.dirFin = angleAtoB(this.attacker, this.config.target) + d;
+        this.dirFin = angleAtoB(this, this.config.target) + d;
         this.dirIncr = normalizeRadian(this.dirFin - this.direction) / t;
         break;
     case "absolute":
@@ -454,7 +439,7 @@ bulletml.runner.SubRunner.prototype.accel = function(cmd) {
  * @param {bulletml.Notify} cmd
  */
 bulletml.runner.SubRunner.prototype.notify = function(cmd) {
-    this.attacker.notify(cmd.eventName, cmd.params);
+    this.onNotify(cmd.eventName, cmd.params);
 };
 
 /**
@@ -472,8 +457,8 @@ var normalizeRadian = function(radian) {
 
 
 /**
- * @param {{x:number,y:number}|bulletml.runner.Bullet} a
- * @param {{x:number,y:number}|bulletml.runner.Bullet} b
+ * @param {{x:number,y:number}} a
+ * @param {{x:number,y:number}} b
  * @return {number}
  */
 var angleAtoB = function(a, b) {
