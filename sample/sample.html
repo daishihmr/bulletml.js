@@ -2,20 +2,50 @@
 <head>
 </head>
 <body style="margin:0">
-<script src="../target/bulletml.min.js"></script>
+<script src="../build/bulletml.min.js"></script>
 <script>
 var CANVAS_WIDTH = 200;
 var CANVAS_HEIGHT = 250;
 
-var game;
+var scene;
 var player;
 var enemies = [];
 var score = 0;
 
 // 弾幕パターン
 
+// BulletMLで記述
+var danmaku0 = bulletml.buildXML(
+    "<bulletml>" + 
+        "<action label='top'>" +
+            "<repeat>" +
+                "<times>999</times>" +
+                "<action>" +
+                    "<fire>" +
+                        "<direction type='sequence'>12</direction>" +
+                        "<speed>4</speed>" +
+                        "<bullet />" +
+                    "</fire>" +
+                    "<repeat>" +
+                        "<times>9-1</times>" +
+                        "<action>" +
+                            "<fire>" +
+                                "<direction type='sequence'>360/9</direction>" +
+                                "<speed>4</speed>" +
+                                "<bullet />" +
+                            "</fire>" +
+                        "</action>" +
+                    "</repeat>" +
+                    "<wait>2</wait>" +
+                "</action>" +
+            "</repeat>" +
+        "</action>" +
+    "</bulletml>"
+);
+
+// BulletML DSLで記述
 var $ = bulletml.dsl;
-var danmaku0 = new bulletml.Root({
+var danmaku1 = new bulletml.Root({
     top: $.action([
         $.repeat(999, [
             $.repeat(30, [
@@ -50,13 +80,13 @@ var danmaku0 = new bulletml.Root({
 // メイン処理
 
 window.onload = function() {
-    game = new Game();
+    scene = new Scene();
 
     // 自機
     player = new Player();
     player.x = CANVAS_WIDTH * 0.5;
     player.y = CANVAS_HEIGHT * 0.9;
-    player.addTo(game);
+    player.addTo(scene);
 
     // 弾幕共通設定
     var danmakuConfig = {
@@ -66,9 +96,18 @@ window.onload = function() {
 
         // 新規に弾が発生した時に呼び出される関数
         createNewBullet: function(runner, spec) {
-            // runnerは弾の動作を司るオブジェクト
 
-            var bullet = new Bullet(spec).addTo(game);
+            // 引数解説
+            //   runner
+            //     弾の動作を司るオブジェクト
+            //     updateメソッドを呼び出すことにより、BulletMLをステップ実行する
+            //     位置・方向・速度の情報を持つ
+            //   spec
+            //     BulletML内に記述した弾の付加情報
+            //     内容はユーザーが自由に定義することが出来る
+
+            // 弾オブジェクトを作成
+            var bullet = new Bullet(spec);
 
             // 弾の消滅時に呼び出される
             runner.onVanish = function() {
@@ -86,30 +125,62 @@ window.onload = function() {
 
                 this.hitTest();
             };
+
+            // シーンに追加する
+            bullet.addTo(scene);
         }
 
     };
 
-    var enemy = new Hex(40, 30, 15, "hsl(270, 60%, 80%)");
-    enemy.x = CANVAS_WIDTH * 0.5;
-    enemy.y = CANVAS_HEIGHT * 0.1;
-    enemy.addTo(game);
+    // 敵(XML版)
+    var enemyXML = new Hex(40, 30, 15, "hsl(270, 60%, 80%)");
+    enemyXML.x = CANVAS_WIDTH * 0.5;
+    enemyXML.y = CANVAS_HEIGHT * 0.1;
+    enemyXML.addTo(scene);
 
-    // 弾幕ランナー
-    enemy.danmakuRunner = danmaku0.createRunner(enemy.x, enemy.y, danmakuConfig);
+    // createRunner
+    //   BulletMLをステップ実行するrunnerを作成する
+    //   毎フレームでrunnerのupdateメソッドを呼び出すことによりBulletMLを実行することが出来る
+    //   BulletML内部での位置情報は手動で更新する必要がある
+    enemyXML.danmakuRunner = danmaku0.createRunner(danmakuConfig);
 
-    enemy.update = function() {
-        // 弾幕ランナーのupdateメソッドを毎フレーム呼び出す
+    enemyXML.update = function(frame) {
+        this.x = CANVAS_WIDTH*.5 - Math.cos(frame*0.01) * CANVAS_WIDTH*.4
+        this.y = CANVAS_HEIGHT*.3 - Math.sin(frame*0.03) * CANVAS_HEIGHT*.2
+
+        // danmakuRunnerに位置を反映する
+        this.danmakuRunner.x = this.x;
+        this.danmakuRunner.y = this.y;
+
+        // danmakuRunnerのupdateメソッドを毎フレーム呼び出す
         this.danmakuRunner.update();
     };
 
-    game.start();
+    // 敵(DSL版)
+    var enemyDSL = new Hex(40, 30, 15, "hsl(270, 60%, 80%)");
+    enemyDSL.x = CANVAS_WIDTH * 0.5;
+    enemyDSL.y = CANVAS_HEIGHT * 0.1;
+    enemyDSL.addTo(scene);
+    enemyDSL.danmakuRunner = danmaku1.createRunner(danmakuConfig);
+    enemyDSL.update = function(frame) {
+        this.x = CANVAS_WIDTH*.5 + Math.cos(frame*0.01) * CANVAS_WIDTH*.4
+        this.y = CANVAS_HEIGHT*.3 + Math.sin(frame*0.03) * CANVAS_HEIGHT*.2
+
+        // danmakuRunnerに位置を反映する
+        this.danmakuRunner.x = this.x;
+        this.danmakuRunner.y = this.y;
+
+        // danmakuRunnerのupdateメソッドを毎フレーム呼び出す
+        this.danmakuRunner.update();
+    };
+
+    scene.start();
 };
 
 // ゲームエンジン系
 
 /** ゲームクラス */
-var Game = function() {
+var Scene = function() {
     var canvas = document.createElement("canvas");
     document.body.appendChild(canvas);
     canvas.width = CANVAS_WIDTH;
@@ -124,16 +195,16 @@ var Game = function() {
 
     this.frame = 0;
 
-    this.gameObjects = [];
+    this.sceneObjects = [];
 };
-Game.prototype.start = function() {
+Scene.prototype.start = function() {
     var renderFrame = function() {
         this.context.fillStyle = "black";
         this.context.globalCompositeOperation = "source-over";
         this.context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
         this.context.globalCompositeOperation = "lighter";
-        var copied = [].concat(this.gameObjects);
+        var copied = [].concat(this.sceneObjects);
         for (var i = 0, end = copied.length; i < end; i++) {
             copied[i].update(this.frame);
             copied[i].draw(this.context);
@@ -147,13 +218,13 @@ Game.prototype.start = function() {
     }.bind(this);
     renderFrame();
 };
-Game.prototype.addChild = function(obj) {
+Scene.prototype.addChild = function(obj) {
     obj.parent = this;
-    this.gameObjects.push(obj);
+    this.sceneObjects.push(obj);
 };
-Game.prototype.removeChild = function(obj) {
+Scene.prototype.removeChild = function(obj) {
     obj.parent = null;
-    this.gameObjects.erase(obj);
+    this.sceneObjects.erase(obj);
 };
 
 /** 六角形クラス */
@@ -229,19 +300,19 @@ var Player = function() {
 };
 Player.prototype = Object.create(Hex.prototype);
 Player.prototype.shot = function(x, y, theta) {
-    new PlayerBullet(this.x + x, this.y + y, theta).addTo(game);
+    new PlayerBullet(this.x + x, this.y + y, theta).addTo(scene);
 };
 Player.prototype.update = function(frame) {
-    var s = game.keyboard.c ? this.speed : this.speed * 2;
-    if (game.keyboard.left) this.x -= s;
-    else if (game.keyboard.right) this.x += s;
-    if (game.keyboard.up) this.y -= s;
-    else if (game.keyboard.down) this.y += s;
+    var s = scene.keyboard.c ? this.speed : this.speed * 2;
+    if (scene.keyboard.left) this.x -= s;
+    else if (scene.keyboard.right) this.x += s;
+    if (scene.keyboard.up) this.y -= s;
+    else if (scene.keyboard.down) this.y += s;
 
     this.x = Math.max(0, Math.min(this.x, CANVAS_WIDTH));
     this.y = Math.max(0, Math.min(this.y, CANVAS_HEIGHT));
 
-    if (game.keyboard.z && frame%5 === 0) {
+    if (scene.keyboard.z && frame%5 === 0) {
         this.shot(-6, +4, Math.PI*1.5 + -0.2);
         this.shot(-4,  0, Math.PI*1.5 + -0.1);
         this.shot(-2, -4, Math.PI*1.5 + -0.0);

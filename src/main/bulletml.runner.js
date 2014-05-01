@@ -41,16 +41,12 @@ bulletml.runner.RunnerFactory.prototype.create = function(config) {
 };
 
 /**
- * @param {number} initialX
- * @param {number} initialY
  * @param {Object} config
  * @param {function(bulletml.runner.Runner)=} callback
  * @return {bulletml.runner.Runner}
  */
-bulletml.Root.prototype.createRunner = function(initialX, initialY, config, callback) {
+bulletml.Root.prototype.createRunner = function(config, callback) {
     var runner = new bulletml.runner.RunnerFactory(this).create(config);
-    runner.x = initialX;
-    runner.y = initialY;
     if (callback) callback(runner);
 
     return runner;

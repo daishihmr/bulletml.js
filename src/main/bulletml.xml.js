@@ -6,7 +6,7 @@
      * @param {(string|Document|Object)} data 弾幕定義
      * @return {bulletml.Root}
      */
-    bulletml.build = function(data) {
+    bulletml.buildXML = function(data) {
         var result;
         if (typeof data === "string") {
             var domParser = new DOMParser();
