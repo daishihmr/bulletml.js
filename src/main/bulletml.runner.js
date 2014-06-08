@@ -108,6 +108,8 @@ bulletml.runner.ParentRunner.prototype.addSubRunner = function(subRunner) {
  */
 bulletml.runner.ParentRunner.prototype.update = function() {
     for (var i = this.subRunners.length; i--;) {
+        this.subRunners[i].x = this.x;
+        this.subRunners[i].y = this.y;
         this.subRunners[i].update();
     }
     if (this.completedChildCount === this.subRunners.length) {
