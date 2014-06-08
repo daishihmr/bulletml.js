@@ -343,15 +343,15 @@ bulletml.runner.SubRunner.prototype.changeDirection = function(cmd) {
     switch (cmd.direction.type) {
     case "aim":
         this.dirFin = angleAtoB(this, this.config.target) + d;
-        this.dirIncr = normalizeRadian(this.dirFin - this.direction) / t;
+        this.dirIncr = (this.dirFin - this.direction) / t;
         break;
     case "absolute":
         this.dirFin = d - Math.PI / 2;
-        this.dirIncr = normalizeRadian(this.dirFin - this.direction) / t;
+        this.dirIncr = (this.dirFin - this.direction) / t;
         break;
     case "relative":
         this.dirFin = this.direction + d;
-        this.dirIncr = normalizeRadian(this.dirFin - this.direction) / t;
+        this.dirIncr = (this.dirFin - this.direction) / t;
         break;
     case "sequence":
         this.dirIncr = d;
