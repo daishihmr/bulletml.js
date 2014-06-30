@@ -17,6 +17,19 @@ bulletml.GLOBAL = this;
     bulletml.Node = function() {};
 
     /**
+     *
+     */
+    bulletml.Node.prototype.scan = function(func) {
+        func(this);
+        for (var key in this) if (this.hasOwnProperty(key)) {
+            var child = this[key];
+            if (child instanceof bulletml.Node) {
+                child.scan(func);
+            }
+        }
+    };
+
+    /**
      * bulletmlのルート要素.
      *
      * @constructor
