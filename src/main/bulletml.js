@@ -11,6 +11,10 @@ var bulletml = {};
 bulletml.GLOBAL = this;
 
 (function() {
+    /**
+     * @constructor
+     */
+    bulletml.Node = function() {};
 
     /**
      * bulletmlのルート要素.
@@ -19,6 +23,8 @@ bulletml.GLOBAL = this;
      * @param {Object=} data
      */
     bulletml.Root = function(data) {
+        bulletml.Node.call(this);
+
         /**
          * @type {string}
          */
@@ -69,6 +75,8 @@ bulletml.GLOBAL = this;
             }
         }
     };
+
+    bulletml.Root.prototype = Object.create(bulletml.Node.prototype);
 
     /**
      * find top level action element by label.
@@ -175,6 +183,8 @@ bulletml.GLOBAL = this;
      * @constructor
      */
     bulletml.Bullet = function() {
+        bulletml.Node.call(this);
+
         /**
          * @type {?string}
          */
@@ -201,6 +211,8 @@ bulletml.GLOBAL = this;
         this.option = {};
         this._localScope = {};
     };
+
+    bulletml.Bullet.prototype = Object.create(bulletml.Node.prototype);
 
     /**
      * @return {bulletml.Bullet}
@@ -234,6 +246,8 @@ bulletml.GLOBAL = this;
      * @param {string} label
      */
     bulletml.BulletRef = function(label) {
+        bulletml.Node.call(this);
+
         this.root = null;
         /**
          * @type {string}
@@ -243,6 +257,8 @@ bulletml.GLOBAL = this;
          */
         this.params = [];
     };
+
+    bulletml.BulletRef.prototype = Object.create(bulletml.Node.prototype);
 
     /**
      * @return {bulletml.BulletRef}
@@ -272,11 +288,15 @@ bulletml.GLOBAL = this;
      * @constructor
      */
     bulletml.Command = function() {
+        bulletml.Node.call(this);
+
         /**
          * @type {string}
          */
         this.commandName = "";
     };
+
+    bulletml.Command.prototype = Object.create(bulletml.Node.prototype);
 
     /**
      * @param {bulletml.Root} root
@@ -291,6 +311,8 @@ bulletml.GLOBAL = this;
      * @augments bulletml.Command
      */
     bulletml.Action = function() {
+        bulletml.Command.call(this);
+
         /**
          * @type {string}
          */
@@ -313,7 +335,7 @@ bulletml.GLOBAL = this;
         this.params = [];
     };
 
-    bulletml.Action.prototype = new bulletml.Command();
+    bulletml.Action.prototype = Object.create(bulletml.Command.prototype);
 
     /** @inheritDoc */
     bulletml.Action.prototype.setRoot = function(root) {
@@ -339,6 +361,8 @@ bulletml.GLOBAL = this;
      * @param {string} label
      */
     bulletml.ActionRef = function(label) {
+        bulletml.Command.call(this);
+
         /**
          * @type {string}
          */
@@ -356,7 +380,7 @@ bulletml.GLOBAL = this;
         this.params = [];
     };
 
-    bulletml.ActionRef.prototype = new bulletml.Command();
+    bulletml.ActionRef.prototype = Object.create(bulletml.Command.prototype);
 
     bulletml.ActionRef.prototype.clone = function() {
         var c = new bulletml.Action();
@@ -371,6 +395,8 @@ bulletml.GLOBAL = this;
      * @augments bulletml.Command
      */
     bulletml.Fire = function() {
+        bulletml.Command.call(this);
+
         /**
          * @type {string}
          */
@@ -401,7 +427,7 @@ bulletml.GLOBAL = this;
         this.option = new bulletml.FireOption();
     };
 
-    bulletml.Fire.prototype = new bulletml.Command();
+    bulletml.Fire.prototype = Object.create(bulletml.Command.prototype);
 
     /** @inheritDoc */
     bulletml.Fire.prototype.setRoot = function(root) {
@@ -417,6 +443,8 @@ bulletml.GLOBAL = this;
      * @param {string} label
      */
     bulletml.FireRef = function(label) {
+        bulletml.Command.call(this);
+
         /**
          * @type {string}
          */
@@ -430,7 +458,7 @@ bulletml.GLOBAL = this;
         this.params = [];
     };
 
-    bulletml.FireRef.prototype = new bulletml.Command();
+    bulletml.FireRef.prototype = Object.create(bulletml.Command.prototype);
 
     /**
      * @constructor
@@ -438,6 +466,8 @@ bulletml.GLOBAL = this;
      * @augments bulletml.Command
      */
     bulletml.ChangeDirection = function() {
+        bulletml.Command.call(this);
+
         /**
          * @type {string}
          */
@@ -450,7 +480,7 @@ bulletml.GLOBAL = this;
         this.term = 0;
     };
 
-    bulletml.ChangeDirection.prototype = new bulletml.Command();
+    bulletml.ChangeDirection.prototype = Object.create(bulletml.Command.prototype);
 
     /**
      * @constructor
@@ -458,6 +488,8 @@ bulletml.GLOBAL = this;
      * @augments bulletml.Command
      */
     bulletml.ChangeSpeed = function() {
+        bulletml.Command.call(this);
+
         /**
          * @type {string}
          */
@@ -470,7 +502,7 @@ bulletml.GLOBAL = this;
         this.term = 0;
     };
 
-    bulletml.ChangeSpeed.prototype = new bulletml.Command();
+    bulletml.ChangeSpeed.prototype = Object.create(bulletml.Command.prototype);
 
     /**
      * @constructor
@@ -478,6 +510,8 @@ bulletml.GLOBAL = this;
      * @augments bulletml.Command
      */
     bulletml.Accel = function() {
+        bulletml.Command.call(this);
+
         /**
          * @type {string}
          */
@@ -493,7 +527,7 @@ bulletml.GLOBAL = this;
         this.term = 0;
     };
 
-    bulletml.Accel.prototype = new bulletml.Command();
+    bulletml.Accel.prototype = Object.create(bulletml.Command.prototype);
 
     /**
      * @constructor
@@ -502,6 +536,8 @@ bulletml.GLOBAL = this;
      * @param {(number|string)=} value
      */
     bulletml.Wait = function(value) {
+        bulletml.Command.call(this);
+
         /**
          * @type {string}
          */
@@ -512,7 +548,7 @@ bulletml.GLOBAL = this;
         this.value = value || 0;
     };
 
-    bulletml.Wait.prototype = new bulletml.Command();
+    bulletml.Wait.prototype = Object.create(bulletml.Command.prototype);
 
     /**
      * @constructor
@@ -520,12 +556,14 @@ bulletml.GLOBAL = this;
      * @augments bulletml.Command
      */
     bulletml.Vanish = function() {
+        bulletml.Command.call(this);
+
         /**
          * @type {string}
          */
         this.commandName = "vanish";
     };
-    bulletml.Vanish.prototype = new bulletml.Command();
+    bulletml.Vanish.prototype = Object.create(bulletml.Command.prototype);
 
     /**
      * @constructor
@@ -533,6 +571,8 @@ bulletml.GLOBAL = this;
      * @augments bulletml.Command
      */
     bulletml.Repeat = function() {
+        bulletml.Command.call(this);
+
         /**
          * @type {string}
          */
@@ -551,7 +591,7 @@ bulletml.GLOBAL = this;
         this.params = [];
     };
 
-    bulletml.Repeat.prototype = new bulletml.Command();
+    bulletml.Repeat.prototype = Object.create(bulletml.Command.prototype);
 
     bulletml.Repeat.prototype.setRoot = function(root) {
         this.root = root;
@@ -567,6 +607,8 @@ bulletml.GLOBAL = this;
      * @since 0.5
      */
     bulletml.Bind = function(variable, expression) {
+        bulletml.Command.call(this);
+
         /**
          * @type {string}
          */
@@ -575,7 +617,7 @@ bulletml.GLOBAL = this;
         this.expression = expression;
     };
 
-    bulletml.Bind.prototype = new bulletml.Command();
+    bulletml.Bind.prototype = Object.create(bulletml.Command.prototype);
 
     /**
      * @constructor
@@ -584,12 +626,14 @@ bulletml.GLOBAL = this;
      * @since 0.5
      */
     bulletml.Notify = function(eventName, params) {
+        bulletml.Command.call(this);
+
         this.commandName = "notify";
         this.eventName = eventName;
         this.params = params || null;
     };
 
-    bulletml.Notify.prototype = new bulletml.Command();
+    bulletml.Notify.prototype = Object.create(bulletml.Command.prototype);
 
     bulletml.DummyCommand = new bulletml.Command();
 
@@ -600,6 +644,8 @@ bulletml.GLOBAL = this;
      * @param {(number|string)=} value
      */
     bulletml.Direction = function(value) {
+        bulletml.Node.call(this);
+
         /**
          * @type {string}
          */
@@ -610,11 +656,15 @@ bulletml.GLOBAL = this;
         this.value = value || 0;
     };
 
+    bulletml.Direction.prototype = Object.create(bulletml.Node.prototype);
+
     /**
      * @constructor
      * @param {(number|string)=} value
      */
     bulletml.Speed = function(value) {
+        bulletml.Node.call(this);
+
         /**
          * @type {string}
          */
@@ -625,11 +675,15 @@ bulletml.GLOBAL = this;
         this.value = (value === undefined) ? 1 : value;
     };
 
+    bulletml.Speed.prototype = Object.create(bulletml.Node.prototype);
+
     /**
      * @constructor
      * @param {(number|string)=} value
      */
     bulletml.Horizontal = function(value) {
+        bulletml.Node.call(this);
+
         /**
          * @type {string}
          */
@@ -640,11 +694,15 @@ bulletml.GLOBAL = this;
         this.value = value || 0;
     };
 
+    bulletml.Horizontal.prototype = Object.create(bulletml.Node.prototype);
+
     /**
      * @constructor
      * @param {(number|string)=} value
      */
     bulletml.Vertical = function(value) {
+        bulletml.Node.call(this);
+
         /**
          * @type {string}
          */
@@ -654,6 +712,8 @@ bulletml.GLOBAL = this;
          */
         this.value = value || 0;
     };
+
+    bulletml.Vertical.prototype = Object.create(bulletml.Node.prototype);
 
     /**
      * @constructor
@@ -661,6 +721,8 @@ bulletml.GLOBAL = this;
      * @since 0.5
      */
     bulletml.FireOption = function(params) {
+        bulletml.Node.call(this);
+
         params = params || {};
 
         /**
@@ -680,14 +742,20 @@ bulletml.GLOBAL = this;
         }
     };
 
+    bulletml.FireOption.prototype = Object.create(bulletml.Node.prototype);
+
     /**
      * @constructor
      * @param {number=} value
      * @since 0.5
      */
     bulletml.OffsetX = function(value) {
+        bulletml.Node.call(this);
+
         this.value = value || 0;
     };
+
+    bulletml.OffsetX.prototype = Object.create(bulletml.Node.prototype);
 
     /**
      * @constructor
@@ -695,8 +763,12 @@ bulletml.GLOBAL = this;
      * @since 0.5
      */
     bulletml.OffsetY = function(value) {
+        bulletml.Node.call(this);
+
         this.value = value || 0;
     };
+
+    bulletml.OffsetY.prototype = Object.create(bulletml.Node.prototype);
 
     /**
      * @constructor
@@ -704,8 +776,12 @@ bulletml.GLOBAL = this;
      * @since 0.5
      */
     bulletml.Autonomy = function(value) {
+        bulletml.Node.call(this);
+
         this.value = !!value;
     };
+
+    bulletml.Autonomy.prototype = Object.create(bulletml.Node.prototype);
 
     /**
      * @param {Array.<(bulletml.Bullet|bulletml.Action|bulletml.Fire)>} array
