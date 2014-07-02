@@ -10,5 +10,6 @@ java -jar build-tools/compiler-latest/compiler.jar \
     --js src/main/bulletml.xml.js \
     --js src/main/bulletml.dsl.js \
     --js src/main/bulletml.runner.js \
+    --js src/main/bulletml.output.json.js \
     --js_output_file build/bulletml.min.js \
     # --formatting PRETTY_PRINT

@@ -33,4 +33,30 @@ var classForName = function(name) {
     };
 };
 
+var sample = {
+    actions: [
+        {
+            type: "Action",
+            label: "top",
+            commands: [
+                {
+                    type: "Fire",
+                    bullet: {
+                        type: "Bullet"
+                    },
+                    direction: {
+                        
+                    }
+                }
+            ]
+        }
+    ],
+    bullets: [
+    ],
+    fires: [
+    ],
+};
+
+
+
 })();
