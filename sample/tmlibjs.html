@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset=UTF-8>
+</head>
+<body>
+
+<canvas id="app"></canvas>
+
+<script src="../lib/tmlib.js"></script>
+<script>
+
+tm.import("display");
+tm.import("ui");
+
+var app;
+tm.main(function() {
+    app = CanvasApp("#app").resize(320, 320).fitWindow();
+    app.replaceScene(LoadingScene({
+        width: 320,
+        height: 320,
+        assets: {
+            "chara5": "../lib/chara5.png",
+            "chara6": "../lib/chara6.png",
+        },
+        nextScene: MainScene
+    }));
+    app.run();
+});
+
+tm.define("MainScene", {
+    superClass: "tm.app.Scene",
+
+    init: function() {
+        this.superInit();
+
+        this.fromJSON({
+            children: {
+                enemy: {
+                    type: "Sprite",
+                    init: ["chara6", 32, 32],
+                    frameIndex: 3,
+                    x: 160,
+                    y: 50,
+                },
+                player: {
+                    type: "Player",
+                    frameIndex: 27,
+                    x: 160,
+                    y: 300,
+                },
+            },
+        });
+    },
+});
+
+tm.define("Player", {
+    superClass: "Sprite",
+    init: function() {
+        this.superInit("chara5", 32, 32);
+
+        this.speed = 6;
+    },
+    update: function(app) {
+        var kb = app.keyboard;
+        if (kb.getKey("c")) {
+            this.speed = 3;
+        } else {
+            this.speed = 6;
+        }
+
+        this.position.add(kb.getKeyDirection().mul(this.speed));
+    },
+});
+</script>
+
+</body>
+</html>
