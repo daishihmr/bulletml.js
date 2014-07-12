@@ -8,7 +8,7 @@
 <script>
 // 弾幕パターンをBulletMLで記述
 var danmaku0 = bulletml.buildXML(
-    "<bulletml>" + 
+    "<bulletml>" +
         "<action label='top'>" +
             "<repeat>" +
                 "<times>999</times>" +
@@ -143,7 +143,7 @@ window.onload = function() {
 
     // 弾幕共通設定
     var danmakuConfig = {
-        
+
         // 「自機狙い弾」が狙う対象。つまり自機
         target: player,
 
@@ -162,6 +162,8 @@ window.onload = function() {
 
             // 弾オブジェクトを作成
             var bullet = new Bullet(spec);
+            bullet.x = runner.x;
+            bullet.y = runner.y;
 
             // 弾の消滅時に呼び出される
             runner.onVanish = function() {

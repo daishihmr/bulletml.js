@@ -8,6 +8,8 @@
 <canvas id="app"></canvas>
 
 <script src="../lib/tmlib.js"></script>
+<script src="../build/bulletml.min.js"></script>
+<script src="../build/plugins/tmlib.bulletml.js"></script>
 <script>
 
 tm.import("display");
@@ -15,10 +17,10 @@ tm.import("ui");
 
 var app;
 tm.main(function() {
-    app = CanvasApp("#app").resize(320, 320).fitWindow();
+    app = CanvasApp("#app").resize(200, 250).fitWindow();
     app.replaceScene(LoadingScene({
-        width: 320,
-        height: 320,
+        width: 200,
+        height: 250,
         assets: {
             "chara5": "../lib/chara5.png",
             "chara6": "../lib/chara6.png",
@@ -40,14 +42,14 @@ tm.define("MainScene", {
                     type: "Sprite",
                     init: ["chara6", 32, 32],
                     frameIndex: 3,
-                    x: 160,
+                    x: 100,
                     y: 50,
                 },
                 player: {
                     type: "Player",
                     frameIndex: 27,
-                    x: 160,
-                    y: 300,
+                    x: 100,
+                    y: 200,
                 },
             },
         });
@@ -63,7 +65,7 @@ tm.define("Player", {
     },
     update: function(app) {
         var kb = app.keyboard;
-        if (kb.getKey("c")) {
+        if (kb.getKey("z")) {
             this.speed = 3;
         } else {
             this.speed = 6;

@@ -37,13 +37,22 @@ var BANNER = "/*\n\
 module.exports = function(grunt) {
 
     grunt.loadNpmTasks("grunt-contrib-concat");
+    grunt.loadNpmTasks("grunt-contrib-copy");
     grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks('grunt-contrib-watch');
 
     grunt.initConfig({
         pkg: grunt.file.readJSON("package.json"),
+        copy: {
+            main: {
+                expand: true,
+                cwd: "src",
+                src: "plugins/*",
+                dest: "build/"
+            }
+        },
         concat: {
-            dist: {
+            main: {
                 options: {
                     banner: BANNER
                 },
@@ -52,7 +61,7 @@ module.exports = function(grunt) {
             }
         },
         uglify: {
-            dist: {
+            main: {
                 options: {
                     banner: BANNER,
                     sourceMap: true
@@ -65,11 +74,11 @@ module.exports = function(grunt) {
         watch: {
             scripts: {
                 files: ["src/**/*.js"],
-                tasks: ["uglify"]
+                tasks: ["copy", "uglify"]
             }
         }
     });
 
-    grunt.registerTask("default", ["concat", "uglify"]);
+    grunt.registerTask("default", ["copy", "concat", "uglify"]);
 
 };
