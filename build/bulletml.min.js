@@ -1,5 +1,5 @@
 /*
- * bulletml.js v0.0.0
+ * bulletml.js v0.5.0
  * https://github.com/daishihmr/bulletml.js
  * 
  * The MIT License (MIT)
