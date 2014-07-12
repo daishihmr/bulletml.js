@@ -11,19 +11,47 @@
 <script src="../build/bulletml.min.js"></script>
 <script src="../build/plugins/tmlib.bulletml.js"></script>
 <script>
+bulletml.dsl();
+var pattern = new bulletml.Root({
+    top: action([
+        repeat(999, [
 
-tm.import("display");
-tm.import("ui");
+            // 10way弾 ここから
+            bindVar("way", 10), // way数
+            bindVar("range", 100), // 扇の範囲
+            bindVar("speed", 0.8), // 弾速
+            fire(direction("$range * -0.5"), speed("$speed"), bullet()),
+            repeat("$way - 1", [
+                fire(direction("$range / ($way - 1)", "sequence"), speed(0, "sequence"), bullet())
+            ]),
+            // 10way弾 ここまで
 
-var app;
+            wait(40),
+
+            // 9way弾 ここから
+            bindVar("way", 9), // way数
+            bindVar("range", 60), // 扇の範囲
+            bindVar("speed", 1.1), // 弾速
+            fire(direction("$range * -0.5"), speed("$speed"), bullet()),
+            repeat("$way - 1", [
+                fire(direction("$range / ($way - 1)", "sequence"), speed(0, "sequence"), bullet())
+            ]),
+            // 9way弾 ここまで
+
+            wait(100)
+        ])
+    ])
+});
+</script>
+<script>
 tm.main(function() {
-    app = CanvasApp("#app").resize(200, 250).fitWindow();
-    app.replaceScene(LoadingScene({
+    var app = tm.display.CanvasApp("#app").resize(200, 250).fitWindow();
+    app.replaceScene(tm.ui.LoadingScene({
         width: 200,
         height: 250,
         assets: {
-            "chara5": "../lib/chara5.png",
-            "chara6": "../lib/chara6.png",
+            "hiyoko": "../lib/hiyoco_nomal_full.png",
+            "waru": "../lib/hiyoco_waru_full.png"
         },
         nextScene: MainScene
     }));
@@ -39,40 +67,45 @@ tm.define("MainScene", {
         this.fromJSON({
             children: {
                 enemy: {
-                    type: "Sprite",
-                    init: ["chara6", 32, 32],
+                    type: "tm.display.Sprite",
+                    init: ["waru", 32, 32],
                     frameIndex: 3,
                     x: 100,
-                    y: 50,
+                    y: 50
                 },
                 player: {
                     type: "Player",
-                    frameIndex: 27,
                     x: 100,
-                    y: 200,
-                },
-            },
+                    y: 200
+                }
+            }
         });
-    },
+
+        var that = this;
+
+        var config = {
+            target: that.player,
+            createNewBullet: function(runner) {
+                tm.bulletml.Bullet(runner).addChildTo(that)
+            }
+        };
+
+        this.enemy.startDanmaku(pattern, config);
+    }
 });
 
 tm.define("Player", {
-    superClass: "Sprite",
-    init: function() {
-        this.superInit("chara5", 32, 32);
+    superClass: "tm.display.Sprite",
 
+    init: function() {
+        this.superInit("hiyoko", 32, 32);
+        this.frameIndex = 9;
         this.speed = 6;
     },
-    update: function(app) {
-        var kb = app.keyboard;
-        if (kb.getKey("z")) {
-            this.speed = 3;
-        } else {
-            this.speed = 6;
-        }
 
-        this.position.add(kb.getKeyDirection().mul(this.speed));
-    },
+    update: function(app) {
+        this.position.add(app.keyboard.getKeyDirection().mul(this.speed));
+    }
 });
 </script>
 
