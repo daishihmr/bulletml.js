@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset=UTF-8>
+</head>
+<body>
+
+<canvas id="app"></canvas>
+
+<script src="../lib/tmlib.js"></script>
+<script src="../build/bulletml.min.js"></script>
+<script src="../build/plugins/tmlib.bulletml.js"></script>
+<script>
+// 弾幕の定義(DSLで)
+bulletml.dsl();
+var pattern = new bulletml.Root({
+    top: action([
+        // 999回繰り返す
+        repeat(999, [
+
+            // 10way弾 ここから
+            bindVar("way", 10), // way数
+            bindVar("range", 100), // 扇の範囲
+            bindVar("speed", 0.8), // 弾速
+            // (敵から見て)左端の弾を撃つ
+            fire(direction("$range * -0.5"), speed("$speed"), bullet()),
+            // way数-1回繰り返す
+            repeat("$way - 1", [
+                // 右に(範囲 / way数-1)度ずらして撃つ
+                fire(direction("$range / ($way - 1)", "sequence"), speed(0, "sequence"), bullet())
+            ]),
+            // 10way弾 ここまで
+
+            wait(40),
+
+            // 9way弾 ここから
+            bindVar("way", 9),
+            bindVar("range", 60),
+            bindVar("speed", 1.1),
+            fire(direction("$range * -0.5"), speed("$speed"), bullet()),
+            repeat("$way - 1", [
+                fire(direction("$range / ($way - 1)", "sequence"), speed(0, "sequence"), bullet())
+            ]),
+            // 9way弾 ここまで
+
+            wait(100)
+        ])
+    ])
+});
+</script>
+<script>
+tm.main(function() {
+    var app = tm.display.CanvasApp("#app").resize(200, 250).fitWindow();
+    app.replaceScene(tm.ui.LoadingScene({
+        width: 200,
+        height: 250,
+        assets: {
+            "normal": "../lib/hiyoco_nomal_full.png",
+            "waru": "../lib/hiyoco_waru_full.png"
+        },
+        nextScene: MainScene
+    }));
+    app.run();
+});
+
+tm.define("MainScene", {
+    superClass: "tm.app.Scene",
+
+    init: function() {
+        this.superInit();
+
+        this.fromJSON({
+            children: {
+                enemy: {
+                    type: "tm.display.Sprite",
+                    init: ["waru", 32, 32],
+                    frameIndex: 3,
+                    x: 100,
+                    y: 50
+                },
+                player: {
+                    type: "tm.display.Sprite",
+                    init: ["normal", 32, 32],
+                    frameIndex: 9,
+                    x: 100,
+                    y: 200
+                }
+            }
+        });
+
+        this.player.update = function(app) {
+            this.position.add(app.keyboard.getKeyDirection().mul(5));
+        };
+
+        var that = this;
+        var config = {
+            target: that.player,
+            createNewBullet: function(runner) {
+                tm.bulletml.Bullet(runner).addChildTo(that)
+            }
+        };
+
+        this.enemy.startDanmaku(pattern, config);
+    }
+});
+</script>
+
+</body>
+</html>
