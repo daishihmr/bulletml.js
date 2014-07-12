@@ -8,7 +8,7 @@ enchant.js用プラグイン、tmlib.js用プラグインもあるよ。
 bulletml.js
 -----------
 
-BulletMLをJavaScriptで読み込んでいろいろやるためのパーサー。
+BulletMLをJavaScriptで読み込んでいろいろやるためのライブラリ。
 
 
 
@@ -21,7 +21,7 @@ enchant.jsでBulletMLを利用するためのプラグイン。
 
 
 
-bulletml.tmlib.js
+tmlib.bulletml.js
 -----------------
 
 tmlib.jsでBulletMLを利用するためのプラグイン。
