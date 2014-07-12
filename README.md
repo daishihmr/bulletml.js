@@ -33,7 +33,7 @@ DEMO
 
 [enchant.js使用](http://daishihmr.github.io/bulletml.js/sample/enchantjs.html)
 
-[tmlib.js使用](http://daishihmr.github.io/bulletml.js/sample/tmlib.html)
+[tmlib.js使用](http://daishihmr.github.io/bulletml.js/sample/tmlibjs.html)
 
 [独自実装](http://daishihmr.github.io/bulletml.js/sample/originalGameEngine.html)
 
