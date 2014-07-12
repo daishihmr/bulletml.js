@@ -6,24 +6,62 @@
 <body style="margin:0">
 <script src="../lib/enchant.js"></script>
 <script src="../build/bulletml.min.js"></script>
-<script src="../src/main/bulletml.enchant.js"></script>
+<script src="../build/plugins/bulletml.enchant.js"></script>
+<script>
+// 弾幕の定義(DSLで)
+bulletml.dsl();
+var pattern = new bulletml.Root({
+    top: action([
+        // 999回繰り返す
+        repeat(999, [
+
+            // 10way弾 ここから
+            bindVar("way", 10), // way数
+            bindVar("range", 100), // 扇の範囲
+            bindVar("speed", 0.8), // 弾速
+            // (敵から見て)左端の弾を撃つ
+            fire(direction("$range * -0.5"), speed("$speed"), bullet()),
+            // way数-1回繰り返す
+            repeat("$way - 1", [
+                // 右に(範囲 / way数-1)度ずらして撃つ
+                fire(direction("$range / ($way - 1)", "sequence"), speed(0, "sequence"), bullet())
+            ]),
+            // 10way弾 ここまで
+
+            wait(40),
+
+            // 9way弾 ここから
+            bindVar("way", 9),
+            bindVar("range", 60),
+            bindVar("speed", 1.1),
+            fire(direction("$range * -0.5"), speed("$speed"), bullet()),
+            repeat("$way - 1", [
+                fire(direction("$range / ($way - 1)", "sequence"), speed(0, "sequence"), bullet())
+            ]),
+            // 9way弾 ここまで
+
+            wait(100)
+        ])
+    ])
+});
+</script>
 <script>
 var C5IMG = "../lib/chara5.png";
 var C6IMG = "../lib/chara6.png";
 
 enchant();
 window.onload = function() {
-    var core = new Core(500, 500);
+    var core = new Core(200, 250);
     core.preload(C5IMG, C6IMG);
     core.onload = function() {
-        
+
         var scene = core.currentScene;
         scene.backgroundColor = "black";
 
-        
+
 
         var player = new Sprite(32, 32);
-        player.moveTo(250-16, 400);
+        player.moveTo(84, 184);
         player.image = core.assets[C5IMG];
         player.frame = 28;
         player.speed = 4;
@@ -40,8 +78,7 @@ window.onload = function() {
 
 
         var enemy = new Sprite(32, 32);
-        enemy.moveTo(250-16, 100);
-        enemy.scale(2, 2);
+        enemy.moveTo(84, 34);
         enemy.image = core.assets[C6IMG];
         enemy.frame = 4;
         enemy.onenterframe = function() {
@@ -51,47 +88,27 @@ window.onload = function() {
 
 
 
-        enemy.startDanmaku(danmaku1);
+        var config = {
+            target: function() {
+                return {
+                    x: player.x + player.width * 0.5,
+                    y: player.y + player.height * 0.5
+                };
+            },
+            createNewBullet: function(runner) {
+                scene.addChild(new Bullet(runner));
+            }
+        };
+
+
+
+        enemy.startDanmaku(pattern, config);
 
 
 
     };
     core.start();
 };
-
-// 弾幕パターンをBulletML DSLで記述
-bulletml.dsl();
-var danmaku1 = new bulletml.Root({
-    top: action([
-        repeat(999, [
-            repeat(30, [
-                fire(direction(12, "sequence"), speed(5), bullet(actionRef("b"))),
-                repeat(9-1, [
-                    fire(direction(360/9, "sequence"), speed(5), bullet(actionRef("b"))),
-                ]),
-                wait(2),
-            ]),
-            wait(30),
-            repeat(30, [
-                fire(direction(-12, "sequence"), speed(5), bullet(actionRef("b"), {color:"hsl(220, 60%, 80%)"})),
-                repeat(9-1, [
-                    fire(direction(360/9, "sequence"), speed(5), bullet(actionRef("b"), {color:"hsl(220, 60%, 80%)"})),
-                ]),
-                wait(2),
-            ]),
-            wait(30),
-        ]),
-    ]),
-    b: action([
-        changeSpeed(speed(1), 30),
-        wait(30),
-        changeDirection(direction(0, "aim"), 60),
-        changeSpeed(speed(3), 30),
-        wait(50),
-        vanish(),
-        fire(speed(2), bullet({color:"hsl(50, 60%, 80%)"}))
-    ]),
-});
 </script>
 </body>
 </html>

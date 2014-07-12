@@ -11,17 +11,22 @@
 <script src="../build/bulletml.min.js"></script>
 <script src="../build/plugins/tmlib.bulletml.js"></script>
 <script>
+// 弾幕の定義(DSLで)
 bulletml.dsl();
 var pattern = new bulletml.Root({
     top: action([
+        // 999回繰り返す
         repeat(999, [
 
             // 10way弾 ここから
             bindVar("way", 10), // way数
             bindVar("range", 100), // 扇の範囲
             bindVar("speed", 0.8), // 弾速
+            // (敵から見て)左端の弾を撃つ
             fire(direction("$range * -0.5"), speed("$speed"), bullet()),
+            // way数-1回繰り返す
             repeat("$way - 1", [
+                // 右に(範囲 / way数-1)度ずらして撃つ
                 fire(direction("$range / ($way - 1)", "sequence"), speed(0, "sequence"), bullet())
             ]),
             // 10way弾 ここまで
@@ -29,9 +34,9 @@ var pattern = new bulletml.Root({
             wait(40),
 
             // 9way弾 ここから
-            bindVar("way", 9), // way数
-            bindVar("range", 60), // 扇の範囲
-            bindVar("speed", 1.1), // 弾速
+            bindVar("way", 9),
+            bindVar("range", 60),
+            bindVar("speed", 1.1),
             fire(direction("$range * -0.5"), speed("$speed"), bullet()),
             repeat("$way - 1", [
                 fire(direction("$range / ($way - 1)", "sequence"), speed(0, "sequence"), bullet())
@@ -50,7 +55,7 @@ tm.main(function() {
         width: 200,
         height: 250,
         assets: {
-            "hiyoko": "../lib/hiyoco_nomal_full.png",
+            "normal": "../lib/hiyoco_nomal_full.png",
             "waru": "../lib/hiyoco_waru_full.png"
         },
         nextScene: MainScene
@@ -74,15 +79,20 @@ tm.define("MainScene", {
                     y: 50
                 },
                 player: {
-                    type: "Player",
+                    type: "tm.display.Sprite",
+                    init: ["normal", 32, 32],
+                    frameIndex: 9,
                     x: 100,
                     y: 200
                 }
             }
         });
 
-        var that = this;
+        this.player.update = function(app) {
+            this.position.add(app.keyboard.getKeyDirection().mul(5));
+        };
 
+        var that = this;
         var config = {
             target: that.player,
             createNewBullet: function(runner) {
@@ -91,20 +101,6 @@ tm.define("MainScene", {
         };
 
         this.enemy.startDanmaku(pattern, config);
-    }
-});
-
-tm.define("Player", {
-    superClass: "tm.display.Sprite",
-
-    init: function() {
-        this.superInit("hiyoko", 32, 32);
-        this.frameIndex = 9;
-        this.speed = 6;
-    },
-
-    update: function(app) {
-        this.position.add(app.keyboard.getKeyDirection().mul(this.speed));
     }
 });
 </script>

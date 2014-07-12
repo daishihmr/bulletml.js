@@ -58,7 +58,7 @@ bulletml.runner.DEFAULT_CONFIG = {
     /** @type {?{x: number, y: number}} */
     target: null,
     /** @type {function(bulletml.runner.Runner,Object)} */
-    createNewBullet: function(runner, spec) {}
+    createNewBullet: function(runner, spec) {},
 };
 
 /**
@@ -285,11 +285,13 @@ bulletml.runner.SubRunner.prototype.fire = function(cmd) {
     var dv = d.value * Math.PI / 180;
     switch(d.type) {
     case "aim":
-        if (this.config.target) {
+        var target = this.config.target;
+        if (target) {
+            if (target instanceof Function) target = target();
             if (cmd.option.autonomy) {
-                bulletRunner.direction = angleAtoB(gunPosition, this.config.target) + dv;
+                bulletRunner.direction = angleAtoB(gunPosition, target) + dv;
             } else {
-                bulletRunner.direction = angleAtoB(this, this.config.target) + dv;
+                bulletRunner.direction = angleAtoB(this, target) + dv;
             }
         } else {
             bulletRunner.direction = dv - Math.PI / 2;
@@ -344,7 +346,9 @@ bulletml.runner.SubRunner.prototype.changeDirection = function(cmd) {
     var t = cmd.term;
     switch (cmd.direction.type) {
     case "aim":
-        this.dirFin = angleAtoB(this, this.config.target) + d;
+        var target = this.config.target;
+        if (target instanceof Function) target = target();
+        this.dirFin = angleAtoB(this, target) + d;
         this.dirIncr = normalizeRadian(this.dirFin - this.direction) / t;
         break;
     case "absolute":
