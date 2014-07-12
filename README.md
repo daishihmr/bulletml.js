@@ -31,10 +31,11 @@ tmlib.jsでBulletMLを利用するためのプラグイン。
 DEMO
 ====
 
-<a href="http://jsdo.it/daishi.hmr/oLN6"><img width="140" src="http://jsdo-it-static-contents.s3.amazonaws.com/images/capture/o/L/N/oLN6.jpg"/></a>
-<a href="http://jsdo.it/daishi.hmr/xPND"><img width="140" src="http://jsdo-it-static-contents.s3.amazonaws.com/images/capture/x/P/N/xPND.jpg"/></a>
-<a href="http://jsdo.it/daishi.hmr/vZxS"><img width="140" src="http://jsdo-it-static-contents.s3.amazonaws.com/images/capture/v/Z/x/vZxS.jpg"/></a>
+[enchant.js使用](http://daishihmr.github.io/bulletml.js/sample/enchantjs.html)
 
+[tmlib.js使用](http://daishihmr.github.io/bulletml.js/sample/tmlib.html)
+
+[独自実装](http://daishihmr.github.io/bulletml.js/sample/originalGameEngine.html)
 
 
 This library is used by ...
