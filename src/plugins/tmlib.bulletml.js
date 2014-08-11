@@ -28,7 +28,7 @@ tm.define("tm.bulletml.Bullet", {
         this.setPosition(this.runner.x, this.runner.y);
         this.runner.onVanish = function() {
             if (this.parent) this.remove();
-        };
+        }.bind(this);
     },
 
     update: function() {
