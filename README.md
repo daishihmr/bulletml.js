@@ -27,6 +27,24 @@ tmlib.bulletml.js
 tmlib.jsでBulletMLを利用するためのプラグイン。
 
 
+CDN
+===
+
+bulletml.min.js
+---------------
+
+https://cdn.rawgit.com/daishihmr/bulletml.js/master/build/bulletml.min.js
+
+bulletml.enchant.js
+-------------------
+
+https://cdn.rawgit.com/daishihmr/bulletml.js/master/build/plugins/bulletml.enchant.js
+
+tmlib.bulletml.js
+-----------------
+
+https://cdn.rawgit.com/daishihmr/bulletml.js/master/build/plugins/tmlib.bulletml.js
+
 
 DEMO
 ====
