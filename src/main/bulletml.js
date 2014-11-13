@@ -10,6 +10,10 @@ var bulletml = {};
 /** @const */
 bulletml.GLOBAL = this;
 
+if (typeof module === 'object') {
+    module.exports = bulletml;
+}
+
 (function() {
     /**
      * @constructor
