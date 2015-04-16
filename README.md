@@ -5,27 +5,35 @@ bulletml.js
 
 enchant.js用プラグイン、tmlib.js用プラグインもあるよ。
 
-bulletml.js
------------
+Modules
+=======
 
-BulletMLをJavaScriptで読み込んでいろいろやるためのライブラリ。
+ - bulletml.js ... BulletMLをJavaScriptで読み込んでいろいろやるためのライブラリ。
+ - bulletml.enchant.js ... enchant.jsでBulletMLを利用するためのプラグイン。
+ - tmlib.bulletml.js ... tmlib.jsでBulletMLを利用するためのプラグイン。
 
+Download
+========
 
+https://github.com/daishihmr/bulletml.js/releases/
+
+CDN site
+========
+
+bulletml.min.js
+---------------
+
+https://cdn.rawgit.com/daishihmr/bulletml.js/master/build/bulletml.min.js
 
 bulletml.enchant.js
 -------------------
 
-enchant.jsでBulletMLを利用するためのプラグイン。
-
-使い方は[wiki](https://github.com/daishihmr/bulletml.js/wiki)を参照。
-
-
+https://cdn.rawgit.com/daishihmr/bulletml.js/master/build/plugins/bulletml.enchant.js
 
 tmlib.bulletml.js
 -----------------
 
-tmlib.jsでBulletMLを利用するためのプラグイン。
-
+https://cdn.rawgit.com/daishihmr/bulletml.js/master/build/plugins/tmlib.bulletml.js
 
 
 DEMO
