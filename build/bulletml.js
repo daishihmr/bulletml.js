@@ -886,7 +886,7 @@ bulletml.GLOBAL = this;
                     return this.next();
                 } else if (n instanceof bulletml.Repeat) {
                     this._localScope.loopCounter = 0;
-                    this._localScope.loopEnd = this._evalParam(n.times)|0;
+                    this._localScope.loopEnd = this._evalParam(n.times);
                     this._pushStack();
                     this._action = n.action.clone();
                     this._localScope = this._cloneScope();
