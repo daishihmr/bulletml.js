@@ -58,6 +58,14 @@ module.exports = function(grunt) {
                 },
                 src: SOURCES,
                 dest: "build/bulletml.js"
+            },
+            node: {
+                options: {
+                    banner: BANNER,
+                    footer: "\nmodule.exports = bulletml;\n"
+                },
+                src: SOURCES,
+                dest: "build/bulletml.node.js"
             }
         },
         uglify: {
