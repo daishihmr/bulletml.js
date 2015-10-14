@@ -1,10 +1,3 @@
-/**
- * @preserve bulletml.js v0.6.0-SNAPSHOT
- *
- * License
- * http://daishihmr.mit-license.org/
- */
-
 /** @namespace */
 var bulletml = {};
 /** @const */

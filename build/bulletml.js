@@ -1,9 +1,9 @@
 /*
- * bulletml.js v0.5.0
+ * bulletml.js v0.5.4
  * https://github.com/daishihmr/bulletml.js
  * 
  * The MIT License (MIT)
- * Copyright © 2014 daishi_hmr, dev7.jp
+ * Copyright © 2015 daishi_hmr, dev7.jp
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the “Software”), to deal in the Software without restriction, including
@@ -23,13 +23,6 @@
  * THE SOFTWARE.
  */
  
-/**
- * @preserve bulletml.js v0.6.0-SNAPSHOT
- *
- * License
- * http://daishihmr.mit-license.org/
- */
-
 /** @namespace */
 var bulletml = {};
 /** @const */

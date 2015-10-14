@@ -13,7 +13,7 @@ var BANNER = "/*\n\
  * https://github.com/daishihmr/bulletml.js\n\
  * \n\
  * The MIT License (MIT)\n\
- * Copyright © 2014 daishi_hmr, dev7.jp\n\
+ * Copyright © 2015 daishi_hmr, dev7.jp\n\
  * \n\
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and\n\
  * associated documentation files (the “Software”), to deal in the Software without restriction, including\n\

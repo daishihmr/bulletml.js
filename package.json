@@ -1,6 +1,6 @@
 {
   "name": "bulletml",
-  "version": "0.5.0",
+  "version": "0.5.4",
   "description": "bulletml.js ===========",
   "main": "build/bulletml.js",
   "scripts": {
