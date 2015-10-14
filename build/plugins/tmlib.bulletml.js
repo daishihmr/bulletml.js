@@ -14,13 +14,11 @@ tm.define("tm.bulletml.Bullet", {
             children: {
                 body: {
                     type: "tm.display.CircleShape",
-                    init: {
-                        width: 10, 
-                        height: 10,
+                    init: [10, 10, {
                         fillStyle: "hsl(0, 80%, 80%)",
                         strokeStyle: "hsl(0, 80%, 50%)",
                         lineWidth: 2
-                    }
+                    }]
                 }
             }
         });

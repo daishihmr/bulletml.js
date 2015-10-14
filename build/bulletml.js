@@ -889,11 +889,14 @@ if (typeof module === 'object') {
                     this._localScope = this._newScope(n.params);
                     return this.next();
                 } else if (n instanceof bulletml.Repeat) {
+                    var count = this._evalParam(n.times);
                     this._localScope.loopCounter = 0;
-                    this._localScope.loopEnd = this._evalParam(n.times);
-                    this._pushStack();
-                    this._action = n.action.clone();
-                    this._localScope = this._cloneScope();
+                    this._localScope.loopEnd = count;
+                    if (count > 0) {
+                        this._pushStack();
+                        this._action = n.action.clone();
+                        this._localScope = this._cloneScope();
+                    }
                     return this.next();
                 } else if (n instanceof bulletml.Fire) {
                     var f = new bulletml.Fire();

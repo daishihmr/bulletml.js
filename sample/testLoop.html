@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset=UTF-8>
+</head>
+<body style="margin:0">
+<script src="../build/bulletml.min.js"></script>
+<script>
+// 弾幕パターンをBulletML DSLで記述
+bulletml.dsl();
+var danmaku1 = new bulletml.Root({
+    top: action([
+        repeat(Infinity, [
+            wait(50),
+            fire(bullet),
+        ]),
+    ]),
+});
+var danmaku3 = new bulletml.Root({
+    top: action([
+        repeat(1, [
+            wait(50),
+            fire(bullet),
+        ]),
+    ]),
+});
+var danmaku2 = new bulletml.Root({
+    top: action([
+        repeat(0, [
+            wait(50),
+            fire(bullet),
+        ]),
+    ]),
+});
+
+// メイン処理
+var SC_W = 200;
+var SC_H = 250;
+window.onload = function() {
+
+    // シーン
+    var scene = new Scene();
+
+
+
+    // 自機
+    var player = new Player().addTo(scene);
+
+
+
+    // 弾幕共通設定
+    var danmakuConfig = {
+
+        // 「自機狙い弾」が狙う対象。つまり自機
+        target: player,
+
+        // 新規に弾が発生した時に呼び出される関数
+        createNewBullet: function(runner, spec) {
+
+            // 引数解説
+            //   runner
+            //     弾の動作を司るオブジェクト
+            //     updateメソッドを呼び出すことにより、BulletMLをステップ実行する
+            //     位置・方向・速度の情報を持つ
+            //   spec
+            //     BulletML内に記述した弾の付加情報
+            //     内容はユーザーが自由に定義することが出来る
+            //     DSL版のみ使用可能
+
+            // 弾オブジェクトを作成
+            var bullet = new Bullet(spec);
+            bullet.x = runner.x;
+            bullet.y = runner.y;
+
+            // 弾の消滅時に呼び出される
+            runner.onVanish = function() {
+                bullet.remove();
+            };
+
+            bullet.update = function() {
+
+                // runnerのupdateを毎フレームで呼び出すと、transformの位置が変化する
+                runner.update();
+
+                // runnerからそのフレームで更新された位置を取り出し、bulletに反映する
+                this.x = runner.x;
+                this.y = runner.y;
+
+                this.areaTest();
+            };
+
+            // 弾オブジェクトをシーンに追加する
+            bullet.addTo(scene);
+        }
+
+    };
+
+
+
+    var enemy1 = new Hex(40, 30, 15, "hsl(250, 60%, 80%)").addTo(scene);
+    enemy1.x = SC_W * 0.25;
+    enemy1.y = SC_H * 0.2;
+    enemy1.runner = danmaku1.createRunner(danmakuConfig);
+    enemy1.update = function(frame) {
+        this.runner.x = this.x;
+        this.runner.y = this.y;
+        this.runner.update();
+    };
+
+    var enemy2 = new Hex(40, 30, 15, "hsl(250, 60%, 80%)").addTo(scene);
+    enemy2.x = SC_W * 0.5;
+    enemy2.y = SC_H * 0.2;
+    enemy2.runner = danmaku2.createRunner(danmakuConfig);
+    enemy2.update = function(frame) {
+        this.runner.x = this.x;
+        this.runner.y = this.y;
+        this.runner.update();
+    };
+
+    var enemy3 = new Hex(40, 30, 15, "hsl(250, 60%, 80%)").addTo(scene);
+    enemy3.x = SC_W * 0.75;
+    enemy3.y = SC_H * 0.2;
+    enemy3.runner = danmaku3.createRunner(danmakuConfig);
+    enemy3.update = function(frame) {
+        this.runner.x = this.x;
+        this.runner.y = this.y;
+        this.runner.update();
+    };
+
+
+    scene.start();
+};
+
+
+
+
+
+
+
+
+
+
+// ここから下はbulletml.jsとは直接関係のないコードです。
+// 独自のゲームエンジンライブラリを使う想定として、最小限の機能を備えたゲームエンジンを作成しています。
+
+
+
+
+
+
+
+
+
+
+
+/** シーンクラス */
+var Scene = function() {
+    var canvas = document.createElement("canvas");
+    document.body.appendChild(canvas);
+    canvas.width = SC_W;
+    canvas.height = SC_H;
+    canvas.fitWindow();
+
+    this.context = canvas.getContext("2d");
+    this.context.textAlign = "right";
+    this.context.textBaseline = "top";
+
+    this.frame = 0;
+
+    this.sceneObjects = [];
+};
+Scene.prototype.start = function() {
+    var renderFrame = function() {
+        this.context.fillStyle = "black";
+        this.context.globalCompositeOperation = "source-over";
+        this.context.fillRect(0, 0, SC_W, SC_H);
+
+        this.context.globalCompositeOperation = "lighter";
+        var copied = [].concat(this.sceneObjects);
+        for (var i = 0, end = copied.length; i < end; i++) {
+            copied[i].update(this.frame);
+            copied[i].draw(this.context);
+        }
+
+        this.context.fillStyle = "white";
+
+        this.frame += 1;
+        requestAnimationFrame(renderFrame);
+    }.bind(this);
+    renderFrame();
+};
+Scene.prototype.addChild = function(obj) {
+    obj.parent = this;
+    this.sceneObjects.push(obj);
+};
+Scene.prototype.removeChild = function(obj) {
+    obj.parent = null;
+    this.sceneObjects.erase(obj);
+};
+
+/** 六角形クラス */
+var Hex = function(w, h, radius, color) {
+    this.radius = radius;
+    this.x = 0;
+    this.y = 0;
+    this.color = color || "hsl(0, 60%, 80%)";
+
+    this.canvas = document.createElement("canvas");
+    this.canvas.width = w*2;
+    this.canvas.height = h*2;
+
+    var context = this.canvas.getContext("2d");
+    context.globalCompositeOperation = "lighter";
+    context.fillStyle = this.color;
+    context.translate(w, h);
+    context.globalAlpha = 1.0;
+    context.fillHex(w, h);
+
+    this.parent = null;
+};
+Hex.prototype = {
+    constructor: Hex,
+    update: function() {},
+    draw: function(context) {
+        context.fillStyle = this.color;
+        context.save();
+        context.translate(this.x, this.y);
+        context.drawImage(this.canvas, -this.canvas.width*.5, -this.canvas.height*.5);
+        context.restore();
+    },
+    addTo: function(parent) {
+        parent.addChild(this);
+        return this;
+    },
+    remove: function() {
+        if (this.parent) this.parent.removeChild(this);
+        return this;
+    }
+};
+
+/** 敵弾クラス */
+var Bullet = function(spec) {
+    Hex.call(this, 8, 8, 2, spec.color);
+};
+Bullet.prototype = Object.create(Hex.prototype);
+Bullet.prototype.areaTest = function() {
+    if (this.x < 0 || SC_W < this.x || this.y < 0 || SC_H < this.y) {
+        this.remove();
+        return;
+    }
+};
+
+/** 自機クラス */
+var Player = function() {
+    Hex.call(this, 10, 10, 5, "hsl(120, 60%, 80%)");
+
+    this.x = SC_W * 0.5;
+    this.y = SC_H * 0.9;
+    this.speed = 1.5;
+};
+Player.prototype = Object.create(Hex.prototype);
+Player.prototype.update = function(frame) {
+    if (keyboard.left) this.x -= this.speed;
+    else if (keyboard.right) this.x += this.speed;
+    if (keyboard.up) this.y -= this.speed;
+    else if (keyboard.down) this.y += this.speed;
+
+    this.x = Math.max(0, Math.min(this.x, SC_W));
+    this.y = Math.max(0, Math.min(this.y, SC_H));
+};
+
+/** キーボード */
+var keyboard = {
+    up: false,
+    down: false,
+    left: false,
+    right: false,
+};
+document.addEventListener("keydown", function(e) {
+    switch (e.keyCode) {
+        case 37: keyboard.left = true; break;
+        case 38: keyboard.up = true; break;
+        case 39: keyboard.right = true; break;
+        case 40: keyboard.down = true; break;
+    }
+}, false);
+document.addEventListener("keyup", function(e) {
+    switch (e.keyCode) {
+        case 37: keyboard.left = false; break;
+        case 38: keyboard.up = false; break;
+        case 39: keyboard.right = false; break;
+        case 40: keyboard.down = false; break;
+    }
+}, false);
+
+Array.prototype.erase = function(obj) {
+    var idx = this.indexOf(obj);
+    if (idx !== -1) this.splice(idx, 1);
+};
+CanvasRenderingContext2D.prototype.fillHex = function(w, h) {
+    this.beginPath();
+    this.moveTo(Math.sin(Math.PI/3 * 0)*w*.5, Math.cos(Math.PI/3 * 0)*h*.5);
+    for (var i = 1; i < 6; i++) {
+        this.lineTo(Math.sin(Math.PI/3 * i)*w*.5, Math.cos(Math.PI/3 * i)*h*.5);
+    }
+    this.closePath();
+    this.fill();
+};
+HTMLCanvasElement.prototype.fitWindow = function() {
+    var resize = function() {
+        var rateWidth = this.width/window.innerWidth;
+        var rateHeight= this.height/window.innerHeight;
+        var rate = this.height/this.width;
+        if (rateWidth > rateHeight) {
+            this.style.width  = innerWidth+"px";
+            this.style.height = innerWidth*rate+"px";
+        } else {
+            this.style.width  = innerHeight/rate+"px";
+            this.style.height = innerHeight+"px";
+        }
+    }.bind(this);
+    window.addEventListener("resize", resize, false);
+    resize();
+};
+</script>
+</body>
+</html>
