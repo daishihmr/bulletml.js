@@ -1248,6 +1248,9 @@ if (typeof module === 'object') {
                         action);
             }
         });
+        attr(element, "option", function(value) {
+           result.option = JSON.parse(value); 
+        });
         result.root = root;
 
         return result;
