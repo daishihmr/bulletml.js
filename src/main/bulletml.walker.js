@@ -26,6 +26,10 @@
          */
         this._localScope = {};
     };
+    /**
+     * return random number[0.0 - 1.0]
+     */
+    bulletml.Walker.random = Math.random;
 
     /**
      * @return {bulletml.Command}
@@ -180,7 +184,7 @@
         } else if (n = bulletml.Walker.globalScope[exp]) {
             return n;
         } else if (exp === "$rand") {
-            return Math.random();
+            return bulletml.Walker.random();
         }
 
         var scope = {};
@@ -194,7 +198,7 @@
                 scope[prop] = this._localScope[prop];
             }
         }
-        scope["$rand"] = Math.random();
+        scope["$rand"] = bulletml.Walker.random();
         var upperScope = this._stack[this._stack.length - 1];
         if (upperScope) {
             scope["$loop"] = {

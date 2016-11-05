@@ -1,16 +1,7 @@
 bulletml.js
 ===========
 
-弾幕記述言語BulletMLをJavaScriptで利用するためのユーティリティ集。
-
-enchant.js用プラグイン、tmlib.js用プラグインもあるよ。
-
-Modules
-=======
-
- - bulletml.js ... BulletMLをJavaScriptで読み込んでいろいろやるためのライブラリ。
- - bulletml.enchant.js ... enchant.jsでBulletMLを利用するためのプラグイン。
- - tmlib.bulletml.js ... tmlib.jsでBulletMLを利用するためのプラグイン。
+JavaScript BulletML library.
 
 Download
 ========
@@ -49,7 +40,7 @@ DEMO
 This library is used by ...
 ============================
 
-<a href="http://tmshooter.net/"><img width="140" src="http://tmshooter.net/tmshooter/glshooter2.png"/></a>
+<a href="http://tmshooter.net/"><img width="140" src="https://raw.githubusercontent.com/daishihmr/glshooter2/master/glshooter2.png"/></a>
 <a href="http://9leap.net/games/2877/"><img src="http://9leap.net/screenshots//140x140/2877_140"/></a>
 <a href="http://9leap.net/games/2995/"><img src="http://9leap.net/screenshots//140x140/2995_140"/></a>
 
@@ -58,27 +49,34 @@ This library is used by ...
 FEATURES
 ========
 
-Parser
+Runner
 ------
 
-従来型の、XMLで記述されたBulletMLをロードして実行することができます
-
 ~~~~javascript
-// enchant.js
-var game = new Game();
-game.preload("bulletml.xml");
-game.onload = function() {
-    var attackPattern = game.assets["bulletml.xml");
+// setup
+var bml = bulletml.buildXML("<bulletml>...</bulletml>");
+var runner = bml.createRunner({
+  target: playerShip, // enemy's attack target (has 'x' and 'y' property)
+  createNewBullet: function(bulletRunner) { // function to be called when new bullet has been fired
+    var bullet = new Bullet();
+    bullet.runner = bulletRunner;
+    scene.addChild(bullet);
+  }
+});
+runner.x = enemy.x;
+runner.y = enemy.y;
+
+enemy.update = function() {
+  // every frame
+  runner.x = this.x;
+  runner.y = this.y;
+  runner.update();
 };
-game.start();
 ~~~~
 
 DSL
 ---
 
-JavaScriptによるDSLで弾幕定義を記述することができます
-
-XMLで書くとこんな弾幕も…
 ~~~~xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE bulletml SYSTEM "http://www.asahi-net.or.jp/~cs8k-cyu/bulletml/bulletml.dtd">
@@ -98,7 +96,6 @@ XMLで書くとこんな弾幕も…
 </bulletml>
 ~~~~
 
-DSLで書くとこんなにスッキリ！
 ~~~~javascript
 var spec = new bulletml.Root({
     top: action([
