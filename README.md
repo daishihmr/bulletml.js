@@ -1,6 +1,8 @@
 bulletml.js
 ===========
 
+[![Join the chat at https://gitter.im/daishihmr/bulletml.js](https://badges.gitter.im/daishihmr/bulletml.js.svg)](https://gitter.im/daishihmr/bulletml.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 JavaScript BulletML library.
 
 Download
