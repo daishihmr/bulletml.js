@@ -54,14 +54,16 @@ FEATURES
 Runner
 ------
 
-~~~~javascript
+~~~~
 // setup
 var bml = bulletml.buildXML("<bulletml>...</bulletml>");
 var runner = bml.createRunner({
   target: playerShip, // enemy's attack target (has 'x' and 'y' property)
   createNewBullet: function(bulletRunner) { // function to be called when new bullet has been fired
     var bullet = new Bullet();
-    bullet.runner = bulletRunner;
+    bullet.update = function() {
+      bulletRunner.update();
+    };
     scene.addChild(bullet);
   }
 });
@@ -79,7 +81,7 @@ enemy.update = function() {
 DSL
 ---
 
-~~~~xml
+~~~~
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE bulletml SYSTEM "http://www.asahi-net.or.jp/~cs8k-cyu/bulletml/bulletml.dtd">
 <bulletml xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
@@ -98,7 +100,7 @@ DSL
 </bulletml>
 ~~~~
 
-~~~~javascript
+~~~~
 var spec = new bulletml.Root({
     top: action([
         repeat(10, [
